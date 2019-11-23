@@ -1,1 +1,1 @@
-Map generator.
+A map generator.
