@@ -237,6 +237,23 @@ public class Polygon2DTest {
 	}
 
 	@Test
+	public void reversed() {
+		List<Point2D> path = new ArrayList<Point2D>();
+		path.add(new Point2D(1, 2));
+		path.add(new Point2D(3, 0));
+		path.add(new Point2D(4, -2));
+		path.add(new Point2D(2, -3));
+		Polygon2D poly = new Polygon2D(path);
+		
+		Polygon2D rev = poly.reversed();
+		
+		assertEquals(path.get(0), rev.vertex(rev.countVertices() - 1));
+		assertEquals(path.get(1), rev.vertex(rev.countVertices() - 2));
+		assertEquals(path.get(2), rev.vertex(rev.countVertices() - 3));
+		assertEquals(path.get(3), rev.vertex(rev.countVertices() - 4));
+	}
+
+	@Test
 	public void isConvex_ForConvexPolygon() {
 		List<Point2D> path = new ArrayList<Point2D>();
 		path.add(new Point2D(1, 2));

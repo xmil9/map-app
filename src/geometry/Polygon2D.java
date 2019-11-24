@@ -76,6 +76,13 @@ public class Polygon2D extends Object {
 		return new LineSegment2D(vertices.get(idx), vertices.get(idx + 1));
 	}
 	
+	public Polygon2D reversed() {
+		Polygon2D rev = new Polygon2D();
+		for (int i = vertices.size() - 1; i >= 0; --i)
+			rev.addVertex(vertex(i).copy());
+		return rev;
+	}
+	
 	public boolean isConvex() {
 		return GeometryUtil.isConvexPath(vertices);
 	}
