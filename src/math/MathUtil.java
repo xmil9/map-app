@@ -141,4 +141,20 @@ public class MathUtil {
 	public static double radiansFromDegrees(double deg) {
 		return deg * Math.PI / 180.0;
 	}
+
+	///////////////
+	
+	public enum Sign {
+		POSITIVE,
+		NEGATIVE,
+		NONE
+	}
+	
+	public static Sign sign(double val) {
+		if (fpGreater(val, 0))
+			return Sign.POSITIVE;
+		else if (fpLess(val, 0))
+			return Sign.NEGATIVE;
+		return Sign.NONE;
+	}
 }

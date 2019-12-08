@@ -194,6 +194,54 @@ public class Polygon2DTest {
 		poly.addVertex(added);
 		assertEquals(added, poly.vertex(0));
 	}
+
+	@Test
+	public void insertVertex_AtBeginning() {
+		List<Point2D> points = new ArrayList<Point2D>();
+		points.add(new Point2D(1, 2));
+		points.add(new Point2D(2, -2));
+		points.add(new Point2D(3, 2));
+		points.add(new Point2D(4, -2));
+		Polygon2D poly = new Polygon2D(points);
+
+		Point2D added = new Point2D(0,  1);
+		poly.insertVertex(added, 0);
+		
+		assertEquals(5, poly.countVertices());
+		assertEquals(added, poly.vertex(0));
+	}
+
+	@Test
+	public void insertVertex_InMiddle() {
+		List<Point2D> points = new ArrayList<Point2D>();
+		points.add(new Point2D(1, 2));
+		points.add(new Point2D(2, -2));
+		points.add(new Point2D(3, 2));
+		points.add(new Point2D(4, -2));
+		Polygon2D poly = new Polygon2D(points);
+
+		Point2D added = new Point2D(0,  1);
+		poly.insertVertex(added, 2);
+		
+		assertEquals(5, poly.countVertices());
+		assertEquals(added, poly.vertex(2));
+	}
+
+	@Test
+	public void insertVertex_AtEnd() {
+		List<Point2D> points = new ArrayList<Point2D>();
+		points.add(new Point2D(1, 2));
+		points.add(new Point2D(2, -2));
+		points.add(new Point2D(3, 2));
+		points.add(new Point2D(4, -2));
+		Polygon2D poly = new Polygon2D(points);
+
+		Point2D added = new Point2D(0,  1);
+		poly.insertVertex(added, 4);
+		
+		assertEquals(5, poly.countVertices());
+		assertEquals(added, poly.vertex(4));
+	}
 	
 	@Test
 	public void countEdges() {
@@ -265,7 +313,7 @@ public class Polygon2DTest {
 	}
 
 	@Test
-	public void isConvex_ForNotConvexPolygon() {
+	public void isConvex_ForConcavePolygon() {
 		List<Point2D> path = new ArrayList<Point2D>();
 		path.add(new Point2D(1, 0));
 		path.add(new Point2D(3, 1));
@@ -274,5 +322,96 @@ public class Polygon2DTest {
 		path.add(new Point2D(0, 5));
 		Polygon2D poly = new Polygon2D(path);
 		assertFalse(poly.isConvex());
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForEmptyPolygon() {
+		Polygon2D poly = new Polygon2D();
+		assertFalse(Polygon2D.isPointInsideConvexPolygon(new Point2D(1, 2), poly));
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForPolygonWithOneVertex() {
+		Polygon2D poly = new Polygon2D(new Point2D(1, 2));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(1, 2), poly));
+		assertFalse(Polygon2D.isPointInsideConvexPolygon(new Point2D(2, 2), poly));
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForPolygonWithTwoVertices() {
+		List<Point2D> path = new ArrayList<Point2D>();
+		path.add(new Point2D(1, 1));
+		path.add(new Point2D(2, 2));
+		Polygon2D poly = new Polygon2D(path);
+		
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(1.5, 1.5), poly));
+		assertFalse(Polygon2D.isPointInsideConvexPolygon(new Point2D(2, 3), poly));
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForCcwConvexPolygon() {
+		List<Point2D> path = new ArrayList<Point2D>();
+		path.add(new Point2D(1, 2));
+		path.add(new Point2D(3, 0));
+		path.add(new Point2D(4, -2));
+		path.add(new Point2D(2, -3));
+		Polygon2D poly = new Polygon2D(path);
+		
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(2, -1), poly));
+		assertFalse(Polygon2D.isPointInsideConvexPolygon(new Point2D(2, 3), poly));
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForCwConvexPolygon() {
+		List<Point2D> path = new ArrayList<Point2D>();
+		path.add(new Point2D(1, 2));
+		path.add(new Point2D(2, -3));
+		path.add(new Point2D(4, -2));
+		path.add(new Point2D(3, 0));
+		Polygon2D poly = new Polygon2D(path);
+		
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(2, -1), poly));
+		assertFalse(Polygon2D.isPointInsideConvexPolygon(new Point2D(2, 3), poly));
+	}
+
+	private static List<Point2D> makeOctagon() {
+		List<Point2D> path = new ArrayList<Point2D>();
+		path.add(new Point2D(6, 8));
+		path.add(new Point2D(8, 8));
+		path.add(new Point2D(10, 6));
+		path.add(new Point2D(10, 4));
+		path.add(new Point2D(8, 2));
+		path.add(new Point2D(6, 2));
+		path.add(new Point2D(4, 4));
+		path.add(new Point2D(4, 6));
+		return path;
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForPointOnEdge() {
+		Polygon2D poly = new Polygon2D(makeOctagon());
+		
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(7, 8), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(9, 7), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(10, 5), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(9, 3), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(7, 2), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(5, 5), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(4, 5), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(5, 7), poly));
+	}
+
+	@Test
+	public void isPointInsideConvexPolygon_ForPointOnVertex() {
+		Polygon2D poly = new Polygon2D(makeOctagon());
+		
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(6, 8), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(8, 8), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(10, 6), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(10, 4), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(8, 2), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(6, 2), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(4, 4), poly));
+		assertTrue(Polygon2D.isPointInsideConvexPolygon(new Point2D(4, 6), poly));
 	}
 }

@@ -120,8 +120,8 @@ public class VoronoiTesselation {
 
 	///////////////
 	
-	// Builds a polygon from an unordered list of edges. Vertices that touch given
-	// border edges are connected along the borders.
+	// Builds a polygon from an unordered list of edges. When vertices that touch given
+	// border edges the polygon is closed along the border.
 	private static class PolygonBuilder {
 		private List<LineSegment2D> edges;
 		private final List<LineSegment2D> borders;
@@ -369,16 +369,12 @@ public class VoronoiTesselation {
 	// Starts the Voronoi tesselation.
 	public List<VoronoiRegion> tesselate() {
 		// Handle some degenerate cases.
-		if (samples.size() == 0) {
-			// Return empty region list.
+		if (samples.size() == 0)
 			return regions;
-		}
-		if (samples.size() == 1) {
+		if (samples.size() == 1)
 			return tesselateWithSingleRegion();
-		}
-		if (samples.size() == 2) {
+		if (samples.size() == 2)
 			return tesselateWithTwoRegions();
-		}
 		
 		// General case for more than three sample points.
 		// - Each sample point is the seed of a Voronoi region.
@@ -466,8 +462,8 @@ public class VoronoiTesselation {
 		Vector2D normal = sampleEdge.direction().ccwNormal();
 		InfiniteLine2D bisection = new InfiniteLine2D(sampleEdge.midPoint(), normal);
 		
-		List<Polygon2D> regionPolys = PolygonLineIntersection2D.convexPolygonLine(
-				makePolygon(border), bisection);
+		List<Polygon2D> regionPolys = ConvexPolygonLineCut2D.cut(makePolygon(border),
+				bisection);
 		if (regionPolys.size() == 2) {
 			// Figure out which polygon belongs to which sample point.
 			boolean isFirstPolyForA = areOnSameSideOf(pa, regionPolys.get(0), bisection);

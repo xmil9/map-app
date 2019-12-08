@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import math.MathUtil;
+
 
 // A closed polygon shape.
 public class Polygon2D extends Object {
@@ -64,6 +66,10 @@ public class Polygon2D extends Object {
 		vertices.add(pt);
 	}
 	
+	public void insertVertex(Point2D pt, int idx) {
+		vertices.add(idx, pt);
+	}
+	
 	public int countEdges() {
 		if (vertices.size() == 1)
 			return 0;
@@ -85,5 +91,48 @@ public class Polygon2D extends Object {
 	
 	public boolean isConvex() {
 		return GeometryUtil.isConvexPath(vertices);
+	}
+
+	// Checks whether a given point is inside a given convex polygon. Points on the
+	// polygon's edges are considered 'inside'.
+	public static boolean isPointInsideConvexPolygon(Point2D pt, Polygon2D poly) {
+		// Special cases.
+		if (poly.countVertices() == 0)
+			return false;
+		if (poly.countVertices() == 1)
+			return poly.vertex(0).equals(pt);
+
+		// If the point is inside the convex polygon all vectors between the point
+		// and the vertices of the polygon must wind around the point in a continuous
+		// cw or ccw manner, i.e. the orientation between vectors will not change
+		// from cw to ccw or vice-versa. We have to also detect if the points is
+		// on one of the polygon's edges.
+		MathUtil.Sign polyOrientation = MathUtil.Sign.NONE;
+		
+		int numVert = poly.countVertices();
+		for (int i = 0; i < numVert; ++i) {
+			Vector2D v = new Vector2D(pt, poly.vertex(i));
+			int next = (i < numVert - 1) ? i + 1 : 0;
+			Vector2D w = new Vector2D(pt, poly.vertex(next));
+			
+			MathUtil.Sign curOrientation = MathUtil.sign(v.perpDot(w));
+
+			if (curOrientation == MathUtil.Sign.NONE &&
+					poly.edge(i).isPointOnLine(pt).isOnLine) {
+				// The point is on an edge.
+				return true;
+			}
+
+			if (polyOrientation == MathUtil.Sign.NONE) {
+				// Init orientation of polygon.
+				polyOrientation = curOrientation;
+			} else if (polyOrientation != curOrientation) {
+				// Change in orientation - point is outside.
+				return false;
+			}
+		}
+
+		// No changes in orientation - point is inside.
+		return true;
 	}
 }

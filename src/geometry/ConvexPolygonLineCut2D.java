@@ -6,15 +6,15 @@ import java.util.List;
 import math.MathUtil;
 
 
-public class PolygonLineIntersection2D {
+public class ConvexPolygonLineCut2D {
 
 	// Sides that a point can be on relative to a line.
 	private enum Side {
 		NONE, LEFT, RIGHT, CENTER;
 	}
 	
-	// Intersects a convex polygon with an infinite line.
-	public static List<Polygon2D> convexPolygonLine(Polygon2D poly, InfiniteLine2D l) {
+	// Cuts a convex polygon with an infinite line.
+	public static List<Polygon2D> cut(Polygon2D poly, InfiniteLine2D l) {
 		List<Polygon2D> res = new ArrayList<Polygon2D>();
 		
 		// Create the output polygons.
@@ -29,7 +29,7 @@ public class PolygonLineIntersection2D {
 		Side prevSide = Side.NONE;
 		
 		// Place the polygon vertices into two separate polygons depending on whether
-		// a vertex is left or right of the intersecting line.
+		// a vertex is left or right of the cut line.
 		for (int i = 0; i < poly.countVertices(); ++i) {
 			Point2D pt = poly.vertex(i);
 
