@@ -239,4 +239,30 @@ public class Rect2DTest {
 		assertEquals(4.0, r.right(), 0.0);
 		assertEquals(6.0, r.bottom(), 0.0);
 	}
+
+	@Test
+	public void isPointInRect_ForPointInside() {
+		Rect2D r = new Rect2D(-1, -2, 5, 7);
+		assertTrue(r.isPointInRect(new Point2D(2, 4)));
+		assertTrue(r.isPointInRect(new Point2D(3, -1)));
+		assertTrue(r.isPointInRect(new Point2D(-0.2, 6)));
+	}
+
+	@Test
+	public void isPointInRect_ForPointOutside() {
+		Rect2D r = new Rect2D(-1, -2, 5, 7);
+		assertFalse(r.isPointInRect(new Point2D(-2, 4)));
+		assertFalse(r.isPointInRect(new Point2D(0, -4)));
+		assertFalse(r.isPointInRect(new Point2D(8, 4)));
+		assertFalse(r.isPointInRect(new Point2D(3, 10)));
+	}
+
+	@Test
+	public void isPointInRect_ForPointOnEdge() {
+		Rect2D r = new Rect2D(-1, -2, 5, 7);
+		assertTrue(r.isPointInRect(new Point2D(2, -2)));
+		assertTrue(r.isPointInRect(new Point2D(5, 2)));
+		assertTrue(r.isPointInRect(new Point2D(0, 7)));
+		assertTrue(r.isPointInRect(new Point2D(-1, 1)));
+	}
 }

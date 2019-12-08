@@ -126,6 +126,14 @@ public class Rect2D extends Object {
 		top -= by;
 		bottom += by;
 	}
+
+	// Checks if a given point is in the rect (inside or on the rect).
+	public boolean isPointInRect(Point2D pt) {
+		return MathUtil.fpGreaterEqual(pt.x, left) &&
+				MathUtil.fpLessEqual(pt.x, right) &&
+				MathUtil.fpGreaterEqual(pt.y, top) && 
+				MathUtil.fpLessEqual(pt.y, bottom);
+	}
 	
 	private void normalize() {
 		if (left > right) {
