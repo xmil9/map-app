@@ -36,7 +36,7 @@ public class VoronoiTesselation {
 			Point2D ea = edge.endPoint();
 			Point2D sb = e.startPoint();
 			Point2D eb = e.endPoint();
-			return (sa.equals(sb) && ea.equals(eb)) &&
+			return (sa.equals(sb) && ea.equals(eb)) ||
 					(sa.equals(eb) && ea.equals(sb));
 		}
 
@@ -50,7 +50,12 @@ public class VoronoiTesselation {
 		// Creates a Voronoi edge between two given Delauney triangles.
 		private static Line2D makeVoronoiEdgeBetweenTriangles(
 				DelauneyTriangle a, DelauneyTriangle b) {
-			return new LineSegment2D(a.circumcenter(), b.circumcenter());
+			Point2D ca = a.circumcenter();
+			Point2D cb = b.circumcenter();
+			if (!ca.equals(cb))
+				return new LineSegment2D(ca, cb);
+			// Degenerate edge.
+			return null;
 		}
 		
 		// Creates a Voronoi edge for a given Delauney edge that only has one
@@ -84,14 +89,17 @@ public class VoronoiTesselation {
 		// Generates Voronoi edges for the collection of Delauney edges.
 		public List<Line2D> makeVoronoiEdges() {
 			List<Line2D> voronoiEdges = new ArrayList<Line2D>();
-			for (DelauneyEdge de : edges)
-				voronoiEdges.add(de.makeVoronoiEdge());
+			for (DelauneyEdge de : edges) {
+				Line2D ve = de.makeVoronoiEdge();
+				if (ve != null)
+					voronoiEdges.add(ve);
+			}
 			return voronoiEdges;
 		}
 		
 		// Returns the index of a given edge it it is in the collection or null.
 		private int findEdge(LineSegment2D edge) {
-			for (int i = 0; i < edges.size() - 1; ++i)
+			for (int i = 0; i < edges.size(); ++i)
 				if (edges.get(i).isEdge(edge))
 					return i;
 			return -1;
@@ -178,7 +186,7 @@ public class VoronoiTesselation {
 				// Process the given start edge first.
 				Line2D startEdge = endEdges.get(0);
 				vertices.add(calcDistantPoint(startEdge));
-				nextEdge = findNextEdge(startEdge);
+				nextEdge = findNextEdge(startEdge.startPoint());
 			} else {
 				// We can start with any edges. Use the first one.
 				nextEdge = edges.get(0);
@@ -188,7 +196,7 @@ public class VoronoiTesselation {
 			// Concatenate the edges and store each start point. 
 			while (nextEdge != null) {
 				vertices.add(nextEdge.startPoint());
-				nextEdge = findNextEdge(nextEdge);
+				nextEdge = findNextEdge(nextEdge.endPoint());
 			}
 
 			// Append the end points of the given end edge.
@@ -208,8 +216,9 @@ public class VoronoiTesselation {
 		}
 		
 		// Finds the edge that connects to a given previous edge.
-		private Line2D findNextEdge(Line2D prevEdge) {
-			Point2D connector = prevEdge.endPoint();
+		private Line2D findNextEdge(Point2D connector) {
+			if (connector == null)
+				return null;
 			
 			int edgeIdx = findEndpoint(connector, -1); 
 			if (edgeIdx == -1)

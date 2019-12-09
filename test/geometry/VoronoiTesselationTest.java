@@ -101,6 +101,24 @@ public class VoronoiTesselationTest {
 	}
 
 	@Test
+	public void tesselate_ForThreePoints() {
+		// Very special case! The circum-center of the single Delauney
+		// triangle lies outside the border bounds. This causes some
+		// special situations in the code that find the Voronoi edges.
+		Set<Point2D> samples = new HashSet<Point2D>();
+		samples.add(new Point2D(1, 2));
+		samples.add(new Point2D(2, 4));
+		samples.add(new Point2D(-2, 1.4));
+		VoronoiTesselation vt = new VoronoiTesselation(samples);
+		List<VoronoiRegion> regions = vt.tesselate();
+		
+		assertTrue(regions.size() == 3);
+		assertTrue(regions.get(0).countVertices() == 5);
+		assertTrue(regions.get(1).countVertices() == 3);
+		assertTrue(regions.get(2).countVertices() == 4);
+	}
+
+	@Test
 	public void tesselate_ForThreePointsWithBorder() {
 		Set<Point2D> samples = new HashSet<Point2D>();
 		samples.add(new Point2D(1, 2));
@@ -117,20 +135,37 @@ public class VoronoiTesselationTest {
 	}
 
 	@Test
-	public void tesselate_ForThreePointsWithBoundingBorder() {
-		// Very special case! The circum-center of the single Delauney
-		// triangle lies outside the border bounds. This causes some
-		// special situations in the code that find the Voronoi edges.
+	public void tesselate_ForRect() {
 		Set<Point2D> samples = new HashSet<Point2D>();
-		samples.add(new Point2D(1, 2));
-		samples.add(new Point2D(2, 4));
-		samples.add(new Point2D(-2, 1.4));
+		samples.add(new Point2D(-1, -2));
+		samples.add(new Point2D(-1, 3));
+		samples.add(new Point2D(5, 3));
+		samples.add(new Point2D(5, -2));
 		VoronoiTesselation vt = new VoronoiTesselation(samples);
 		List<VoronoiRegion> regions = vt.tesselate();
 		
-		assertTrue(regions.size() == 3);
-		assertTrue(regions.get(0).countVertices() == 5);
-		assertTrue(regions.get(1).countVertices() == 3);
+		assertTrue(regions.size() == 4);
+		assertTrue(regions.get(0).countVertices() == 4);
+		assertTrue(regions.get(1).countVertices() == 4);
 		assertTrue(regions.get(2).countVertices() == 4);
+		assertTrue(regions.get(3).countVertices() == 4);
+	}
+
+	@Test
+	public void tesselate_ForRectWithBorder() {
+		Set<Point2D> samples = new HashSet<Point2D>();
+		samples.add(new Point2D(-1, -2));
+		samples.add(new Point2D(-1, 3));
+		samples.add(new Point2D(5, 3));
+		samples.add(new Point2D(5, -2));
+		Rect2D border = new Rect2D(-10, -10, 10, 10);
+		VoronoiTesselation vt = new VoronoiTesselation(samples, border);
+		List<VoronoiRegion> regions = vt.tesselate();
+		
+		assertTrue(regions.size() == 4);
+		assertTrue(regions.get(0).countVertices() == 4);
+		assertTrue(regions.get(1).countVertices() == 4);
+		assertTrue(regions.get(2).countVertices() == 4);
+		assertTrue(regions.get(3).countVertices() == 4);
 	}
 }

@@ -28,10 +28,11 @@ public class App extends Application {
 	private Scene makeMapScene() {
 		MapScene map = new MapScene(500, 400);
 
-		Set<Point2D> points = new HashSet<Point2D>();
-		points.add(new Point2D(1, 2));
-		points.add(new Point2D(2, 4));
-		points.add(new Point2D(-2, 1.4));
+		Set<Point2D> samples = new HashSet<Point2D>();
+		samples.add(new Point2D(-1, -2));
+		samples.add(new Point2D(-1, 3));
+		samples.add(new Point2D(5, 3));
+		samples.add(new Point2D(5, -2));
 //		points.add(new Point2D(10, 10));
 //		points.add(new Point2D(100, 100));
 //		points.add(new Point2D(27, 67));
@@ -42,17 +43,16 @@ public class App extends Application {
 //		points.add(new Point2D(75, 56));
 //		points.add(new Point2D(22, 93));
 
-//		DelauneyTriangulation delauney = new DelauneyTriangulation(points);
+//		DelauneyTriangulation delauney = new DelauneyTriangulation(samples);
 //		List<Triangle2D> triangles = delauney.triangulate();
-//		map.addTriangles(triangles, Color.web("orange", 1.0));
+//		map.addTriangles(triangles, Color.web("black", 1.0));
 
-		Rect2D bounds = new Rect2D(-2, 1.4, 2, 4);
-		//Rect2D bounds = new Rect2D(-3, -1, 4, 5);
+		Rect2D bounds = new Rect2D(-10, -10, 10, 10);
 		List<Rect2D> rects = new ArrayList<Rect2D>();
 		rects.add(bounds);
 		map.addRects(rects, Color.web("blue", 1.0));
 		
-		VoronoiTesselation voronoi = new VoronoiTesselation(points/*, bounds*/);
+		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiRegion> regions = voronoi.tesselate();
 		
 		List<Polygon2D> polys = new ArrayList<Polygon2D>();
@@ -61,7 +61,7 @@ public class App extends Application {
 		map.addPolygons(polys, Color.web("red", 1.0));
 
 		List<Point2D> ptList = new ArrayList<Point2D>();
-		for (Point2D pt : points)
+		for (Point2D pt : samples)
 			ptList.add(pt);
 		map.addPoints(ptList, Color.web("red", 1.0));
 		
