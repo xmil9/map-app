@@ -41,46 +41,28 @@ public class VoronoiTesselation {
 		}
 
 		// Creates a Voronoi edge for this edge.
-		public LineSegment2D makeVoronoiEdge(List<LineSegment2D> borders)
-				throws GeometryException {
-			if (triangles[1] == null) {
-				return makeVoronoiEdgeToBorder(edge, triangles[0], borders);
-			}
+		public Line2D makeVoronoiEdge() {
+			if (triangles[1] == null)
+				return makeInfiniteVoronoiEdge(edge, triangles[0]);
 			return makeVoronoiEdgeBetweenTriangles(triangles[0], triangles[1]);
 		}
 		
 		// Creates a Voronoi edge between two given Delauney triangles.
-		private static LineSegment2D makeVoronoiEdgeBetweenTriangles(
+		private static Line2D makeVoronoiEdgeBetweenTriangles(
 				DelauneyTriangle a, DelauneyTriangle b) {
 			return new LineSegment2D(a.circumcenter(), b.circumcenter());
 		}
 		
-		// Creates a Voronoi edge for a given Delauney edge that is only part of
-		// one Delauney triangle.
-		private static LineSegment2D makeVoronoiEdgeToBorder(LineSegment2D delauneyEdge,
-				DelauneyTriangle triangle, List<LineSegment2D> borders)
-						throws GeometryException {
+		// Creates a Voronoi edge for a given Delauney edge that only has one
+		// adjacent Delauney triangle.
+		private static Line2D makeInfiniteVoronoiEdge(LineSegment2D delauneyEdge,
+				DelauneyTriangle triangle) {
 			// The cirumcenter of the triangle is the start point of the Voronoi
-			// edge and the edge travels in the direction away from the triangle
-			// until it meets a border edge. Since the triangle is oriented ccw,
-			// a cw normal to any of its edges points away from it.
-			LineRay2D bisector = new LineRay2D(triangle.circumcenter(),
+			// edge and the edge travels in the direction away from the triangle.
+			// Since the triangle is oriented ccw, a cw normal to any of its edges
+			// points away from it.
+			return new LineRay2D(triangle.circumcenter(),
 					delauneyEdge.direction().cwNormal());
-
-			Point2D borderPt = null;
-			
-			for (LineSegment2D borderEdge : borders) {
-				LineIntersection2D.Result res =
-						LineIntersection2D.intersect(borderEdge, bisector);
-				if (res.type == LineIntersection2D.IntersectionType.POINT)
-					borderPt = (Point2D) res.intersection;
-			}
-			
-			if (borderPt == null) {
-				throw new GeometryException(
-						"Failed to find intersection of Voronoi edge with border.");
-			}
-			return new LineSegment2D(triangle.circumcenter(), borderPt);
 		}
 	}
 	
@@ -91,8 +73,7 @@ public class VoronoiTesselation {
 		private List<DelauneyEdge> edges = new ArrayList<DelauneyEdge>();
 		
 		// Adds an edge to the collection.
-		public void addEdge(LineSegment2D edge,
-				DelauneyTriangle t) {
+		public void addEdge(LineSegment2D edge, DelauneyTriangle t) {
 			int pos = findEdge(edge);
 			if (pos != -1)
 				edges.get(pos).addTriangle(t);
@@ -101,11 +82,10 @@ public class VoronoiTesselation {
 		}
 		
 		// Generates Voronoi edges for the collection of Delauney edges.
-		public List<LineSegment2D> makeVoronoiEdges(List<LineSegment2D> borders)
-				throws GeometryException {
-			List<LineSegment2D> voronoiEdges = new ArrayList<LineSegment2D>();
+		public List<Line2D> makeVoronoiEdges() {
+			List<Line2D> voronoiEdges = new ArrayList<Line2D>();
 			for (DelauneyEdge de : edges)
-				voronoiEdges.add(de.makeVoronoiEdge(borders));
+				voronoiEdges.add(de.makeVoronoiEdge());
 			return voronoiEdges;
 		}
 		
@@ -120,77 +100,58 @@ public class VoronoiTesselation {
 
 	///////////////
 	
-	// Builds a polygon from an unordered list of edges. When vertices that touch given
-	// border edges the polygon is closed along the border.
+	// Builds a polygon from an unordered list of edges. Clips polygon at given bounds.
 	private static class PolygonBuilder {
-		private List<LineSegment2D> edges;
-		private final List<LineSegment2D> borders;
+		private List<Line2D> edges;
+		private final Polygon2D clip;
 		
-		public PolygonBuilder(List<LineSegment2D> edges, List<LineSegment2D> borders)
-				throws GeometryException {
-			if (edges.size() < 2) {
-				throw new GeometryException(
-						"PolygonBuilder is expecting two or more edges.");
-			}
+		public PolygonBuilder(List<Line2D> edges, Rect2D clipBounds) {
 			this.edges = copyEdges(edges);
-			this.borders = borders;
+			this.clip = makePolygon(clipBounds);
 		}
 		
 		// Builds the polygon.
-		public Polygon2D build() throws GeometryException {
-			List<Point2D> orderedVertices = createVertexSequence();
-			return new Polygon2D(orderedVertices);
+		public Polygon2D build() {
+			Polygon2D unclipped = new Polygon2D(createVertexSequence());
+			return ConvexPolygonIntersection2D.intersect(unclipped, clip);
 		}
 		
 		// Creates a deep copy of a given list of edges.
-		private static List<LineSegment2D> copyEdges(List<LineSegment2D> src) {
-			List<LineSegment2D> copy = new ArrayList<LineSegment2D>();
-			for (LineSegment2D e : src)
-				copy.add((LineSegment2D) e.copy());
+		private static List<Line2D> copyEdges(List<Line2D> src) {
+			List<Line2D> copy = new ArrayList<Line2D>();
+			for (Line2D e : src)
+				copy.add((Line2D) e.copy());
 			return copy;
 		}
 		
 		// Returns an order list of vertices that results from connecting the
 		// available edges.
-		private List<Point2D> createVertexSequence() throws GeometryException {
+		private List<Point2D> createVertexSequence() {
 			if (edges.isEmpty())
 				return new ArrayList<Point2D>();
 			
-			List<LineSegment2D> endEdges = findEndEdges();
+			List<Line2D> endEdges = findEndEdges();
 			List<Point2D> vertices = orderEdges(endEdges);
-			
-			boolean isOpenPath = endEdges.size() > 0; 
-			if (isOpenPath)
-				closeWithBorder(vertices);
 			
 			return vertices;
 		}
 		
 		// Returns those edges from a given list that do not connect to an other
-		// edge at one of their endpoints. Orders the points of the returned edges
-		// so that they form the first and last edge of a polygon.
-		private List<LineSegment2D> findEndEdges() throws GeometryException {
-			List<LineSegment2D> res = new ArrayList<LineSegment2D>();
+		// edge at one of their endpoints.
+		private List<Line2D> findEndEdges() {
+			List<Line2D> res = new ArrayList<Line2D>();
 			
-			int numFound = 0;
 			// Keep track of found edge objects so that we can delete them later.
-			LineSegment2D foundEdges[] = new LineSegment2D[] {null, null};
+			int numFound = 0;
+			Line2D foundEdges[] = new Line2D[] {null, null};
 			
 			for (int i = 0; i < edges.size(); ++i) {
-				Point2D start = edges.get(i).startPoint();
-				Point2D end = edges.get(i).endPoint();
-				boolean isStartEdge = (numFound == 0);
-				
-				if (findEndpoint(start, i) == -1) {
-					res.add(new LineSegment2D(isStartEdge ? start : end,
-							isStartEdge ? end : start));
-					foundEdges[numFound++] = edges.get(i);
-				} else if (findEndpoint(end, i) == -1) {
-					res.add(new LineSegment2D(isStartEdge ? end : start,
-							isStartEdge ? start : end));
-					foundEdges[numFound++] = edges.get(i);
-				}
-				
+				Line2D e = edges.get(i);
+				if (!e.hasEndPoint()) {
+					res.add(e);
+					foundEdges[numFound++] = e;
+				}					
+					
 				// We can stop after we found two.
 				if (numFound > 1)
 					break;
@@ -201,22 +162,23 @@ public class VoronoiTesselation {
 				if (foundEdges[i] != null)
 					edges.remove(foundEdges[i]);
 			}
-			
-			// There should be either two or no edges.
-			if (res.size() != 0 && res.size() != 2)
-				throw new GeometryException(
-						"Unexpected number of open edges in Voronoi region.");
+
 			return res;
 		}
 		
 		// Orders the available edges. Uses given edges at start and end.
-		private List<Point2D> orderEdges(List<LineSegment2D> endEdges) {
-			boolean isOpenPath = !endEdges.isEmpty();
+		private List<Point2D> orderEdges(List<Line2D> endEdges) {
+			// There should be either zero or two end edges.
+			boolean isOpenPath = endEdges.size() == 2;
 			
-			LineSegment2D nextEdge = null;
+			List<Point2D> vertices = new ArrayList<Point2D>();
+
+			Line2D nextEdge = null;
 			if (isOpenPath) {
-				// Use the given start edge.
-				nextEdge = endEdges.get(0);
+				// Process the given start edge first.
+				Line2D startEdge = endEdges.get(0);
+				vertices.add(calcDistantPoint(startEdge));
+				nextEdge = findNextEdge(startEdge);
 			} else {
 				// We can start with any edges. Use the first one.
 				nextEdge = edges.get(0);
@@ -224,7 +186,6 @@ public class VoronoiTesselation {
 			}
 			
 			// Concatenate the edges and store each start point. 
-			List<Point2D> vertices = new ArrayList<Point2D>();
 			while (nextEdge != null) {
 				vertices.add(nextEdge.startPoint());
 				nextEdge = findNextEdge(nextEdge);
@@ -233,75 +194,33 @@ public class VoronoiTesselation {
 			// Append the end points of the given end edge.
 			if (isOpenPath) {
 				vertices.add(endEdges.get(1).startPoint());
-				vertices.add(endEdges.get(1).endPoint());
+				vertices.add(calcDistantPoint(endEdges.get(1)));
 			}
 			
 			return vertices;
 		}
 		
-		// Closes an open path by connecting it to border edges.
-		private void closeWithBorder(List<Point2D> vertices) {
-			Point2D firstPt = vertices.get(0);
-			Point2D lastPt = vertices.get(vertices.size() - 1);
-			LineSegment2D startBorder = findBorder(firstPt);
-			LineSegment2D endBorder = findBorder(lastPt);
-			
-			if (startBorder.equals(endBorder)) {
-				// Nothing to do. The polygon automatically connects the first and
-				// last points in a straight line.
-			} else {
-				LineIntersection2D.Result isect =
-						LineIntersection2D.intersect(startBorder, endBorder);
-				if (isect.type == LineIntersection2D.IntersectionType.POINT) {
-					// Neighboring border edges. Add their corner point as vertex.
-					// However, if one of the path points lies exactly on the
-					// corner, then we don't need to add the corner.
-					Point2D corner = (Point2D) isect.intersection;
-					if (!corner.equals(firstPt) && !corner.equals(lastPt))
-						vertices.add(corner);
-				} else if (isect.type == LineIntersection2D.IntersectionType.NONE) {
-					// The border edges are parallel. We need to connect the path
-					// points across three border edges. Find the two border corners
-					// that form a convex polygon with the rest of the path.
-					int numPts = vertices.size();
-					if (areConvex(vertices.get(numPts - 3),
-							vertices.get(numPts - 2), lastPt, endBorder.startPoint()))
-						vertices.add(endBorder.startPoint());
-					else
-						vertices.add(endBorder.endPoint());
-
-					if (areConvex(vertices.get(2), vertices.get(1),
-							firstPt, startBorder.startPoint()))
-						vertices.add(startBorder.startPoint());
-					else
-						vertices.add(startBorder.endPoint());
-				}
-			}
-		}
-		
-		// Checks if the given points form a convex path.
-		private boolean areConvex(Point2D a, Point2D b, Point2D c, Point2D d) {
-			List<Point2D> path = new ArrayList<Point2D>();
-			path.add(a);
-			path.add(b);
-			path.add(c);
-			path.add(d);
-			return GeometryUtil.isConvexPath(path);
+		// Returns a point far past the end point of a given line.
+		private static Point2D calcDistantPoint(Line2D edge) {
+			final double DIST = 100000;
+			Vector2D normedDir = edge.direction().normalize();
+			return edge.startPoint().offset(normedDir.scale(DIST));
 		}
 		
 		// Finds the edge that connects to a given previous edge.
-		private LineSegment2D findNextEdge(LineSegment2D prevEdge) {
+		private Line2D findNextEdge(Line2D prevEdge) {
 			Point2D connector = prevEdge.endPoint();
 			
-			int pos = findEndpoint(connector, -1); 
-			if (pos == -1)
+			int edgeIdx = findEndpoint(connector, -1); 
+			if (edgeIdx == -1)
 				return null;
 
-			LineSegment2D e = edges.get(pos); 
-			edges.remove(pos);
+			Line2D e = edges.get(edgeIdx); 
+			edges.remove(edgeIdx);
 			
+			// Make sure the end points of the edge are in the correct order.
 			if (connector.equals(e.startPoint()))
-				return (LineSegment2D) e.copy();
+				return e.copy();
 			// Flip the found edge.
 			return new LineSegment2D(e.endPoint(), e.startPoint());
 		}
@@ -318,15 +237,6 @@ public class VoronoiTesselation {
 			}
 			return -1;
 		}
-		
-		// Returns the border edge that a given point belongs to.
-		private LineSegment2D findBorder(Point2D pt) {
-			for (LineSegment2D borderEdge : borders) {
-				if (borderEdge.isPointOnLine(pt).isOnLine)
-					return borderEdge;
-			}
-			return null;
-		}
 	}
 	
 	///////////////
@@ -336,15 +246,11 @@ public class VoronoiTesselation {
 	// Border around the sample points. Used to terminate Voronoi edges that
 	// would extend to infinity.
 	private final Rect2D border;
-	// Edges of border.
-	private final List<LineSegment2D> borderEdges;
 	// List of regions generated by the the tesselation.
 	private List<VoronoiRegion> regions = new ArrayList<VoronoiRegion>();
 	// Triangles of the Delauney triangulation. A by-product of the tesselation
 	// that can be useful, e.g. for debugging.
 	private List<Triangle2D> triangulation;
-	// Error log.
-	private List<String> log = new ArrayList<String>();
 
 	
 	// Construct from points with the bounding box of the points as border.
@@ -363,7 +269,6 @@ public class VoronoiTesselation {
 	public VoronoiTesselation(Set<Point2D> samplePoints, Rect2D border) {
 		samples = new ArrayList<Point2D>(samplePoints);
 		this.border = border;
-		borderEdges = calcBorderEdges(border);
 	}
 
 	// Starts the Voronoi tesselation.
@@ -394,18 +299,12 @@ public class VoronoiTesselation {
 				delauneyTriangulation();
 		
 		for (Point2D sample : samples) {
-			try {
-				DelauneyEdgeCollection delauneyEdges = collectDelauneyEdges(sample,
-						delauneyTriangles);
-				List<LineSegment2D> voronoiEdges =
-						delauneyEdges.makeVoronoiEdges(borderEdges);
-				
-				regions.add(new VoronoiRegion(sample,
-						makePolygon(voronoiEdges, borderEdges)));
-			} catch (GeometryException e) {
-				log.add("Skipped region for sample point " + sample.toString() +
-						": " + e.getMessage());
-			}
+			DelauneyEdgeCollection delauneyEdges =
+					collectDelauneyEdges(sample, delauneyTriangles);
+			List<Line2D> voronoiEdges = delauneyEdges.makeVoronoiEdges();
+			
+			regions.add(new VoronoiRegion(sample, makePolygon(voronoiEdges,
+					border)));
 		}
 		
 		return regions;
@@ -421,16 +320,6 @@ public class VoronoiTesselation {
 		Rect2D border = GeometryUtil.calcBoundingBox(points);
 		border.inflate(offset);
 		return border;
-	}
-	
-	// Calculates border edges at a given offset around a given list of points.
-	private static List<LineSegment2D> calcBorderEdges(Rect2D border) {
-		List<LineSegment2D> res = new ArrayList<LineSegment2D>();
-		res.add(new LineSegment2D(border.leftTop(), border.rightTop()));
-		res.add(new LineSegment2D(border.rightTop(), border.rightBottom()));
-		res.add(new LineSegment2D(border.rightBottom(), border.leftBottom()));
-		res.add(new LineSegment2D(border.leftBottom(), border.leftTop()));
-		return res;
 	}
 	
 	// Degenerate tesselation with a single region.
@@ -506,9 +395,8 @@ public class VoronoiTesselation {
 	}
 	
 	// Creates a polygon from given unordered edges.
-	private static Polygon2D makePolygon(List<LineSegment2D> edges,
-			List<LineSegment2D> borders) throws GeometryException {
-		PolygonBuilder builder = new PolygonBuilder(edges, borders);
+	private static Polygon2D makePolygon(List<Line2D> edges, Rect2D borderBounds) {
+		PolygonBuilder builder = new PolygonBuilder(edges, borderBounds);
 		return builder.build();
 	}
 
@@ -516,9 +404,9 @@ public class VoronoiTesselation {
 	private static Polygon2D makePolygon(Rect2D r) {
 		Polygon2D poly = new Polygon2D();
 		poly.addVertex(r.leftTop());
-		poly.addVertex(r.rightTop());
-		poly.addVertex(r.rightBottom());
 		poly.addVertex(r.leftBottom());
+		poly.addVertex(r.rightBottom());
+		poly.addVertex(r.rightTop());
 		return poly;
 	}
 	

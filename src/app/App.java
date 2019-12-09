@@ -47,6 +47,7 @@ public class App extends Application {
 //		map.addTriangles(triangles, Color.web("orange", 1.0));
 
 		Rect2D bounds = new Rect2D(-2, 1.4, 2, 4);
+		//Rect2D bounds = new Rect2D(-3, -1, 4, 5);
 		List<Rect2D> rects = new ArrayList<Rect2D>();
 		rects.add(bounds);
 		map.addRects(rects, Color.web("blue", 1.0));

@@ -118,6 +118,9 @@ public class VoronoiTesselationTest {
 
 	@Test
 	public void tesselate_ForThreePointsWithBoundingBorder() {
+		// Very special case! The circum-center of the single Delauney
+		// triangle lies outside the border bounds. This causes some
+		// special situations in the code that find the Voronoi edges.
 		Set<Point2D> samples = new HashSet<Point2D>();
 		samples.add(new Point2D(1, 2));
 		samples.add(new Point2D(2, 4));
@@ -126,8 +129,8 @@ public class VoronoiTesselationTest {
 		List<VoronoiRegion> regions = vt.tesselate();
 		
 		assertTrue(regions.size() == 3);
-		assertTrue(regions.get(0).countVertices() == 4);
-		assertTrue(regions.get(1).countVertices() == 4);
-		assertTrue(regions.get(2).countVertices() == 5);
+		assertTrue(regions.get(0).countVertices() == 5);
+		assertTrue(regions.get(1).countVertices() == 3);
+		assertTrue(regions.get(2).countVertices() == 4);
 	}
 }
