@@ -52,4 +52,10 @@ public class Point2D extends Object {
 	public Point2D offset(Vector2D v) {
 		return offset(v.x, v.y);
 	}
+	
+	public static double distanceSquared(Point2D a, Point2D b) {
+		double dx = b.x - a.x;
+		double dy = b.y - a.y;
+		return dx * dx + dy * dy;
+	}
 }

@@ -9,10 +9,12 @@ public class DelauneyTriangle extends Object {
 	
 	private final Triangle2D triangle;
 	private final Circle2D circumcircle;
+	private final Rect2D bounds;
 	
 	DelauneyTriangle(Triangle2D t) throws GeometryException {
 		triangle = t;
-		circumcircle = t.calcCircumcircle(); 
+		circumcircle = t.calcCircumcircle();
+		bounds = GeometryUtil.calcBoundingBox(t.vertexArray());
 	}
 	
 	@Override
@@ -50,6 +52,8 @@ public class DelauneyTriangle extends Object {
 	}
 	
 	int findVertex(Point2D pt) {
+		if (!bounds.isPointInRect(pt))
+			return -1;
 		for (int i = 0; i < 3; ++i)
 			if (triangle.vertex(i).equals(pt))
 				return i;

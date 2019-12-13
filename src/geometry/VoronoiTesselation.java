@@ -203,6 +203,8 @@ public class VoronoiTesselation {
 			if (isOpenPath) {
 				vertices.add(endEdges.get(1).startPoint());
 				vertices.add(calcDistantPoint(endEdges.get(1)));
+				
+				fixIntersectingEndEdges(vertices);
 			}
 			
 			return vertices;
@@ -245,6 +247,26 @@ public class VoronoiTesselation {
 				}
 			}
 			return -1;
+		}
+		
+		// Make sures end edges do not intersect before they end at their distant
+		// end points. The polygon would not be convex in that case, creating
+		// problems when intersecting it with the border.
+		private static void fixIntersectingEndEdges(List<Point2D> vertices) {
+			LineIntersection2D.Result isect = LineIntersection2D.intersect(
+					new LineSegment2D(vertices.get(1), vertices.get(0)),
+					new LineSegment2D(vertices.get(vertices.size() - 2),
+							vertices.get(vertices.size() - 1)));
+			if (isect.type == LineIntersection2D.IntersectionType.POINT) {
+				Point2D isectPt = (Point2D) isect.intersection;
+				
+				// It's ok if the intersection is at the start points.
+				if (!isectPt.equals(vertices.get(1)) &&
+						!isectPt.equals(vertices.get(vertices.size() - 2))) {
+					vertices.set(0, isectPt);
+					vertices.set(vertices.size() - 1, isectPt.copy());
+				}
+			}
 		}
 	}
 	
@@ -312,8 +334,9 @@ public class VoronoiTesselation {
 					collectDelauneyEdges(sample, delauneyTriangles);
 			List<Line2D> voronoiEdges = delauneyEdges.makeVoronoiEdges();
 			
-			regions.add(new VoronoiRegion(sample, makePolygon(voronoiEdges,
-					border)));
+			Polygon2D voronoiPoly = makePolygon(voronoiEdges, border);
+			if (voronoiPoly.countVertices() > 0)
+				regions.add(new VoronoiRegion(sample, voronoiPoly));
 		}
 		
 		return regions;

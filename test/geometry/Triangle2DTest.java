@@ -145,6 +145,34 @@ public class Triangle2DTest {
 	}
 	
 	@Test
+	public void vertexArray() {
+		Point2D a = new Point2D(1, 2);
+		Point2D b = new Point2D(1, 2);
+		Point2D c = new Point2D(1, 2);
+		Triangle2D t = new Triangle2D(a, b, c);
+		
+		Point2D[] arr = t.vertexArray();
+		
+		assertEquals(3, arr.length);
+		assertEquals(a, arr[0]);
+		assertEquals(b, arr[1]);
+		assertEquals(c, arr[2]);
+	}
+	
+	@Test
+	public void vertexArray_ForEmptyTriangle() {
+		Triangle2D t = new Triangle2D();
+		
+		Point2D[] arr = t.vertexArray();
+		
+		assertEquals(3, arr.length);
+		Point2D emptyPt = new Point2D();
+		assertEquals(emptyPt, arr[0]);
+		assertEquals(emptyPt, arr[1]);
+		assertEquals(emptyPt, arr[2]);
+	}
+	
+	@Test
 	public void isPoint_WhenTriangleIsPoint() {
 		Point2D a = new Point2D(1, 2);
 		Point2D b = new Point2D(1, 2);

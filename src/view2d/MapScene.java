@@ -40,15 +40,15 @@ public class MapScene {
 	    content.setScaleY(factor);
 	}
 	
-	public void addPoints(List<Point2D> points, Color clr) {
+	public void addPoints(List<Point2D> points, Color clr, double strokeWidth) {
 		for (Point2D pt : points) {
-			Circle c = new Circle(pt.x, pt.y, 0.1);
+			Circle c = new Circle(pt.x, pt.y, strokeWidth);
 		    c.setFill(clr);
 		    content.getChildren().add(c);
 		}
 	}
 	
-	public void addTriangles(List<Triangle2D> triangles, Color clr) {
+	public void addTriangles(List<Triangle2D> triangles, Color clr, double strokeWidth) {
 		for (Triangle2D t : triangles) {
 			Polygon poly = new Polygon();
 			poly.getPoints().add(t.vertex(0).x);
@@ -59,13 +59,13 @@ public class MapScene {
 			poly.getPoints().add(t.vertex(2).y);
 		    poly.setStrokeType(StrokeType.INSIDE);
 		    poly.setStroke(clr);
-		    poly.setStrokeWidth(0.01);
+		    poly.setStrokeWidth(strokeWidth);
 		    poly.setFill(null);
 		    content.getChildren().add(poly);
 		}
 	}
 	
-	public void addPolygons(List<Polygon2D> polys, Color clr) {
+	public void addPolygons(List<Polygon2D> polys, Color clr, double strokeWidth) {
 		for (Polygon2D poly : polys) {
 			Polygon viewPoly = new Polygon();
 			for (int i = 0; i < poly.countVertices(); ++i) {
@@ -74,13 +74,13 @@ public class MapScene {
 			}
 		    viewPoly.setStrokeType(StrokeType.INSIDE);
 		    viewPoly.setStroke(clr);
-		    viewPoly.setStrokeWidth(0.01);
+		    viewPoly.setStrokeWidth(strokeWidth);
 		    viewPoly.setFill(null);
 		    content.getChildren().add(viewPoly);
 		}
 	}
 	
-	public void addRects(List<Rect2D> rects, Color clr) {
+	public void addRects(List<Rect2D> rects, Color clr, double strokeWidth) {
 		for (Rect2D r : rects) {
 			Polygon viewPoly = new Polygon();
 			viewPoly.getPoints().add(r.left());
@@ -93,7 +93,7 @@ public class MapScene {
 			viewPoly.getPoints().add(r.bottom());
 		    viewPoly.setStrokeType(StrokeType.INSIDE);
 		    viewPoly.setStroke(clr);
-		    viewPoly.setStrokeWidth(0.01);
+		    viewPoly.setStrokeWidth(strokeWidth);
 		    viewPoly.setFill(null);
 		    content.getChildren().add(viewPoly);
 		}

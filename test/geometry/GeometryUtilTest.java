@@ -45,15 +45,31 @@ public class GeometryUtilTest {
 	}
 
 	@Test
+	public void calcBoundingBox_ForPointArray() {
+		Point2D[] points = new Point2D[] {
+				new Point2D(2, 3),
+				new Point2D(2.3, 3.6),
+				new Point2D(-3.4, 7.8),
+				new Point2D(0, 2),
+				new Point2D(1.9, 9.1),
+		};
+		Rect2D bounds = GeometryUtil.calcBoundingBox(points);
+		assertEquals(-3.4, bounds.left(), 0.0);
+		assertEquals(2.0, bounds.top(), 0.0);
+		assertEquals(2.3, bounds.right(), 0.0);
+		assertEquals(9.1, bounds.bottom(), 0.0);
+	}
+
+	@Test
 	public void isConvexPath_ForNoPoints() {
-		assertFalse(GeometryUtil.isConvexPath(new ArrayList<Point2D>()));
+		assertTrue(GeometryUtil.isConvexPath(new ArrayList<Point2D>()));
 	}
 
 	@Test
 	public void isConvexPath_ForOnePoints() {
 		List<Point2D> path = new ArrayList<Point2D>();
 		path.add(new Point2D(1, 2));
-		assertFalse(GeometryUtil.isConvexPath(path));
+		assertTrue(GeometryUtil.isConvexPath(path));
 	}
 
 	@Test
@@ -61,7 +77,7 @@ public class GeometryUtilTest {
 		List<Point2D> path = new ArrayList<Point2D>();
 		path.add(new Point2D(1, 2));
 		path.add(new Point2D(5, 3));
-		assertFalse(GeometryUtil.isConvexPath(path));
+		assertTrue(GeometryUtil.isConvexPath(path));
 	}
 
 	@Test
@@ -121,6 +137,17 @@ public class GeometryUtilTest {
 		path.add(new Point2D(2, 1));
 		path.add(new Point2D(3, 2));
 		path.add(new Point2D(4, 3));
-		assertFalse(GeometryUtil.isConvexPath(path));
+		assertTrue(GeometryUtil.isConvexPath(path));
+	}
+
+	@Test
+	public void areConvex_ForPathWithDuplicateConsecutivePoints() {
+		List<Point2D> path = new ArrayList<Point2D>();
+		path.add(new Point2D(1, 0));
+		path.add(new Point2D(2, 1));
+		path.add(new Point2D(2, 1));
+		path.add(new Point2D(3, 2));
+		path.add(new Point2D(4, 3));
+		assertTrue(GeometryUtil.isConvexPath(path));
 	}
 }

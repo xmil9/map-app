@@ -47,20 +47,18 @@ public class Circle2D extends Object {
 	
 	// Checks if a given point is in the circle (inside or on the circle).
 	public boolean isPointInCircle(Point2D pt) {
-		double distSquared = new Vector2D(pt, center).lengthSquared();
-		return MathUtil.fpLessEqual(distSquared, radius * radius);
+		return MathUtil.fpLessEqual(
+				Point2D.distanceSquared(pt, center), radius * radius);
 	}
 	
 	// Checks if a given point is on the circle.
 	public boolean isPointOnCircle(Point2D pt) {
-		double distSquared = new Vector2D(pt, center).lengthSquared();
-		return MathUtil.fpEqual(distSquared, radius * radius);
+		return MathUtil.fpEqual(Point2D.distanceSquared(pt, center), radius * radius);
 	}
 	
 	// Checks if a given point is strictly inside the circle (not on the circle).
 	public boolean isPointInsideCircle(Point2D pt) {
-		double distSquared = new Vector2D(pt, center).lengthSquared();
-		return MathUtil.fpLess(distSquared, radius * radius);
+		return MathUtil.fpLess(Point2D.distanceSquared(pt, center), radius * radius);
 	}
 	
 	// Returns a point along the circle's circumference at a given angle measured

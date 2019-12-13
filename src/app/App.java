@@ -26,49 +26,64 @@ public class App extends Application {
 	}
 	
 	private Scene makeMapScene() {
+		final boolean showSamples = true;
+		final boolean showVoronoi = true;
+		final boolean showDelauney = false;
+		final boolean showBounds = true;
+		
+		final double strokeWidth = 0.05;
 		MapScene map = new MapScene(500, 400);
 
-		Set<Point2D> samples = new HashSet<Point2D>();
-		samples.add(new Point2D(-1, -2));
-		samples.add(new Point2D(-1, 3));
-		samples.add(new Point2D(5, 3));
-		samples.add(new Point2D(5, -2));
-//		points.add(new Point2D(10, 10));
-//		points.add(new Point2D(100, 100));
-//		points.add(new Point2D(27, 67));
-//		points.add(new Point2D(44, 23));
-//		points.add(new Point2D(78, 51));
-//		points.add(new Point2D(15, 44));
-//		points.add(new Point2D(78, 89));
-//		points.add(new Point2D(75, 56));
-//		points.add(new Point2D(22, 93));
+		Rect2D bounds = new Rect2D(0, 0, 100, 100);
+		Set<Point2D> samples = genSamplePoints(200, bounds);
 
-//		DelauneyTriangulation delauney = new DelauneyTriangulation(samples);
-//		List<Triangle2D> triangles = delauney.triangulate();
-//		map.addTriangles(triangles, Color.web("black", 1.0));
-
-		Rect2D bounds = new Rect2D(-10, -10, 10, 10);
-		List<Rect2D> rects = new ArrayList<Rect2D>();
-		rects.add(bounds);
-		map.addRects(rects, Color.web("blue", 1.0));
-		
 		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiRegion> regions = voronoi.tesselate();
-		
-		List<Polygon2D> polys = new ArrayList<Polygon2D>();
-		for (VoronoiRegion vr : regions)
-			polys.add(vr.border());
-		map.addPolygons(polys, Color.web("red", 1.0));
 
-		List<Point2D> ptList = new ArrayList<Point2D>();
-		for (Point2D pt : samples)
-			ptList.add(pt);
-		map.addPoints(ptList, Color.web("red", 1.0));
+		if (showSamples) {
+			List<Point2D> ptList = new ArrayList<Point2D>();
+			for (Point2D pt : samples)
+				ptList.add(pt);
+			map.addPoints(ptList, Color.web("red", 1.0), strokeWidth * 5);
+		}		
 		
-		if (voronoi.getTriangulation() != null)
-			map.addTriangles(voronoi.getTriangulation(), Color.web("black", 1.0));
+		if (showBounds) {
+			List<Rect2D> rects = new ArrayList<Rect2D>();
+			rects.add(bounds);
+			map.addRects(rects, Color.web("blue", 1.0), strokeWidth);
+		}		
 		
-		map.scale(30);
+		if (showVoronoi) {
+			List<Polygon2D> polys = new ArrayList<Polygon2D>();
+			for (VoronoiRegion vr : regions)
+				polys.add(vr.border());
+			map.addPolygons(polys, Color.web("red", 1.0), strokeWidth);
+		}
+
+		if (showDelauney) {
+			if (voronoi.getTriangulation() != null)
+				map.addTriangles(voronoi.getTriangulation(), Color.web("black", 1.0),
+						strokeWidth);
+		}		
+		
+		map.scale(10);
 		return map.scene();
+	}
+	
+	private static Set<Point2D> genSamplePoints(int num, Rect2D bounds) {
+		Set<Point2D> pts = new HashSet<Point2D>();
+		while (pts.size() < num)
+			pts.add(genSamplePoint(bounds));
+		return pts;
+	}
+	
+	private static Point2D genSamplePoint(Rect2D bounds) {
+		return new Point2D(
+				genValue(bounds.left(), bounds.right()),
+				genValue(bounds.top(), bounds.bottom()));
+	}
+	
+	private static double genValue(double min, double max) {
+		return min + (max - min) * Math.random();
 	}
 }

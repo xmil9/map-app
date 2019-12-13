@@ -10,7 +10,8 @@ public class MathUtil {
 	// Floating point threshold for equality of two floating point
 	// values.
 	
-	private static double globalFpThres = fpDefaultThreshold();
+	private static double defaultFpThres = 0.0000001;
+	private static double globalFpThres = defaultFpThres;
 	
 	public static double globalFpThreshold() {
 		return globalFpThres;
@@ -18,10 +19,6 @@ public class MathUtil {
 	
 	public static void setGlobalFpThreshold(double thres) {
 		globalFpThres = thres;
-	}
-	
-	public static double fpDefaultThreshold() {
-		return 0.0000001;
 	}
 	
 	///////////////
@@ -33,7 +30,7 @@ public class MathUtil {
 	}
 	
 	public static boolean fpEqual(double a, double b) {
-		return fpEqual(a, b, globalFpThreshold()); 
+		return fpEqual(a, b, globalFpThres); 
 	}
 
 	public static boolean fpLess(double a, double b, double thres) {
@@ -44,7 +41,7 @@ public class MathUtil {
 	}
 	
 	public static boolean fpLess(double a, double b) {
-		return fpLess(a, b, globalFpThreshold()); 
+		return fpLess(a, b, globalFpThres); 
 	}
 
 	public static boolean fpLessEqual(double a, double b, double thres) {
@@ -55,7 +52,7 @@ public class MathUtil {
 	}
 	
 	public static boolean fpLessEqual(double a, double b) {
-		return fpLessEqual(a, b, globalFpThreshold()); 
+		return fpLessEqual(a, b, globalFpThres); 
 	}
 
 	public static boolean fpGreater(double a, double b, double thres) {
@@ -66,7 +63,7 @@ public class MathUtil {
 	}
 	
 	public static boolean fpGreater(double a, double b) {
-		return fpGreater(a, b, globalFpThreshold()); 
+		return fpGreater(a, b, globalFpThres); 
 	}
 
 	public static boolean fpGreaterEqual(double a, double b, double thres) {
@@ -77,7 +74,7 @@ public class MathUtil {
 	}
 	
 	public static boolean fpGreaterEqual(double a, double b) {
-		return fpGreaterEqual(a, b, globalFpThreshold()); 
+		return fpGreaterEqual(a, b, globalFpThres); 
 	}
 
 	///////////////

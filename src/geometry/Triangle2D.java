@@ -54,6 +54,11 @@ public class Triangle2D extends Object {
 		return new LineSegment2D(vertices[idx], vertices[(idx < 2) ? idx + 1 : 0]);
 	}
 	
+	// Returns array of the triangle's vertices. 
+	public Point2D[] vertexArray() {
+		return vertices;
+	}
+	
 	// Checks if the triangle degenerates into a point.
 	public boolean isPoint() {
 		return vertices[0].equals(vertices[1]) && vertices[0].equals(vertices[2]);
