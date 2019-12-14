@@ -2,9 +2,9 @@ package geometry;
 
 import java.util.Objects;
 
-import math.MathUtil;
+import math.FpUtil;
 
-
+// Represents a point in 2D space.
 public class Point2D extends Object {
 	public final double x;
 	public final double y;
@@ -27,13 +27,13 @@ public class Point2D extends Object {
 		if (getClass() != other.getClass())
 			return false;
 		Point2D otherPt = (Point2D) other;
-		return MathUtil.fpEqual(x, otherPt.x) &&
-				MathUtil.fpEqual(y, otherPt.y);
+		return FpUtil.fpEqual(x, otherPt.x) &&
+				FpUtil.fpEqual(y, otherPt.y);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(MathUtil.fpHashCode(x), MathUtil.fpHashCode(y));
+		return Objects.hash(FpUtil.fpHashCode(x), FpUtil.fpHashCode(y));
 	}
 	
 	@Override

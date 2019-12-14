@@ -2,9 +2,9 @@ package geometry;
 
 import java.util.Objects;
 
-import math.MathUtil;
+import math.FpUtil;
 
-
+// Represents a geometric circle in 2D space.
 public class Circle2D extends Object {
 
 	public final Point2D center;
@@ -25,12 +25,12 @@ public class Circle2D extends Object {
 			return false;
 		Circle2D otherCircle = (Circle2D) other;
 		return center.equals(otherCircle.center) &&
-				MathUtil.fpEqual(radius, otherCircle.radius);
+				FpUtil.fpEqual(radius, otherCircle.radius);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(center, MathUtil.fpHashCode(radius));
+		return Objects.hash(center, FpUtil.fpHashCode(radius));
 	}
 	
 	public Circle2D copy() {
@@ -38,7 +38,7 @@ public class Circle2D extends Object {
 	}
 	
 	public boolean isPoint() {
-		return MathUtil.fpEqual(radius, 0.0);
+		return FpUtil.fpEqual(radius, 0.0);
 	}
 	
 	public Circle2D offset(Vector2D v) {
@@ -47,18 +47,18 @@ public class Circle2D extends Object {
 	
 	// Checks if a given point is in the circle (inside or on the circle).
 	public boolean isPointInCircle(Point2D pt) {
-		return MathUtil.fpLessEqual(
+		return FpUtil.fpLessEqual(
 				Point2D.distanceSquared(pt, center), radius * radius);
 	}
 	
 	// Checks if a given point is on the circle.
 	public boolean isPointOnCircle(Point2D pt) {
-		return MathUtil.fpEqual(Point2D.distanceSquared(pt, center), radius * radius);
+		return FpUtil.fpEqual(Point2D.distanceSquared(pt, center), radius * radius);
 	}
 	
 	// Checks if a given point is strictly inside the circle (not on the circle).
 	public boolean isPointInsideCircle(Point2D pt) {
-		return MathUtil.fpLess(Point2D.distanceSquared(pt, center), radius * radius);
+		return FpUtil.fpLess(Point2D.distanceSquared(pt, center), radius * radius);
 	}
 	
 	// Returns a point along the circle's circumference at a given angle measured

@@ -2,7 +2,7 @@ package geometry;
 
 import java.util.Objects;
 
-import math.MathUtil;
+import math.FpUtil;
 
 // 2-dimensional mathematical vector.
 public class Vector2D extends Object {
@@ -31,13 +31,13 @@ public class Vector2D extends Object {
 		if (getClass() != other.getClass())
 			return false;
 		Vector2D otherVec = (Vector2D) other;
-		return MathUtil.fpEqual(x, otherVec.x) &&
-				MathUtil.fpEqual(y, otherVec.y);
+		return FpUtil.fpEqual(x, otherVec.x) &&
+				FpUtil.fpEqual(y, otherVec.y);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(MathUtil.fpHashCode(x), MathUtil.fpHashCode(y));
+		return Objects.hash(FpUtil.fpHashCode(x), FpUtil.fpHashCode(y));
 	}
 
 	public Vector2D copy() {
@@ -125,25 +125,25 @@ public class Vector2D extends Object {
 	// Checks if a given vector is parallel to 'this'.
 	// Could be pointing in the same or opposite direction.
 	public boolean isParallel(Vector2D w) {
-		return MathUtil.fpEqual(perpDot(w), 0.0);
+		return FpUtil.fpEqual(perpDot(w), 0.0);
 	}
 	
 	// Checks if the angle between 'this' and a given vector is < 90.
 	public boolean hasAcuteAngle(Vector2D w) {
-		return MathUtil.fpGreater(dot(w), 0.0);
+		return FpUtil.fpGreater(dot(w), 0.0);
 	}
 	
 	// Checks if the angle between 'this' and a given vector is > 90.
 	public boolean hasObtuseAngle(Vector2D w) {
-		return MathUtil.fpLess(dot(w), 0.0);
+		return FpUtil.fpLess(dot(w), 0.0);
 	}
 	
 	// Checks if a given vector is counter-clockwise of 'this' when facing into
 	// the direction of 'this'. This depends on the coordinate system used.
 	public boolean isCcw(Vector2D w, CoordSystem cs) {
 		if (cs == CoordSystem.SCREEN)
-			return MathUtil.fpLess(perpDot(w), 0.0);
-		return MathUtil.fpGreater(perpDot(w), 0.0);
+			return FpUtil.fpLess(perpDot(w), 0.0);
+		return FpUtil.fpGreater(perpDot(w), 0.0);
 	}
 
 	public boolean isCcw(Vector2D w) {
@@ -155,8 +155,8 @@ public class Vector2D extends Object {
 	// direction of 'this'. This depends on the coordinate system used.
 	public boolean isCw(Vector2D w, CoordSystem cs) {
 		if (cs == CoordSystem.SCREEN)
-			return MathUtil.fpGreater(perpDot(w), 0.0);
-		return MathUtil.fpLess(perpDot(w), 0.0);
+			return FpUtil.fpGreater(perpDot(w), 0.0);
+		return FpUtil.fpLess(perpDot(w), 0.0);
 	}
 
 	public boolean isCw(Vector2D w) {

@@ -23,8 +23,8 @@ public class Interval extends Object {
 		if (getClass() != other.getClass())
 			return false;
 		Interval otherIval = (Interval) other;
-		return MathUtil.fpEqual(a, otherIval.a) &&
-				MathUtil.fpEqual(b, otherIval.b);
+		return FpUtil.fpEqual(a, otherIval.a) &&
+				FpUtil.fpEqual(b, otherIval.b);
 	}
 
 	@Override
@@ -41,12 +41,12 @@ public class Interval extends Object {
 	}
 	
 	public boolean isEmpty() {
-		return MathUtil.fpEqual(length(), 0.0); 
+		return FpUtil.fpEqual(length(), 0.0); 
 	}
 	
 	public boolean contains(double val) {
-		return MathUtil.fpGreaterEqual(val, a) &&
-				MathUtil.fpLessEqual(val, b);
+		return FpUtil.fpGreaterEqual(val, a) &&
+				FpUtil.fpLessEqual(val, b);
 	}
 	
 	public Interval intersect(Interval other) {

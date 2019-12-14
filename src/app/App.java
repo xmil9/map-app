@@ -26,17 +26,17 @@ public class App extends Application {
 	}
 	
 	private Scene makeMapScene() {
-		final boolean showSamples = true;
+		final boolean showSamples = false;
 		final boolean showVoronoi = true;
 		final boolean showDelauney = false;
 		final boolean showBounds = true;
 		
 		final double strokeWidth = 0.05;
-		MapScene map = new MapScene(500, 400);
+		MapScene map = new MapScene(1100, 1100);
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Set<Point2D> samples = genSamplePoints(200, bounds);
-
+		Set<Point2D> samples = genSamplePoints(10000, bounds);
+		
 		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiRegion> regions = voronoi.tesselate();
 

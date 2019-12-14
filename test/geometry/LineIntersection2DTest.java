@@ -3,7 +3,7 @@ package geometry;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import math.MathUtil;
+import math.FpUtil;
 
 
 public class LineIntersection2DTest {
@@ -11,7 +11,7 @@ public class LineIntersection2DTest {
 	private boolean haveSameSlope(Vector2D a, Vector2D b) {
 		if (a.x == 0)
 			return b.x == 0;
-		return MathUtil.fpEqual(a.y / a.x, b.y / b.x); 
+		return FpUtil.fpEqual(a.y / a.x, b.y / b.x); 
 	}
 	
 	///////////////

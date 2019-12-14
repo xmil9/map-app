@@ -2,7 +2,7 @@ package geometry;
 
 import java.util.Objects;
 
-import math.MathUtil;
+import math.FpUtil;
 
 // 2-dimensional rectangle.
 // Always normalized: left <= right, top <= bottom
@@ -37,16 +37,16 @@ public class Rect2D extends Object {
 		if (getClass() != other.getClass())
 			return false;
 		Rect2D otherRt = (Rect2D) other;
-		return MathUtil.fpEqual(left, otherRt.left) &&
-				MathUtil.fpEqual(top, otherRt.top) &&
-				MathUtil.fpEqual(right, otherRt.right) &&
-				MathUtil.fpEqual(bottom, otherRt.bottom);
+		return FpUtil.fpEqual(left, otherRt.left) &&
+				FpUtil.fpEqual(top, otherRt.top) &&
+				FpUtil.fpEqual(right, otherRt.right) &&
+				FpUtil.fpEqual(bottom, otherRt.bottom);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(MathUtil.fpHashCode(left), MathUtil.fpHashCode(top),
-				MathUtil.fpHashCode(right), MathUtil.fpHashCode(bottom));
+		return Objects.hash(FpUtil.fpHashCode(left), FpUtil.fpHashCode(top),
+				FpUtil.fpHashCode(right), FpUtil.fpHashCode(bottom));
 	}
 	
 	public Rect2D copy() {
@@ -54,7 +54,7 @@ public class Rect2D extends Object {
 	}
 
 	public boolean isDegenerate() {
-		return MathUtil.fpEqual(left, right) || MathUtil.fpEqual(top,  bottom);
+		return FpUtil.fpEqual(left, right) || FpUtil.fpEqual(top,  bottom);
 	}
 	
 	public double left() {
@@ -130,10 +130,10 @@ public class Rect2D extends Object {
 
 	// Checks if a given point is in the rect (inside or on the rect).
 	public boolean isPointInRect(Point2D pt) {
-		return MathUtil.fpGreaterEqual(pt.x, left) &&
-				MathUtil.fpLessEqual(pt.x, right) &&
-				MathUtil.fpGreaterEqual(pt.y, top) && 
-				MathUtil.fpLessEqual(pt.y, bottom);
+		return FpUtil.fpGreaterEqual(pt.x, left) &&
+				FpUtil.fpLessEqual(pt.x, right) &&
+				FpUtil.fpGreaterEqual(pt.y, top) && 
+				FpUtil.fpLessEqual(pt.y, bottom);
 	}
 	
 	private void normalize() {

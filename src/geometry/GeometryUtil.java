@@ -2,9 +2,9 @@ package geometry;
 
 import java.util.List;
 
-import math.MathUtil;
+import math.FpUtil;
 
-
+// Geometry related utility functionality.
 public class GeometryUtil {
 
 	// Calculates a minimal rectangle around given points.
@@ -54,15 +54,15 @@ public class GeometryUtil {
 				continue;
 			
 			double val = prev.perpDot(next);
-			if (MathUtil.fpEqual(val, 0))
+			if (FpUtil.fpEqual(val, 0))
 				continue;
 
 			if (orientation == Orientation.None)
-				orientation = MathUtil.fpGreater(val, 0) ?
+				orientation = FpUtil.fpGreater(val, 0) ?
 						Orientation.Cw : Orientation.Ccw;
 			
 			// Orientation cannot change for convex paths.
-			Orientation edgeOrientation = MathUtil.fpGreater(val, 0) ?
+			Orientation edgeOrientation = FpUtil.fpGreater(val, 0) ?
 					Orientation.Cw : Orientation.Ccw; 
 			if (edgeOrientation != orientation)
 				return false;

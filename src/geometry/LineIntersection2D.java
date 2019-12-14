@@ -1,7 +1,7 @@
 package geometry;
 
 import math.Interval;
-import math.MathUtil;
+import math.FpUtil;
 import types.Pair;
 
 // Calculates intersections between all line types. 
@@ -112,7 +112,7 @@ public class LineIntersection2D {
 
 		switch (numInfiniteEnds) {
 		case 0:
-			return MathUtil.fpEqual(overlap.a, overlap.b) ?
+			return FpUtil.fpEqual(overlap.a, overlap.b) ?
 					IntersectionType.POINT : IntersectionType.LINE_SEGMENT;
 		case 1:
 			return IntersectionType.LINE_RAY;
@@ -195,9 +195,9 @@ public class LineIntersection2D {
 	// Checks if the point for given parametric value is on the line and not beyond
 	// the start or end points.
 	private static boolean isParametricPointOnLine(double parametricVal, Line2D line) {
-		if (line.hasStartPoint() && MathUtil.fpLess(parametricVal, 0))
+		if (line.hasStartPoint() && FpUtil.fpLess(parametricVal, 0))
 			return false;
-		if (line.hasEndPoint() && MathUtil.fpGreater(parametricVal, 1))
+		if (line.hasEndPoint() && FpUtil.fpGreater(parametricVal, 1))
 			return false;
 		return true;
 	}

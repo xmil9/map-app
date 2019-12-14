@@ -1,7 +1,8 @@
 package geometry;
 
-import math.MathUtil;
+import math.FpUtil;
 
+// Algorithm to intersect convex polygons.
 public class ConvexPolygonIntersection2D {
 
 	// Indicates which polygon's edge is inside the other polygon.
@@ -56,11 +57,11 @@ public class ConvexPolygonIntersection2D {
 		// considered 'inside'. 
 		public boolean isPointOnInside(Point2D pt) {
 			Vector2D v = new Vector2D(curEdge.startPoint(), pt);
-			return MathUtil.fpLessEqual(curEdge.direction().perpDot(v), 0.0);
+			return FpUtil.fpLessEqual(curEdge.direction().perpDot(v), 0.0);
 		}
 		
 		public boolean isEdgeCcwOrCollinear(LineSegment2D e) {
-			return MathUtil.fpLessEqual(curEdge.direction().perpDot(e.direction()), 0);
+			return FpUtil.fpLessEqual(curEdge.direction().perpDot(e.direction()), 0);
 		}
 		
 		// Returns the index of the edge that the algorithm associates with a

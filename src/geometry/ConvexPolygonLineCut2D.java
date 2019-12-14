@@ -3,9 +3,9 @@ package geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import math.MathUtil;
+import math.FpUtil;
 
-
+// Algorithm to cut a convex polygon by a line. 
 public class ConvexPolygonLineCut2D {
 
 	// Sides that a point can be on relative to a line.
@@ -107,9 +107,9 @@ public class ConvexPolygonLineCut2D {
 	private static Side calcSideOfLine(InfiniteLine2D l, Point2D pt) {
 		double perpDotResult = l.direction().perpDot(
 				new Vector2D(l.anchorPoint(), pt));
-		if (MathUtil.fpLess(perpDotResult, 0))
+		if (FpUtil.fpLess(perpDotResult, 0))
 			return Side.LEFT;
-		else if (MathUtil.fpGreater(perpDotResult, 0))
+		else if (FpUtil.fpGreater(perpDotResult, 0))
 			return Side.RIGHT;
 		return Side.CENTER;
 	}
