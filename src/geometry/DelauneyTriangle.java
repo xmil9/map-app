@@ -11,7 +11,7 @@ public class DelauneyTriangle extends Object {
 	private final Circle2D circumcircle;
 	private final Rect2D bounds;
 	
-	DelauneyTriangle(Triangle2D t) throws GeometryException {
+	public DelauneyTriangle(Triangle2D t) throws GeometryException {
 		triangle = t;
 		circumcircle = t.calcCircumcircle();
 		bounds = GeometryUtil.calcBoundingBox(t.vertexArray());
@@ -43,15 +43,15 @@ public class DelauneyTriangle extends Object {
 		}
 	}
 	
-	Triangle2D triangle() {
+	public Triangle2D triangle() {
 		return triangle.copy();
 	}
 	
-	Point2D vertex(int idx) {
+	public Point2D vertex(int idx) {
 		return triangle.vertex(idx);
 	}
 	
-	int findVertex(Point2D pt) {
+	public int findVertex(Point2D pt) {
 		if (!bounds.isPointInRect(pt))
 			return -1;
 		for (int i = 0; i < 3; ++i)
@@ -60,15 +60,15 @@ public class DelauneyTriangle extends Object {
 		return -1;
 	}
 	
-	LineSegment2D edge(int idx) {
+	public LineSegment2D edge(int idx) {
 		return triangle.edge(idx);
 	}
 	
-	boolean isPointInCircumcircle(Point2D pt) {
+	public boolean isPointInCircumcircle(Point2D pt) {
 		return circumcircle.isPointInCircle(pt);
 	}
 	
-	Point2D circumcenter() {
+	public Point2D circumcenter() {
 		return circumcircle.center;
 	}
 }
