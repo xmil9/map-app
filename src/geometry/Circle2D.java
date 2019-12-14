@@ -30,7 +30,7 @@ public class Circle2D extends Object {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(center, radius);
+		return Objects.hash(center, MathUtil.fpHashCode(radius));
 	}
 	
 	public Circle2D copy() {

@@ -33,7 +33,7 @@ public class Point2D extends Object {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(x, y);
+		return Objects.hash(MathUtil.fpHashCode(x), MathUtil.fpHashCode(y));
 	}
 	
 	@Override

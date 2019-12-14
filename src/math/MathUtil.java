@@ -1,16 +1,15 @@
 package math;
 
 import java.lang.Math;
+import java.util.Objects;
 
 
 public class MathUtil {
 	
 	///////////////
 	
-	// Floating point threshold for equality of two floating point
-	// values.
-	
-	private static double defaultFpThres = 0.0000001;
+	// Floating point threshold for equality of two floating point values.
+	public static final double defaultFpThres = 0.0000001;
 	private static double globalFpThres = defaultFpThres;
 	
 	public static double globalFpThreshold() {
@@ -19,6 +18,28 @@ public class MathUtil {
 	
 	public static void setGlobalFpThreshold(double thres) {
 		globalFpThres = thres;
+		truncationFactor = calcTruncationFactor(thres);
+	}
+	
+	///////////////
+
+	// Inverse of fp threshold. Used to generate hash codes for fp values.
+	private static double truncationFactor = calcTruncationFactor(globalFpThres);
+
+	private static double calcTruncationFactor(double fpThreshold) {
+		return 1.0 / fpThreshold;
+	}
+	
+	// Returns a hash code for a given floating point value. Attempts to account
+	// for the equality threshold of fp values. 
+	public static long fpHashCode(double fp) {
+		return Objects.hash((long) (fp * truncationFactor));
+	}
+
+	// Overload for given fp threshold.
+	public static long fpHashCode(double fp, double thres) {
+		double truncFactor = 1.0 / thres;
+		return Objects.hash((long) (fp * truncFactor));
 	}
 	
 	///////////////

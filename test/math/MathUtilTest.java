@@ -90,6 +90,38 @@ public class MathUtilTest {
 	///////////////
 	
 	@Test
+	public void fpHashCode_ForValuesWithLowerPrecisionThanThreshold() {
+		long hashA = MathUtil.fpHashCode(364.47521111111, 0.0001);
+		long hashB = MathUtil.fpHashCode(364.47531111111, 0.0001);
+		assertTrue(hashA != hashB);
+	}
+	
+	@Test
+	public void fpHashCode_ForValuesWithHigherPrecisionThanThreshold() {
+		long hashA = MathUtil.fpHashCode(364.47521111111, 0.0001);
+		long hashB = MathUtil.fpHashCode(364.47522111111, 0.0001);
+		assertTrue(hashA == hashB);
+	}
+	
+	@Test
+	public void fpHashCode_ForGlobalFpThreshold() {
+		double prevThres = MathUtil.globalFpThreshold();
+		MathUtil.setGlobalFpThreshold(MathUtil.defaultFpThres);
+		
+		long hashA = MathUtil.fpHashCode(364.11111118);
+		long hashB = MathUtil.fpHashCode(364.11111119);
+		assertTrue(hashA == hashB);
+
+		long hashC = MathUtil.fpHashCode(364.1111118);
+		long hashD = MathUtil.fpHashCode(364.1111119);
+		assertTrue(hashC != hashD);
+
+		MathUtil.setGlobalFpThreshold(prevThres);
+}
+	
+	///////////////
+	
+	@Test
 	public void clampToRange_ForValueInRange() {
 		assertEquals(2.0, MathUtil.clampToRange(2.0, 1.0, 4.0), 0.0);
 		assertEquals(-2.0, MathUtil.clampToRange(-2.0, -4.0, -1.0), 0.0);

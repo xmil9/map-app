@@ -45,7 +45,8 @@ public class Rect2D extends Object {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(left, top, right, bottom);
+		return Objects.hash(MathUtil.fpHashCode(left), MathUtil.fpHashCode(top),
+				MathUtil.fpHashCode(right), MathUtil.fpHashCode(bottom));
 	}
 	
 	public Rect2D copy() {
