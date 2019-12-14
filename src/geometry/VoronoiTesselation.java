@@ -1,8 +1,10 @@
 package geometry;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -321,17 +323,25 @@ public class VoronoiTesselation {
 		// -   If two Delauney triangles share the edge, then the Voronoi edge
 		//     is the line connecting the triangles' circumcenters.
 		// -   If only one Delauney triangle contains the edge, then the Voronoi
-		//     edge is the line from the triangle's circumcenter to the closest
-		//     border.
+		//     edge is clipped by the given border.
 		// - Combine the collected Voronoi edges into a polygon that forms the
 		//   border of the Voronoi region for the processed sample point.
 		
+		// Run triangulation.
 		final List<DelauneyTriangle> delauneyTriangles =
 				delauneyTriangulation();
 		
-		for (Point2D sample : samples) {
-			DelauneyEdgeCollection delauneyEdges =
-					collectDelauneyEdges(sample, delauneyTriangles);
+		// Associates each vertex of all Delauney triangles with the edges
+		// that connect to it.
+		Map<Point2D, DelauneyEdgeCollection> edgeMap =
+				collectDelauneyEdges(delauneyTriangles);
+		
+		// Calculate the Voronoi region for each sample point. (The Delauney
+		// vertices ight actually be slightly off the original sample points
+		// because of floating point calculation inaccuracies). 
+		for (var mapEntry : edgeMap.entrySet()) {
+			Point2D sample = mapEntry.getKey();
+			DelauneyEdgeCollection delauneyEdges = edgeMap.get(sample);
 			List<Line2D> voronoiEdges = delauneyEdges.makeVoronoiEdges();
 			
 			Polygon2D voronoiPoly = makePolygon(voronoiEdges, border);
@@ -408,22 +418,27 @@ public class VoronoiTesselation {
 	
 	// Collects all edges of Delauney triangles that share a given sample
 	// point.
-	private DelauneyEdgeCollection collectDelauneyEdges(Point2D sample,
+	private Map<Point2D, DelauneyEdgeCollection> collectDelauneyEdges(
 			List<DelauneyTriangle> delauneyTriangles) {
-		DelauneyEdgeCollection edges = new DelauneyEdgeCollection();
+		Map<Point2D, DelauneyEdgeCollection> edgeMap =
+				new HashMap<Point2D, DelauneyEdgeCollection>();
 		
-		for (DelauneyTriangle t : delauneyTriangles) {
-			int pos = t.findVertex(sample);
-			if (pos != -1) {
+		for (var dt : delauneyTriangles) {
+			for (int i = 0; i < 3; ++i) {
+				Point2D v = dt.vertex(i);
+				DelauneyEdgeCollection edges = edgeMap.get(v);
+				if (edges == null)
+					edges = new DelauneyEdgeCollection();
+				
 				// Keep edges ordered.
-				edges.addEdge(new LineSegment2D(t.vertex(pos == 0 ? 2 : pos - 1),
-						t.vertex(pos)), t);
-				edges.addEdge(new LineSegment2D(t.vertex(pos),
-						t.vertex(pos == 2 ? 0 : pos + 1)), t);
+				edges.addEdge(new LineSegment2D(dt.vertex(i == 0 ? 2 : i - 1), v), dt);
+				edges.addEdge(new LineSegment2D(v, dt.vertex(i == 2 ? 0 : i + 1)), dt);
+				
+				edgeMap.put(v, edges);
 			}
 		}
 		
-		return edges;
+		return edgeMap;
 	}
 	
 	// Creates a polygon from given unordered edges.
