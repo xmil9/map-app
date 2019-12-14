@@ -30,7 +30,10 @@ public class MathUtil {
 	}
 	
 	public static boolean fpEqual(double a, double b) {
-		return fpEqual(a, b, globalFpThres); 
+		// Should call overload taking a threshold but since this is
+		// a very hot function it is considerably faster to do the
+		// calculation right here.
+		return Math.abs(a - b) <= globalFpThres;
 	}
 
 	public static boolean fpLess(double a, double b, double thres) {
@@ -41,7 +44,10 @@ public class MathUtil {
 	}
 	
 	public static boolean fpLess(double a, double b) {
-		return fpLess(a, b, globalFpThres); 
+		// Should call overload taking a threshold but since this is
+		// a very hot function it is considerably faster to do the
+		// calculation right here.
+		return a - b < -globalFpThres;
 	}
 
 	public static boolean fpLessEqual(double a, double b, double thres) {
@@ -52,7 +58,10 @@ public class MathUtil {
 	}
 	
 	public static boolean fpLessEqual(double a, double b) {
-		return fpLessEqual(a, b, globalFpThres); 
+		// Should call overload taking a threshold but since this is
+		// a very hot function it is considerably faster to do the
+		// calculation right here.
+		return a - b <= globalFpThres;
 	}
 
 	public static boolean fpGreater(double a, double b, double thres) {
@@ -63,18 +72,24 @@ public class MathUtil {
 	}
 	
 	public static boolean fpGreater(double a, double b) {
-		return fpGreater(a, b, globalFpThres); 
+		// Should call overload taking a threshold but since this is
+		// a very hot function it is considerably faster to do the
+		// calculation right here.
+		return a - b > globalFpThres;
 	}
 
 	public static boolean fpGreaterEqual(double a, double b, double thres) {
 		// Check that b is smaller than a by at least the threshold value.
 		// because within the threashold they would still be considered
 		// equal.
-		return a - b >= -thres; 
+		return a - b >= -thres;
 	}
 	
 	public static boolean fpGreaterEqual(double a, double b) {
-		return fpGreaterEqual(a, b, globalFpThres); 
+		// Should call overload taking a threshold but since this is
+		// a very hot function it is considerably faster to do the
+		// calculation right here.
+		return a - b >= -globalFpThres;
 	}
 
 	///////////////
