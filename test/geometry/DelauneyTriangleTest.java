@@ -223,4 +223,20 @@ public class DelauneyTriangleTest {
 			fail();
 		}
 	}
+
+	@Test
+	public void circumcircleRadius() {
+		try {
+			Circle2D circle = new Circle2D(new Point2D(1, 2), 3);
+			Point2D a = circle.pointAtRadian(1);
+			Point2D b = circle.pointAtRadian(1.3);
+			Point2D c = circle.pointAtRadian(2.1);
+			Triangle2D t = new Triangle2D(a, b, c);
+			DelauneyTriangle dt = new DelauneyTriangle(t);
+			
+			assertEquals(3, dt.circumcircleRadius(), 0.000001);
+		} catch (GeometryException e) {
+			fail();
+		}
+	}
 }

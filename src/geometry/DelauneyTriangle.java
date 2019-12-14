@@ -79,4 +79,8 @@ public class DelauneyTriangle extends Object {
 	public Point2D circumcenter() {
 		return circumcircle.center;
 	}
+	
+	public double circumcircleRadius() {
+		return circumcircle.radius;
+	}
 }

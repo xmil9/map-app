@@ -2,9 +2,12 @@ package geometry;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import math.FpUtil;
 
 
 // Implementation of Bowyer-Watson algorithm to perform a Delauney triangulation
@@ -70,14 +73,17 @@ public class DelauneyTriangulation {
 	private final List<Point2D> samples;
 	// Triangle that bounds all input points.
 	private final Triangle2D boundingTriangle;
-	// Current state of the triangulation. Holds triangles and some data that
-	// they are annotated with.
+	// Current state of the triangulation. Holds active triangles and some data
+	// that they are annotated with.
 	private List<DelauneyTriangle> triangulation =
+			new ArrayList<DelauneyTriangle>();
+	// List of triangles that don't need to be considered anymore for further
+	// triangulation steps.
+	private List<DelauneyTriangle> settledTriangles =
 			new ArrayList<DelauneyTriangle>();
 	
 	public DelauneyTriangulation(Set<Point2D> samplePoints) {
 		samples = new ArrayList<Point2D>(samplePoints);
-		// Determine the bounding triangle.
 		boundingTriangle = calcBoundingTriangle(samples);
 		
 		// Add bounding triangle vertices to the end of the vertex list.
@@ -86,6 +92,10 @@ public class DelauneyTriangulation {
 			samples.add(boundingTriangle.vertex(1));
 			samples.add(boundingTriangle.vertex(2));
 		}
+
+		// Sort all collected sample points by their x-coordinate to enable
+		// detecting triangles that cannot affect the triangulation anymore.
+		Collections.sort(samples, makePointXCoordComparator());
 	}
 	
 	// Starts the Delauney triangulation.
@@ -99,18 +109,20 @@ public class DelauneyTriangulation {
 			
 			for (Point2D sample : samples) {
 				edges.clear();
-				findEnclosingPolygonEdges(sample, triangulation, edges);
+				findEnclosingPolygonEdges(sample, edges);
 				edges.removeDuplicates();
-				generateNewTriangles(sample, edges, triangulation);
+				generateNewTriangles(sample, edges);
 			}
 			
-			removeTrianglesSharingVertices(triangulation, boundingTriangle);
+			settleRemainingTriangles();
+			removeTrianglesSharingVertices(boundingTriangle);
 		} catch (GeometryException e) {
 			// Abort the triangulation.
 			triangulation.clear();
+			settledTriangles.clear();
 		}
 		
-		return prepareResult(triangulation);
+		return prepareResult(settledTriangles);
 	}
 	
 	// Returns the triangulation extended with information that the algorithm
@@ -118,7 +130,87 @@ public class DelauneyTriangulation {
 	// as optimization, so that callers don't need to recalculate data that the
 	// algorithm already calculated.
 	public List<DelauneyTriangle> delauneyTriangles() {
-		return triangulation;
+		return settledTriangles;
+	}
+	
+	// Adds the edges of active triangles whose circumcircle contains a given sample
+	// point to a given edge buffer and removes the triangles from the given list.
+	private void findEnclosingPolygonEdges(Point2D sample, EdgeBuffer edges) {
+		int i = 0;
+		while (i < triangulation.size()) {
+			DelauneyTriangle t = triangulation.get(i);
+			if (hasTriangleSettled(t, sample)) {
+				triangulation.remove(i);
+				settledTriangles.add(t);
+				continue;
+			}
+			
+			if (t.isPointInCircumcircle(sample)) {
+				edges.addEdges(t);
+				triangulation.remove(i);
+				// Since we removed the triangle we don't need to increase
+				// the loop counter.
+			} else {
+				++i;
+			}
+		}
+	}
+	
+	// For each given edge generate a new triangle with a given sample point.
+	private void generateNewTriangles(Point2D sample, EdgeBuffer edges) {
+		for (int i = 0; i < edges.size(); ++i) {
+			LineSegment2D e = edges.get(i);
+			try {
+				Triangle2D t = new Triangle2D(sample, e.startPoint(), e.endPoint());
+				// Skip triangles that are lines or points.
+				if (!t.isDegenerate())
+					triangulation.add(new DelauneyTriangle(t));
+			} catch (GeometryException ex) {
+				// Skip this triangle.
+			}
+		}
+	}
+	
+	// Removes triangles from a given list that share vertices with a given master
+	// triangle.
+	private void removeTrianglesSharingVertices(Triangle2D master) {
+		int i = 0;
+		while (i < settledTriangles.size()) {
+			DelauneyTriangle t = settledTriangles.get(i);
+			
+			boolean wasRemoved = false;
+			for (int j = 0; j < 3; ++j) {
+				if (isVertexOf(t.vertex(j), master)) {
+					settledTriangles.remove(i);
+					wasRemoved = true;
+					break;
+				}
+			}
+			
+			if (!wasRemoved)
+				++i;
+		}
+	}
+	
+	// Mark all remaining triangles as settles. 
+	private void settleRemainingTriangles() {
+		settledTriangles.addAll(triangulation);
+		triangulation.clear();
+	}
+	
+	// Returns a Comparator object that compares Point2D objects by their
+	// x-coordinates.
+	private static Comparator<Point2D> makePointXCoordComparator() {
+		return new Comparator<Point2D>() {         
+		    @Override         
+		    public int compare(Point2D a, Point2D b) {
+		    	if (FpUtil.fpLess(a.x, b.x))
+		    		return -1;
+		    	if (FpUtil.fpEqual(a.x, b.x))
+		    		return 0;
+		      return 1;         
+		    }     
+		};
 	}
 	
 	// Calculates a triangle that encloses the given points. The points need to
@@ -138,61 +230,11 @@ public class DelauneyTriangulation {
 		return new Triangle2D(a, b, c);
 	}
 	
-	// Adds the edges of given triangles whose circumcircle contains a given sample
-	// point to a given edge buffer and removes the triangles from the given list.
-	private static void findEnclosingPolygonEdges(Point2D sample,
-			List<DelauneyTriangle> triangles, EdgeBuffer edges) {
-		int i = 0;
-		while (i < triangles.size()) {
-			DelauneyTriangle t = triangles.get(i); 
-			if (t.isPointInCircumcircle(sample)) {
-				edges.addEdges(t);
-				triangles.remove(i);
-				// Since we removed the triangle we don't need to increase
-				// the loop counter.
-			} else {
-				++i;
-			}
-		}
-	}
-	
-	// For each given edge generate a new triangle with a given sample point and store
-	// it in a given triangle list.
-	private static void generateNewTriangles(Point2D sample,
-			EdgeBuffer edges, List<DelauneyTriangle> triangles) {
-		for (int i = 0; i < edges.size(); ++i) {
-			LineSegment2D e = edges.get(i);
-			try {
-				Triangle2D t = new Triangle2D(sample, e.startPoint(), e.endPoint());
-				// Skip triangles that are lines or points.
-				if (!t.isDegenerate())
-					triangles.add(new DelauneyTriangle(t));
-			} catch (GeometryException ex) {
-				// Skip this triangle.
-			}
-		}
-	}
-	
-	// Removes triangles from a given list that share vertices with a given master
-	// triangle.
-	private static void removeTrianglesSharingVertices(
-			List<DelauneyTriangle> triangles, Triangle2D master) {
-		int i = 0;
-		while (i < triangles.size()) {
-			DelauneyTriangle t = triangles.get(i);
-			
-			boolean wasRemoved = false;
-			for (int j = 0; j < 3; ++j) {
-				if (isVertexOf(t.vertex(j), master)) {
-					triangles.remove(i);
-					wasRemoved = true;
-					break;
-				}
-			}
-			
-			if (!wasRemoved)
-				++i;
-		}
+	// Checks if a given  triangle needs to ever be considered again during the
+	// triangulation. Requires that the sample points of the triangulation
+	// are sorted by ascending x-coordinates.
+	private static boolean hasTriangleSettled(DelauneyTriangle t, Point2D pt) {
+		return FpUtil.fpGreater(pt.x - t.circumcenter().x, t.circumcircleRadius());
 	}
 	
 	// Checks if a given point is a vertex of a given triangle.
