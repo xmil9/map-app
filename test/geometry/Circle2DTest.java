@@ -45,7 +45,7 @@ public class Circle2DTest {
 		assertEquals(new Point2D(1, 2), copy.center);
 		assertEquals(3, copy.radius, 0.0);
 	}
-
+	
 	@Test
 	public void isPoint_WhenCircleIsPoint() {
 		Circle2D c = new Circle2D(new Point2D(1, 2), 0);
@@ -64,6 +64,12 @@ public class Circle2DTest {
 		Circle2D off = c.offset(new Vector2D(2, 1));
 		assertEquals(new Point2D(3, 3), off.center);
 		assertEquals(c.radius, off.radius, 0.0);
+	}
+
+	@Test
+	public void bounds() {
+		Circle2D c = new Circle2D(new Point2D(1, 2), 3);
+		assertEquals(new Rect2D(-2, -1, 4, 5), c.bounds());
 	}
 
 	@Test

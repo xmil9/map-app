@@ -41,6 +41,11 @@ public class Circle2D extends Object {
 		return FpUtil.fpEqual(radius, 0.0);
 	}
 	
+	public Rect2D bounds() {
+		return new Rect2D(center.x - radius, center.y - radius, center.x + radius,
+				center.y + radius);
+	}
+	
 	public Circle2D offset(Vector2D v) {
 		return new Circle2D(center.offset(v), radius);
 	}
