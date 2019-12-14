@@ -2,6 +2,8 @@ package geometry;
 
 import java.util.Objects;
 
+import math.FpUtil;
+
 
 //Triangle extended with additional information and an interface
 //customized for operations needed for Delauney triangulation. 
@@ -9,12 +11,17 @@ public class DelauneyTriangle extends Object {
 	
 	private final Triangle2D triangle;
 	private final Circle2D circumcircle;
+	// Optimization: Cache bounds of triangle to speed up finding vertices. 
 	private final Rect2D bounds;
+	// Optimization: Cache squared radius of circumcircle to speed checks
+	// for point in circumcircle. 
+	private final double radiusSquared;
 	
 	public DelauneyTriangle(Triangle2D t) throws GeometryException {
 		triangle = t;
 		circumcircle = t.calcCircumcircle();
 		bounds = GeometryUtil.calcBoundingBox(t.vertexArray());
+		radiusSquared = circumcircle.radius * circumcircle.radius;
 	}
 	
 	@Override
@@ -65,7 +72,8 @@ public class DelauneyTriangle extends Object {
 	}
 	
 	public boolean isPointInCircumcircle(Point2D pt) {
-		return circumcircle.isPointInCircle(pt);
+		return FpUtil.fpLessEqual(
+				Point2D.distanceSquared(pt, circumcircle.center), radiusSquared);
 	}
 	
 	public Point2D circumcenter() {
