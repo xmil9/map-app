@@ -672,4 +672,44 @@ public class VoronoiTesselationTest {
 				new Point2D(30, 34.1904761904),
 		}));
 	}
+
+	@Test
+	public void tesselate_ForPointsWithDecimals() {
+		Set<Point2D> samples = new HashSet<Point2D>();
+		samples.add(new Point2D(10.03982460, 10.874267480));
+		samples.add(new Point2D(45.3094234, 7.8437662));
+		samples.add(new Point2D(42.02437654767, 17.02308702));
+		samples.add(new Point2D(20.00247202, 50.74692212));
+		Rect2D border = new Rect2D(0, 0, 100, 100);
+		VoronoiTesselation vt = new VoronoiTesselation(samples, border);
+		List<VoronoiRegion> regions = vt.tesselate();
+		
+		assertTrue(regions.size() == 4);
+		assertTrue(hasRegionWithVertices(regions, new Point2D[] {
+				new Point2D(0.0, 34.5638037550),
+				new Point2D(0, 100),
+				new Point2D(100, 100),
+				new Point2D(100, 78.9337298886),
+				new Point2D(23.182534043444, 28.77137746533),
+		}));
+		assertTrue(hasRegionWithVertices(regions, new Point2D[] {
+				new Point2D(0, 34.56380375503),
+				new Point2D(23.18253404344, 28.77137746),
+				new Point2D(27.4398063005, 6.62616003340),
+				new Point2D(26.8704608261, 0),
+				new Point2D(0, 0),
+		}));
+		assertTrue(hasRegionWithVertices(regions, new Point2D[] {
+				new Point2D(100, 78.9337298886),
+				new Point2D(100, 32.5936189109),
+				new Point2D(27.43980630055, 6.6261600334),
+				new Point2D(23.18253404344, 28.77137746533),
+		}));
+		assertTrue(hasRegionWithVertices(regions, new Point2D[] {
+				new Point2D(100, 32.5936189109),
+				new Point2D(100, 0),
+				new Point2D(26.870460826, 0),
+				new Point2D(27.4398063005, 6.6261600334),
+		}));
+	}
 }
