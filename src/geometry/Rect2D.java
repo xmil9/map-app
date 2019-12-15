@@ -136,6 +136,15 @@ public class Rect2D extends Object {
 				FpUtil.fpLessEqual(pt.y, bottom);
 	}
 	
+	public Rect2D intersect(Rect2D other) {
+		if (left > other.right || other.left > right ||
+				top > other.bottom || other.top > bottom) {
+			return new Rect2D();
+		}
+		return new Rect2D(Math.max(left,  other.left), Math.max(top, other.top),
+				Math.min(right,  other.right), Math.min(bottom, other.bottom));
+	}
+	
 	private void normalize() {
 		if (left > right) {
 			double tmp = left;

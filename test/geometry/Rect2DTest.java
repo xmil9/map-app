@@ -265,4 +265,74 @@ public class Rect2DTest {
 		assertTrue(r.isPointInRect(new Point2D(0, 7)));
 		assertTrue(r.isPointInRect(new Point2D(-1, 1)));
 	}
+
+	@Test
+	public void intersect_ForVertOverlappingRects() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(-3, 1, 7, 10);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(-1, 1, 5, 7), isect);
+	}
+
+	@Test
+	public void intersect_ForHorzOverlappingRects() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(2, -4, 10, 8);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(2, -2, 5, 7), isect);
+	}
+
+	@Test
+	public void intersect_ForDiagonallyOverlappingRectsCase1() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(-3, -5, 3, 4);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(-1, -2, 3, 4), isect);
+	}
+
+	@Test
+	public void intersect_ForDiagonallyOverlappingRectsCase2() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(1, 3, 7, 10);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(1, 3, 5, 7), isect);
+	}
+
+	@Test
+	public void intersect_ForNestedRects() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(1, 0, 3, 2);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(1, 0, 3, 2), isect);
+	}
+
+	@Test
+	public void intersect_ForVertNonOverlappingRects() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(2, 10, 7, 14);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(), isect);
+	}
+
+	@Test
+	public void intersect_ForHorzNonOverlappingRects() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D b = new Rect2D(8, 2, 11, 14);
+		Rect2D isect = a.intersect(b);
+		assertEquals(new Rect2D(), isect);
+	}
+
+	@Test
+	public void intersect_ForSameRect() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D isect = a.intersect(a);
+		assertEquals(a, isect);
+	}
+
+	@Test
+	public void intersect_WithEmptyRect() {
+		Rect2D a = new Rect2D(-1, -2, 5, 7);
+		Rect2D isect = a.intersect(new Rect2D());
+		assertEquals(new Rect2D(), isect);
+	}
 }
