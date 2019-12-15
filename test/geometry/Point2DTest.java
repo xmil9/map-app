@@ -63,6 +63,20 @@ public class Point2DTest {
 	}
 	
 	@Test
+	public void distance() {
+		assertEquals(Math.sqrt(5),
+				Point2D.distance(new Point2D(1, 3), new Point2D(3, 2)), 0.00001);
+		assertEquals(Math.sqrt(41),
+				Point2D.distance(new Point2D(-1, 3), new Point2D(3, -2)), 0.00001);
+	}
+	
+	@Test
+	public void distance_ForSamePoint() {
+		assertEquals(0,
+				Point2D.distance(new Point2D(1, 3), new Point2D(1, 3)), 0.0);
+	}
+	
+	@Test
 	public void distanceSquared() {
 		assertEquals(5,
 				Point2D.distanceSquared(new Point2D(1, 3), new Point2D(3, 2)), 0.0);

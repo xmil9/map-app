@@ -53,6 +53,14 @@ public class Point2D extends Object {
 		return offset(v.x, v.y);
 	}
 	
+	// Returns distance between given points.
+	// Because it uses a sqrt the calculation is slow. To compare distances
+	// it is faster to compare their squared values.
+	public static double distance(Point2D a, Point2D b) {
+		return Math.sqrt(distanceSquared(a, b));
+	}
+	
+	// Returns squared distance between given points.
 	public static double distanceSquared(Point2D a, Point2D b) {
 		double dx = b.x - a.x;
 		double dy = b.y - a.y;
