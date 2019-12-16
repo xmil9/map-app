@@ -169,11 +169,12 @@ public class PoissonDiscSampling {
 	
 	///////////////
 	
-	// Number of candidates that are generated when trying to find a new sample.
-	private static final int numCandidates = 30;
 	private final Rect2D domain;
 	// Min distance that samples are allowed to be from each other.
 	private final double minDist;
+	// Number of candidates that are generated when trying to find a new sample.
+	private static final int NUM_CANDIDATES_DEFAULT = 30;
+	private final int numCandidates;
 	// Max distance from seed sample that candidate samples are looked for. 
 	private final double maxCandidateDist;
 	private List<Point2D> samples = new ArrayList<Point2D>();
@@ -181,8 +182,13 @@ public class PoissonDiscSampling {
 	private BackgroundGrid grid;
 	
 	public PoissonDiscSampling(Rect2D domain, double minDist) {
+		this(domain, minDist, NUM_CANDIDATES_DEFAULT);
+	}
+
+	public PoissonDiscSampling(Rect2D domain, double minDist, int numCandidatePoints) {
 		this.domain = domain;
 		this.minDist = minDist;
+		this.numCandidates = numCandidatePoints;
 		this.maxCandidateDist = 2 * minDist;
 		this.grid = new BackgroundGrid(domain, minDist);
 	}
