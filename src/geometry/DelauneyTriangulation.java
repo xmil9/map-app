@@ -61,9 +61,9 @@ public class DelauneyTriangulation {
 		
 		private boolean isDuplicateEdge(LineSegment2D a, LineSegment2D b) {
 			Point2D sa = a.startPoint(); 
-			Point2D ea = a.endPoint(); 
-			Point2D sb = b.startPoint(); 
-			Point2D eb = b.endPoint(); 
+			Point2D ea = a.endPoint();
+			Point2D sb = b.startPoint();
+			Point2D eb = b.endPoint();
 			return (sa.equals(sb) && ea.equals(eb)) ||
 					(sa.equals(eb) && ea.equals(sb));
 		}

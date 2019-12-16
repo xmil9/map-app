@@ -98,4 +98,15 @@ public class MapScene {
 		    content.getChildren().add(viewPoly);
 		}
 	}
+	
+	public void addCircles(List<Circle2D> circles, Color clr, double strokeWidth) {
+		for (Circle2D c : circles) {
+			Circle viewCircle = new Circle(c.center.x, c.center.y, c.radius);
+			viewCircle.setStrokeType(StrokeType.INSIDE);
+			viewCircle.setStroke(clr);
+			viewCircle.setStrokeWidth(strokeWidth);
+			viewCircle.setFill(null);
+		    content.getChildren().add(viewCircle);
+		}
+	}
 }

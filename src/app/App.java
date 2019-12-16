@@ -26,6 +26,11 @@ public class App extends Application {
 	}
 	
 	private Scene makeMapScene() {
+//		return makeVoronoiScene();
+		return makePoissonDiscSampleScene();
+	}
+	
+	private Scene makeVoronoiScene() {
 		final boolean showSamples = false;
 		final boolean showVoronoi = true;
 		final boolean showDelauney = false;
@@ -35,8 +40,8 @@ public class App extends Application {
 		MapScene map = new MapScene(1100, 1100);
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Set<Point2D> samples = genSamplePoints(10000, bounds);
-		
+		Set<Point2D> samples = genSamplePoints(10, bounds);
+
 		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiRegion> regions = voronoi.tesselate();
 
@@ -64,6 +69,40 @@ public class App extends Application {
 			if (voronoi.getTriangulation() != null)
 				map.addTriangles(voronoi.getTriangulation(), Color.web("black", 1.0),
 						strokeWidth);
+		}		
+		
+		map.scale(10);
+		return map.scene();
+	}
+	
+	private Scene makePoissonDiscSampleScene() {
+		final boolean showSamples = true;
+		final boolean showDomain = true;
+		final boolean showMinDistance = true;
+		
+		final double strokeWidth = 0.05;
+		MapScene map = new MapScene(1100, 1100);
+
+		Rect2D domain = new Rect2D(0, 0, 100, 100);
+		double minDist = 3;
+		PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist);
+		List<Point2D> samples = sampler.generate();
+		
+		if (showSamples) {
+			map.addPoints(samples, Color.web("red", 1.0), strokeWidth * 5);
+		}		
+
+		if (showMinDistance) {
+			List<Circle2D> circleList = new ArrayList<Circle2D>();
+			for (Point2D pt : samples)
+				circleList.add(new Circle2D(pt, minDist));
+			map.addCircles(circleList, Color.web("black", 1.0), strokeWidth);
+		}		
+		
+		if (showDomain) {
+			List<Rect2D> rects = new ArrayList<Rect2D>();
+			rects.add(domain);
+			map.addRects(rects, Color.web("blue", 1.0), strokeWidth);
 		}		
 		
 		map.scale(10);
