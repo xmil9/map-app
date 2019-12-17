@@ -26,8 +26,8 @@ public class App extends Application {
 	}
 	
 	private Scene makeMapScene() {
-//		return makeVoronoiScene();
-		return makePoissonDiscSampleScene();
+//		return makePoissonDiscSampleScene();
+		return makeVoronoiScene();
 	}
 	
 	private Scene makeVoronoiScene() {
@@ -40,7 +40,8 @@ public class App extends Application {
 		MapScene map = new MapScene(1100, 1100);
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Set<Point2D> samples = genSamplePoints(10, bounds);
+//		Set<Point2D> samples = genSamplePoints(10, bounds);
+		Set<Point2D> samples = genPoissonSamplePoints(bounds);
 
 		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiRegion> regions = voronoi.tesselate();
@@ -109,7 +110,13 @@ public class App extends Application {
 		return map.scene();
 	}
 	
-	private static Set<Point2D> genSamplePoints(int num, Rect2D bounds) {
+	private static Set<Point2D> genPoissonSamplePoints(Rect2D bounds) {
+		PoissonDiscSampling sampler = new PoissonDiscSampling(bounds, 0.5);
+		List<Point2D> samples = sampler.generate();
+		return new HashSet<Point2D>(samples);
+	}
+	
+	private static Set<Point2D> genUniformSamplePoints(int num, Rect2D bounds) {
 		Set<Point2D> pts = new HashSet<Point2D>();
 		while (pts.size() < num)
 			pts.add(genSamplePoint(bounds));
