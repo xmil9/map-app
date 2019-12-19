@@ -48,6 +48,16 @@ public class MapScene {
 		}
 	}
 	
+	public void addLines(List<LineSegment2D> lines, Color clr, double strokeWidth) {
+		for (LineSegment2D l : lines) {
+			Line viewLine = new Line(l.startPoint().x, l.startPoint().y,
+					l.endPoint().x, l.endPoint().y);  
+			viewLine.setStroke(clr);
+			viewLine.setStrokeWidth(strokeWidth);
+		    content.getChildren().add(viewLine);
+		}
+	}
+	
 	public void addTriangles(List<Triangle2D> triangles, Color clr, double strokeWidth) {
 		for (Triangle2D t : triangles) {
 			Polygon poly = new Polygon();
