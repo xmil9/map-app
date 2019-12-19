@@ -75,7 +75,7 @@ public class MapScene {
 		}
 	}
 	
-	public void addPolygons(List<Polygon2D> polys, Color clr, double strokeWidth) {
+	public void addPolygons(List<Polygon2D> polys, Color fillClr, Color strokeClr, double strokeWidth) {
 		for (Polygon2D poly : polys) {
 			Polygon viewPoly = new Polygon();
 			for (int i = 0; i < poly.countVertices(); ++i) {
@@ -83,9 +83,9 @@ public class MapScene {
 				viewPoly.getPoints().add(poly.vertex(i).y);
 			}
 		    viewPoly.setStrokeType(StrokeType.INSIDE);
-		    viewPoly.setStroke(clr);
+		    viewPoly.setStroke(strokeClr);
 		    viewPoly.setStrokeWidth(strokeWidth);
-		    viewPoly.setFill(null);
+		    viewPoly.setFill(fillClr);
 		    content.getChildren().add(viewPoly);
 		}
 	}

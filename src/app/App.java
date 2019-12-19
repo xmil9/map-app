@@ -33,14 +33,15 @@ public class App extends Application {
 	}
 	
 	private Scene makeMapScene() {
-		final double strokeWidth = 0.05;
+		final double strokeWidth = 0.01;
 		MapScene scene = new MapScene(1100, 1100);
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map map = new Map(bounds);
 		map.generate();
 		
-		scene.addPolygons(map.tileShapes(), Color.web("red", 1.0), strokeWidth);
+		scene.addPolygons(map.tileShapes(), Color.web("359BFF"),
+				Color.web("black", 1.0), strokeWidth);
 
 		scene.scale(10);
 		return scene.scene();
@@ -79,7 +80,7 @@ public class App extends Application {
 			List<Polygon2D> polys = new ArrayList<Polygon2D>();
 			for (VoronoiTile vr : regions)
 				polys.add(vr.outline);
-			scene.addPolygons(polys, Color.web("red", 1.0), strokeWidth);
+			scene.addPolygons(polys, null, Color.web("red", 1.0), strokeWidth);
 		}
 
 		if (showDelauney) {

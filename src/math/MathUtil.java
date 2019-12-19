@@ -1,6 +1,7 @@
 package math;
 
 import java.lang.Math;
+import java.util.Random;
 
 // Mathematical utility functions. 
 public class MathUtil {
@@ -69,6 +70,8 @@ public class MathUtil {
 
 	///////////////
 	
+	// Sign
+	
 	public enum Sign {
 		POSITIVE,
 		NEGATIVE,
@@ -81,5 +84,23 @@ public class MathUtil {
 		else if (FpUtil.fpLess(val, 0))
 			return Sign.NEGATIVE;
 		return Sign.NONE;
+	}
+	
+	///////////////
+	
+	// Random
+	
+	// Returns random value with approx Gaussian distribution in range [min, max].
+	// The distribution is only approx because a Gaussian distribution has no
+	// limits (extreme values are just very unlikely). This function clamps values
+	// 3 times the standard distribution (1.0) away from the median (0.0).
+	public static double randGaussian(Random rand, double min, double max) {
+		double val = rand.nextGaussian();
+		// Limit value to [0, 6].
+		double clamped = clampToRange(val + 3, 0, 6);
+		// Map value to [0, 1].
+		double normed = clamped / 6.0;
+		// Map to given range.
+		return min + (max - min) * normed;
 	}
 }

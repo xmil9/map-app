@@ -15,8 +15,8 @@ public class MapTile {
 	private final Map map;
 	// Array of indices into the map's node array. Ordered ccw.
 	private List<Integer> nodes;
-	// Array of indices into the map's fragment array.
-	private List<Integer> neighborTiles = new ArrayList<Integer>();
+	// Array of indices into the map's tile array.
+	private List<Integer> neighbors = new ArrayList<Integer>();
 	
 	public MapTile(Point2D seed, Polygon2D shape, Map map) {
 		this.seed = seed;
@@ -29,7 +29,7 @@ public class MapTile {
 	}
 	
 	public void addNeighbor(int tileIdx) {
-		if (!neighborTiles.contains(tileIdx))
-			neighborTiles.add(tileIdx);
+		if (!neighbors.contains(tileIdx))
+			neighbors.add(tileIdx);
 	}
 }
