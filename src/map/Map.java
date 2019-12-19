@@ -114,23 +114,21 @@ public class Map {
 		// Each vertex of the triangle corresponds to a tile seed. The triangle edges
 		// connect neighboring tiles. Mark the tiles of all triangle vertices as
 		// connected to each other.
+		Point2D[] seed = new Point2D[3];
+		Integer[] tileIdx = new Integer[3];
+		MapTile[] tile = new MapTile[3];
+		
 		for (var triangle : triangulation) {
-			Point2D seedA = triangle.vertex(0);
-			Integer tileIdxA = tileLookup.get(seedA);
-			MapTile tileA = tiles.get(tileIdxA);
-			Point2D seedB = triangle.vertex(1);
-			Integer tileIdxB = tileLookup.get(seedB);
-			MapTile tileB = tiles.get(tileIdxB);
-			Point2D seedC = triangle.vertex(2);
-			Integer tileIdxC = tileLookup.get(seedC);
-			MapTile tileC = tiles.get(tileIdxC);
-
-			tileA.addNeighbor(tileIdxB);
-			tileA.addNeighbor(tileIdxC);
-			tileB.addNeighbor(tileIdxA);
-			tileB.addNeighbor(tileIdxC);
-			tileC.addNeighbor(tileIdxA);
-			tileC.addNeighbor(tileIdxB);
+			for (int i = 0; i < 3; ++i) {
+				seed[i] = triangle.vertex(i);
+				tileIdx[i] = tileLookup.get(seed[i]);
+				tile[i] = tiles.get(tileIdx[i]);
+			}
+			for (int i = 0; i < 3; ++i) {
+				int next = (i < 2) ? i + 1 : 0;
+				tile[i].addNeighbor(tileIdx[next]);
+				tile[i].addNeighbor(tileIdx[(next < 2) ? next + 1 : 0]);
+			}			
 		}
 	}
 }
