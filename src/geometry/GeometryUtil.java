@@ -3,6 +3,7 @@ package geometry;
 import java.util.List;
 
 import math.FpUtil;
+import math.MathUtil;
 
 // Geometry related utility functionality.
 public class GeometryUtil {
@@ -47,7 +48,7 @@ public class GeometryUtil {
 		Orientation orientation = Orientation.None;
 		
 		for (int i = 0; i < path.size(); ++i) {
-			int nextIdx = (i < path.size() - 1) ? i + 1 : 0;
+			int nextIdx = MathUtil.cyclicNext(i, path.size());
 			prev = next;
 			next = new Vector2D(path.get(i), path.get(nextIdx));
 			if (prev == null)

@@ -10,6 +10,7 @@ import geometry.Rect2D;
 import geometry.Triangle2D;
 import geometry.VoronoiTesselation;
 import geometry.VoronoiTile;
+import math.MathUtil;
 
 
 // Generates the layout of tiles for a map.
@@ -43,8 +44,10 @@ public class MapGeometryGenerator {
 	
 	// Constructs the map's geometry for a given tesselation of the mapped area.  
 	private void makeMapGeometry(VoronoiTesselation tess) {
-		makeMapTiles(tess.tesselate());
+		List<VoronoiTile> tessTiles = tess.tesselate();
+		makeMapTiles(tessTiles);
 		populateTileNeighbors(tess.getTriangulation());
+		populateNodeNeighbors(tessTiles);
 	}
 	
 	// Constructs the tiles that the map is segmented into from given tiles of
@@ -77,7 +80,7 @@ public class MapGeometryGenerator {
 			Integer nodeIdx = rep.nodeLookup.get(pt);
 			if (nodeIdx == null) {
 				// Add new node.
-				rep.nodes.add(new MapNode(pt));
+				rep.nodes.add(new MapNode(pt, map));
 				nodeIdx = rep.nodes.size() - 1;
 				rep.nodeLookup.put(pt, nodeIdx);
 			}
@@ -91,7 +94,7 @@ public class MapGeometryGenerator {
 	// Populates the data structure that holds information about which tiles neighbor
 	// each other.
 	private void populateTileNeighbors(List<Triangle2D> triangulation) {
-		// Each vertex of the triangle corresponds to a tile seed. The triangle edges
+		// Each vertex of a triangle corresponds to a tile seed. The triangle edges
 		// connect neighboring tiles. Mark the tiles of all triangle vertices as
 		// connected to each other.
 		Point2D[] seed = new Point2D[3];
@@ -105,10 +108,40 @@ public class MapGeometryGenerator {
 				tile[i] = rep.tiles.get(tileIdx[i]);
 			}
 			for (int i = 0; i < 3; ++i) {
-				int next = (i < 2) ? i + 1 : 0;
+				int next = MathUtil.cyclicNext(i, 3);
 				tile[i].addNeighbor(tileIdx[next]);
-				tile[i].addNeighbor(tileIdx[(next < 2) ? next + 1 : 0]);
+				tile[i].addNeighbor(tileIdx[MathUtil.cyclicNext(next, 3)]);
 			}			
+		}
+	}
+	
+	// Populates the data structure that holds information about which nodes neighbor
+	// each other.
+	private void populateNodeNeighbors(List<VoronoiTile> tessTiles) {
+		// Each vertex of a Voronoi tile's outline corresponds to a map node. The
+		// border edges connect neighboring nodes. Mark the nodes of neighboring
+		// vertices as connected to each other.
+		for (var tessTile : tessTiles) {
+			int numVertices = tessTile.outline.countVertices();
+			for (int i = 0; i < numVertices; ++i) {
+				Point2D vertex = tessTile.outline.vertex(i);
+				Point2D next = tessTile.outline.vertex(
+						MathUtil.cyclicNext(i, numVertices));
+				connectNodesAt(vertex, next);
+			}
+		}
+	}
+	
+	// Marks two map nodes at given locations as neighbors.
+	private void connectNodesAt(Point2D a, Point2D b) {
+		Integer nodeIdxA = rep.nodeLookup.get(a);
+		MapNode nodeA = (nodeIdxA != null) ? rep.nodes.get(nodeIdxA) : null;
+		Integer nodeIdxB = rep.nodeLookup.get(b);
+		MapNode nodeB = (nodeIdxB != null) ? rep.nodes.get(nodeIdxB) : null;
+		
+		if (nodeA != null && nodeB != null) {
+			nodeA.addNeighbor(nodeIdxB);
+			nodeB.addNeighbor(nodeIdxA);
 		}
 	}
 }

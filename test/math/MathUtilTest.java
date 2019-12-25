@@ -98,6 +98,29 @@ public class MathUtilTest {
 	public void shiftIntoRange_ForEmptyRange() {
 		assertEquals(5, MathUtil.shiftIntoRange(5, 10, 10), 0.0);
 	}
+	
+	@Test
+	public void cyclicNext() {
+		assertEquals(1, MathUtil.cyclicNext(0, 4));
+		assertEquals(2, MathUtil.cyclicNext(1, 4));
+		assertEquals(3, MathUtil.cyclicNext(2, 4));
+		assertEquals(0, MathUtil.cyclicNext(3, 4));
+	}
+	
+	@Test
+	public void cyclicNext_ForIndexOutsideRange() {
+		assertEquals(0, MathUtil.cyclicNext(100, 4));
+	}
+	
+	@Test
+	public void cyclicNext_ForEmptyRange() {
+		assertEquals(0, MathUtil.cyclicNext(0, 0));
+	}
+	
+	@Test
+	public void cyclicNext_ForNegativeIndex() {
+		assertEquals(-1, MathUtil.cyclicNext(-2, 3));
+	}
 
 	///////////////
 	

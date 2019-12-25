@@ -56,6 +56,14 @@ public class MathUtil {
 		return val;
 	}
 	
+	// Returns the next index for a given index. Cycles around to zero when index
+	// passes the end of the range.
+	public static int cyclicNext(int curIdx, int numElems) {
+		if (curIdx < numElems - 1)
+			return ++curIdx;
+		return 0;
+	}
+	
 	///////////////
 	
 	// Angle unit conversions.

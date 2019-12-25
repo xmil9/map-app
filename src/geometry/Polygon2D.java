@@ -112,7 +112,7 @@ public class Polygon2D extends Object {
 		int numVert = poly.countVertices();
 		for (int i = 0; i < numVert; ++i) {
 			Vector2D v = new Vector2D(pt, poly.vertex(i));
-			int next = (i < numVert - 1) ? i + 1 : 0;
+			int next = MathUtil.cyclicNext(i, numVert);
 			Vector2D w = new Vector2D(pt, poly.vertex(next));
 			
 			MathUtil.Sign curOrientation = MathUtil.sign(v.perpDot(w));

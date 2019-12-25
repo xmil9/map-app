@@ -11,7 +11,7 @@ import geometry.Rect2D;
 public class Map {
 
 	// Data structures that hold the map data.
-	// Kept in separate class to allow generator objects to work with it.
+	// Kept in separate class to allow generator objects to work with it more esily.
 	public static class Representation {
 		// Tiles that map is made from.
 		public List<MapTile> tiles;

@@ -2,6 +2,8 @@ package geometry;
 
 import java.util.Arrays;
 
+import math.MathUtil;
+
 
 // 2-dimensional triangle.
 // Vertices are arranged in ccw order.
@@ -51,7 +53,7 @@ public class Triangle2D extends Object {
 	}
 	
 	public LineSegment2D edge(int idx) {
-		return new LineSegment2D(vertices[idx], vertices[(idx < 2) ? idx + 1 : 0]);
+		return new LineSegment2D(vertices[idx], vertices[MathUtil.cyclicNext(idx, 3)]);
 	}
 	
 	// Returns array of the triangle's vertices. 

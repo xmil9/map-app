@@ -76,6 +76,6 @@ public class MapTopographyGenerator {
 	}
 	
 	private void generateContinent(Continent continent) {
-		// >>>>>>>>>> create graph of nodes in map <<<<<<<<<<<<<<< 
+		// todo
 	}
 }
