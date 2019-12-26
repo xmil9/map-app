@@ -114,7 +114,8 @@ public class Map {
 
 	// Generates the tile layout of the map.
 	private void generateGeometry() {
-		MapGeometryGenerator gen = new MapGeometryGenerator(bounds, this, rand);
+		MapGeometryGenerator.Spec spec = new MapGeometryGenerator.Spec(bounds, 1.0, 30);
+		MapGeometryGenerator gen = new MapGeometryGenerator(this, spec, rand);
 		rep = gen.generate();
 	}
 	

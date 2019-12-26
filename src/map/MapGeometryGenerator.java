@@ -18,31 +18,49 @@ import types.Pair;
 // Generates the layout of tiles for a map.
 public class MapGeometryGenerator {
 
-	private final Rect2D bounds;
-	private final Map map;
-	private final Random rand;
-	private Map.Representation rep;
+	public static class Spec {
+		public final Rect2D bounds;
+		// Minimal distance of randomly generated sample points.
+		// Smaller distance => smaller and more map tiles.
+		public final double minSampleDistance;
+		// Number of candidates for generated sample points.
+		// Larger number => more evenly spaced sample points but slower.
+		public final int numSampleCandidates;
+		
+		public Spec(Rect2D bounds, double minSampleDist, int numCandidates) {
+			this.bounds = bounds;
+			this.minSampleDistance = minSampleDist;
+			this.numSampleCandidates = numCandidates;
+		}
+	}
 
-	public MapGeometryGenerator(Rect2D bounds, Map map, Random rand) {
-		this.bounds = bounds;
+	///////////////
+	
+	private final Map map;
+	private Map.Representation rep;
+	private final Spec spec;
+	private final Random rand;
+
+	public MapGeometryGenerator(Map map, Spec spec, Random rand) {
 		this.map = map;
-		this.rand = rand;
 		this.rep = new Map.Representation();
+		this.spec = spec;
+		this.rand = rand;
 	}
 
 	// Starts generating the geometry.
 	public Map.Representation generate() {
-		List<Point2D> seeds = generateTileSeeds(bounds, rand);
-		makeMapGeometry(new VoronoiTesselation(seeds, bounds));
+		List<Point2D> seeds = generateTileSeeds(spec.bounds, spec.minSampleDistance,
+				spec.numSampleCandidates, rand);
+		makeMapGeometry(new VoronoiTesselation(seeds, spec.bounds));
 		return rep;
 	}
 	
 	// Generates tile seeds within given bounds.
-	private static List<Point2D> generateTileSeeds(Rect2D bounds, Random rand) {
-		final double MIN_SAMPLE_DIST = 1.0;
-		final int NUM_CANDIDATES = 30;
+	private static List<Point2D> generateTileSeeds(Rect2D bounds, double minSampleDist,
+			int numCandidates, Random rand) {
 		PoissonDiscSampling sampler =
-				new PoissonDiscSampling(bounds, MIN_SAMPLE_DIST, NUM_CANDIDATES, rand);
+				new PoissonDiscSampling(bounds, minSampleDist, numCandidates, rand);
 		return sampler.generate();
 	}
 	
