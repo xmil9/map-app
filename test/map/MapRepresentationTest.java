@@ -18,8 +18,7 @@ public class MapRepresentationTest {
 
 	@Test
 	public void addTile_SingleTile() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var pos = new Point2D(2, 0);
 		List<Point2D> shapePts = new ArrayList<Point2D>();
@@ -38,8 +37,7 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void addTile_MultipleTiles() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
@@ -68,8 +66,7 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void tile() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
@@ -99,8 +96,7 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void findTileAt_ForAvailableLocation() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
@@ -135,8 +131,7 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void findTileAt_ForUnavailableLocation() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
@@ -166,8 +161,7 @@ public class MapRepresentationTest {
 
 	@Test
 	public void addNode_SingleNode() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var pos = new Point2D(2, 0);
 		var node = new MapNode(pos, map);
@@ -180,8 +174,7 @@ public class MapRepresentationTest {
 
 	@Test
 	public void addNode_MultipleNodes() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addNode(new MapNode(new Point2D(2, 0), map));
@@ -193,8 +186,7 @@ public class MapRepresentationTest {
 
 	@Test
 	public void node() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var nodeA = new MapNode(new Point2D(2, 0), map);
 		var nodeB = new MapNode(new Point2D(3, 2), map);
@@ -209,8 +201,7 @@ public class MapRepresentationTest {
 
 	@Test
 	public void findNodeAt_ForAvailableNode() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var nodeA = new MapNode(new Point2D(2, 0), map);
 		var nodeB = new MapNode(new Point2D(3, 2), map);
@@ -236,8 +227,7 @@ public class MapRepresentationTest {
 
 	@Test
 	public void findNodeAt_ForUnavailableNode() {
-		var mapBounds = new Rect2D(-100, -100, 100, 100);
-		var map = new Map(mapBounds, new Random());
+		var map = new Map(null, new Random());
 		
 		var nodeA = new MapNode(new Point2D(2, 0), map);
 		var nodeB = new MapNode(new Point2D(3, 2), map);

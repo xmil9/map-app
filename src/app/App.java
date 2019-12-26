@@ -13,6 +13,8 @@ import javafx.stage.*;
 
 import geometry.*;
 import map.Map;
+import map.MapGeometryGenerator;
+import map.MapTopographyGenerator;
 import view2d.MapScene;
 
 
@@ -27,7 +29,7 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("The Map App");
-		primaryStage.setScene(makeScene(null));
+		primaryStage.setScene(makeScene(123456L));
 		primaryStage.show();
 	}
 	
@@ -36,18 +38,43 @@ public class App extends Application {
 		
 //		return makePoissonDiscSampleScene();
 //		return makeVoronoiScene();
-		return makeMapScene();
+//		return makeMapScene();
+		return makeTestMapScene();
 	}
 	
 	private Scene makeMapScene() {
-		final double strokeWidth = 0.01;
+		final double strokeWidth = 0.03;
 		MapScene scene = new MapScene(1100, 1100);
 
-		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Map map = new Map(bounds, rand);
+		Rect2D bounds = new Rect2D(10, 10, 15, 15);
+		Map.Spec spec = new Map.Spec(new MapGeometryGenerator.Spec(bounds, 1, 30),
+				new MapTopographyGenerator.Spec(rand));
+		Map map = new Map(spec, rand);
 		map.generate();
 		
-		scene.addPolygons(map.tileShapes(), Color.web("359BFF"),
+		scene.addPolygons(map.tileShapes(), Color.web("359BAF"),
+				Color.web("black", 1.0), strokeWidth);
+
+		scene.scale(10);
+		return scene.scene();
+	}
+	
+	private Scene makeTestMapScene() {
+		final double strokeWidth = 0.03;
+		MapScene scene = new MapScene(1100, 1100);
+
+		var bounds = new Rect2D(10, 10, 15, 15);
+		var map = new Map(null, rand);
+		var spec = new MapGeometryGenerator.Spec(bounds, 1, 30);
+		var gen = new MapGeometryGenerator(map, spec, rand);
+		
+		Map.Representation rep = gen.generate();
+		
+		List<Polygon2D> shapes = new ArrayList<Polygon2D>(rep.countTiles());
+		for (int i = 0; i < rep.countTiles(); ++i)
+			shapes.add(rep.tile(i).shape);
+		
+		scene.addPolygons(shapes, Color.web("359BAF"),
 				Color.web("black", 1.0), strokeWidth);
 
 		scene.scale(10);

@@ -12,6 +12,18 @@ import types.Pair;
 
 public class Map {
 
+	public static class Spec {
+		public final MapGeometryGenerator.Spec geom;
+		public final MapTopographyGenerator.Spec topo;
+		
+		public Spec(MapGeometryGenerator.Spec geom, MapTopographyGenerator.Spec topo) {
+			this.geom = geom;
+			this.topo = topo;
+		}
+	}
+	
+	///////////////
+	
 	// Data structures that hold the map data.
 	// Kept in separate class to allow generator objects to work with it more esily.
 	public static class Representation {
@@ -83,12 +95,12 @@ public class Map {
 	
 	///////////////
 	
-	private final Rect2D bounds;
+	private final Spec spec;
 	private final Random rand;
 	private Representation rep;
 
-	public Map(Rect2D bounds, Random rand) {
-		this.bounds = bounds;
+	public Map(Spec spec, Random rand) {
+		this.spec = spec;
 		this.rand = rand;
 		this.rep = new Representation();
 	}
@@ -114,15 +126,13 @@ public class Map {
 
 	// Generates the tile layout of the map.
 	private void generateGeometry() {
-		MapGeometryGenerator.Spec spec = new MapGeometryGenerator.Spec(bounds, 1.0, 30);
-		MapGeometryGenerator gen = new MapGeometryGenerator(this, spec, rand);
+		MapGeometryGenerator gen = new MapGeometryGenerator(this, spec.geom, rand);
 		rep = gen.generate();
 	}
 	
 	// Generates the node elevations.
 	private void generateTopography() {
-		MapTopographyGenerator.Spec spec = new MapTopographyGenerator.Spec(rand);
-		MapTopographyGenerator gen = new MapTopographyGenerator(rep, spec, rand);
+		MapTopographyGenerator gen = new MapTopographyGenerator(rep, spec.topo, rand);
 		gen.generate();
 	}
 }

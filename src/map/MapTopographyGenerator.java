@@ -60,18 +60,18 @@ public class MapTopographyGenerator {
 	private void initContinents() {
 		continents = new ArrayList<Continent>(spec.numContinents);
 		
-		final int totalLandNodes = (int) (rep.countNodes() * spec.landRatio);
-		int landNodesRemaining = totalLandNodes;
-		
-		for (int i = 0; i < spec.numContinents - 1; ++i) {
-			int continentsRemaining = spec.numContinents - i; 
-			int continentSize = rand.nextInt(landNodesRemaining - continentsRemaining);
-			landNodesRemaining -= continentSize;
-			continents.add(new Continent(continentSize));
-		}
-		
-		// Last continent.
-		continents.add(new Continent(landNodesRemaining));
+//		final int totalLandNodes = (int) (rep.countNodes() * spec.landRatio);
+//		int landNodesRemaining = totalLandNodes;
+//		
+//		for (int i = 0; i < spec.numContinents - 1; ++i) {
+//			int continentsRemaining = spec.numContinents - i; 
+//			int continentSize = rand.nextInt(landNodesRemaining - continentsRemaining);
+//			landNodesRemaining -= continentSize;
+//			continents.add(new Continent(continentSize));
+//		}
+//		
+//		// Last continent.
+//		continents.add(new Continent(landNodesRemaining));
 	}
 	
 	private void generateContinent(Continent continent) {
