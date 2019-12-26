@@ -3,18 +3,23 @@ package app;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
-import geometry.*;
 import javafx.application.*;
 import javafx.scene.*;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
+
+import geometry.*;
 import map.Map;
 import view2d.MapScene;
 
 
 public class App extends Application {
+	
+	private Random rand;
+	
 	public static void main(String passes[]) {
 		launch(passes);
 	}
@@ -22,11 +27,13 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("The Map App");
-		primaryStage.setScene(makeScene());
+		primaryStage.setScene(makeScene(null));
 		primaryStage.show();
 	}
 	
-	private Scene makeScene() {
+	private Scene makeScene(Long randSeed) {
+		rand = (randSeed != null) ? new Random(randSeed) : new Random();
+		
 //		return makePoissonDiscSampleScene();
 //		return makeVoronoiScene();
 		return makeMapScene();
@@ -37,7 +44,7 @@ public class App extends Application {
 		MapScene scene = new MapScene(1100, 1100);
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Map map = new Map(bounds);
+		Map map = new Map(bounds, rand);
 		map.generate();
 		
 		scene.addPolygons(map.tileShapes(), Color.web("359BFF"),
@@ -57,8 +64,8 @@ public class App extends Application {
 		MapScene scene = new MapScene(1100, 1100);
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-//		List<Point2D> samples = genSamplePoints(10, bounds);
-		List<Point2D> samples = genPoissonSamplePoints(bounds);
+//		List<Point2D> samples = genSamplePoints(10, bounds, rand);
+		List<Point2D> samples = genPoissonSamplePoints(bounds, rand);
 
 		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiTile> regions = voronoi.tesselate();
@@ -103,7 +110,9 @@ public class App extends Application {
 
 		Rect2D domain = new Rect2D(0, 0, 100, 100);
 		double minDist = 3;
-		PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist);
+		int numCandidatePts = 30;
+		PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist,
+				numCandidatePts, rand);
 		List<Point2D> samples = sampler.generate();
 		
 		if (showSamples) {
@@ -127,26 +136,27 @@ public class App extends Application {
 		return scene.scene();
 	}
 	
-	private static List<Point2D> genPoissonSamplePoints(Rect2D bounds) {
-		PoissonDiscSampling sampler = new PoissonDiscSampling(bounds, 0.5);
+	private static List<Point2D> genPoissonSamplePoints(Rect2D bounds, Random rand) {
+		PoissonDiscSampling sampler = new PoissonDiscSampling(bounds, 0.5, 30, rand);
 		return sampler.generate();
 	}
 	
-	private static List<Point2D> genUniformSamplePoints(int num, Rect2D bounds) {
+	private static List<Point2D> genUniformSamplePoints(int num, Rect2D bounds,
+			Random rand) {
 		// Collect samples in set to prevent duplicates. 
-		Set<Point2D> pts = new HashSet<Point2D>();
+		Set<Point2D> pts = new HashSet<Point2D>(num);
 		while (pts.size() < num)
-			pts.add(genSamplePoint(bounds));
+			pts.add(genSamplePoint(bounds, rand));
 		return new ArrayList<Point2D>(pts);
 	}
 	
-	private static Point2D genSamplePoint(Rect2D bounds) {
+	private static Point2D genSamplePoint(Rect2D bounds, Random rand) {
 		return new Point2D(
-				genValue(bounds.left(), bounds.right()),
-				genValue(bounds.top(), bounds.bottom()));
+				genValue(bounds.left(), bounds.right(), rand),
+				genValue(bounds.top(), bounds.bottom(), rand));
 	}
 	
-	private static double genValue(double min, double max) {
-		return min + (max - min) * Math.random();
+	private static double genValue(double min, double max, Random rand) {
+		return min + (max - min) * rand.nextDouble();
 	}
 }

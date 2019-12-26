@@ -2,6 +2,7 @@ package map;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import geometry.Point2D;
 import geometry.PoissonDiscSampling;
@@ -19,27 +20,29 @@ public class MapGeometryGenerator {
 
 	private final Rect2D bounds;
 	private final Map map;
+	private final Random rand;
 	private Map.Representation rep;
 
-	public MapGeometryGenerator(Rect2D bounds, Map map) {
+	public MapGeometryGenerator(Rect2D bounds, Map map, Random rand) {
 		this.bounds = bounds;
 		this.map = map;
+		this.rand = rand;
 		this.rep = new Map.Representation();
 	}
 
 	// Starts generating the geometry.
 	public Map.Representation generate() {
-		List<Point2D> seeds = generateTileSeeds(bounds);
+		List<Point2D> seeds = generateTileSeeds(bounds, rand);
 		makeMapGeometry(new VoronoiTesselation(seeds, bounds));
 		return rep;
 	}
 	
 	// Generates tile seeds within given bounds.
-	private static List<Point2D> generateTileSeeds(Rect2D bounds) {
+	private static List<Point2D> generateTileSeeds(Rect2D bounds, Random rand) {
 		final double MIN_SAMPLE_DIST = 1.0;
 		final int NUM_CANDIDATES = 30;
 		PoissonDiscSampling sampler =
-				new PoissonDiscSampling(bounds, MIN_SAMPLE_DIST, NUM_CANDIDATES);
+				new PoissonDiscSampling(bounds, MIN_SAMPLE_DIST, NUM_CANDIDATES, rand);
 		return sampler.generate();
 	}
 	

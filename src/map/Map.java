@@ -3,6 +3,7 @@ package map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
@@ -83,10 +84,12 @@ public class Map {
 	///////////////
 	
 	private final Rect2D bounds;
+	private final Random rand;
 	private Representation rep;
 
-	public Map(Rect2D bounds) {
+	public Map(Rect2D bounds, Random rand) {
 		this.bounds = bounds;
+		this.rand = rand;
 		this.rep = new Representation();
 	}
 
@@ -111,14 +114,14 @@ public class Map {
 
 	// Generates the tile layout of the map.
 	private void generateGeometry() {
-		MapGeometryGenerator gen = new MapGeometryGenerator(bounds, this);
+		MapGeometryGenerator gen = new MapGeometryGenerator(bounds, this, rand);
 		rep = gen.generate();
 	}
 	
 	// Generates the node elevations.
 	private void generateTopography() {
-		MapTopographyGenerator.Spec spec = new MapTopographyGenerator.Spec();
-		MapTopographyGenerator gen = new MapTopographyGenerator(rep, spec);
+		MapTopographyGenerator.Spec spec = new MapTopographyGenerator.Spec(rand);
+		MapTopographyGenerator gen = new MapTopographyGenerator(rep, spec, rand);
 		gen.generate();
 	}
 }

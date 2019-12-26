@@ -3,6 +3,7 @@ package geometry;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -30,7 +31,8 @@ public class PoissonDiscSamplingTest {
 		
 		final int numRuns = 10;
 		for (int i = 0; i < numRuns; ++i) {
-			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist);
+			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist,
+					PoissonDiscSampling.NUM_CANDIDATES_DEFAULT, new Random(1111));
 			List<Point2D> samples = sampler.generate();
 			
 			assertTrue(!samples.isEmpty());
@@ -45,7 +47,8 @@ public class PoissonDiscSamplingTest {
 
 		final int numRuns = 10;
 		for (int i = 0; i < numRuns; ++i) {
-			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist);
+			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist,
+					PoissonDiscSampling.NUM_CANDIDATES_DEFAULT, new Random(2222));
 			List<Point2D> samples = sampler.generate();
 			
 			assertTrue(!samples.isEmpty());
@@ -60,7 +63,8 @@ public class PoissonDiscSamplingTest {
 		
 		final int numRuns = 10;
 		for (int i = 0; i < numRuns; ++i) {
-			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist);
+			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist,
+					PoissonDiscSampling.NUM_CANDIDATES_DEFAULT, new Random(3333));
 			List<Point2D> samples = sampler.generate(new Point2D(3, 6));
 			
 			assertTrue(!samples.isEmpty());
@@ -75,7 +79,8 @@ public class PoissonDiscSamplingTest {
 
 		final int numRuns = 10;
 		for (int i = 0; i < numRuns; ++i) {
-			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist);
+			PoissonDiscSampling sampler = new PoissonDiscSampling(domain, minDist,
+					PoissonDiscSampling.NUM_CANDIDATES_DEFAULT, new Random(4444));
 			List<Point2D> samples = sampler.generate(new Point2D(37, -3));
 			
 			assertTrue(!samples.isEmpty());

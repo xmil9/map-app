@@ -142,15 +142,16 @@ public class PoissonDiscSampling {
 	// are taken from.
 	private static class Annulus {
 		
-		private Ring2D ring;
+		private final Ring2D ring;
 		// Overlap of ring bounds and domain area.
-		private Rect2D bounds;
-		private Random rand = new Random();
+		private final Rect2D bounds;
+		private final Random rand;
 		
 		public Annulus(Point2D center, double innerRadius, double outerRadius,
-				Rect2D domain) {
+				Rect2D domain, Random rand) {
 			this.ring = new Ring2D(center, innerRadius, outerRadius);
 			this.bounds = ring.bounds().intersect(domain);
+			this.rand = rand;
 		}
 		
 		public Point2D generatePointInRing() {
@@ -169,27 +170,26 @@ public class PoissonDiscSampling {
 	
 	///////////////
 	
+	// Number of candidates that are generated when trying to find a new sample.
+	public static final int NUM_CANDIDATES_DEFAULT = 30;
 	private final Rect2D domain;
 	// Min distance that samples are allowed to be from each other.
 	private final double minDist;
-	// Number of candidates that are generated when trying to find a new sample.
-	private static final int NUM_CANDIDATES_DEFAULT = 30;
 	private final int numCandidates;
 	// Max distance from seed sample that candidate samples are looked for. 
 	private final double maxCandidateDist;
+	private final Random rand;
 	private List<Point2D> samples = new ArrayList<Point2D>();
 	private List<Integer> active = new ArrayList<Integer>();
 	private BackgroundGrid grid;
 	
-	public PoissonDiscSampling(Rect2D domain, double minDist) {
-		this(domain, minDist, NUM_CANDIDATES_DEFAULT);
-	}
-
-	public PoissonDiscSampling(Rect2D domain, double minDist, int numCandidatePoints) {
+	public PoissonDiscSampling(Rect2D domain, double minDist, int numCandidatePoints,
+			Random rand) {
 		this.domain = domain;
 		this.minDist = minDist;
 		this.numCandidates = numCandidatePoints;
 		this.maxCandidateDist = 2 * minDist;
+		this.rand = rand;
 		this.grid = new BackgroundGrid(domain, minDist);
 	}
 	
@@ -217,8 +217,8 @@ public class PoissonDiscSampling {
 	
 	// Generates random sample.
 	private Point2D generateSample() {
-		double x = domain.left() + Math.random() * domain.width();
-		double y = domain.top() + Math.random() * domain.height();
+		double x = domain.left() + rand.nextDouble() * domain.width();
+		double y = domain.top() + rand.nextDouble() * domain.height();
 		return new Point2D(x, y);
 	}
 	
@@ -244,7 +244,8 @@ public class PoissonDiscSampling {
 	// Finds a new sample for a given seed sample.
 	// Returns null if none could be found.
 	private Point2D findNewSample(Point2D seedSample) {
-		Annulus annulus = new Annulus(seedSample, minDist, maxCandidateDist, domain);
+		Annulus annulus =
+				new Annulus(seedSample, minDist, maxCandidateDist, domain, rand);
 		
 		for (int i = 0; i < numCandidates; ++i) {
 			Point2D candidate = annulus.generatePointInRing();

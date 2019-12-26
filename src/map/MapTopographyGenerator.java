@@ -13,8 +13,7 @@ public class MapTopographyGenerator {
 		public final double landRatio;
 		public final int numContinents;
 		
-		public Spec() {
-			Random rand = new Random(); 
+		public Spec(Random rand) {
 			landRatio = MathUtil.randGaussian(rand, 0,  1);
 			numContinents = (int) MathUtil.randGaussian(rand, 0,  10);
 		}
@@ -39,10 +38,10 @@ public class MapTopographyGenerator {
 	private Random rand;
 	private List<Continent> continents;
 
-	public MapTopographyGenerator(Map.Representation rep, Spec spec) {
+	public MapTopographyGenerator(Map.Representation rep, Spec spec, Random rand) {
 		this.rep = rep;
 		this.spec = spec;
-		this.rand = new Random();
+		this.rand = rand;
 	}
 	
 	public Map.Representation generate() {
