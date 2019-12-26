@@ -61,7 +61,7 @@ public class MapTopographyGenerator {
 	private void initContinents() {
 		continents = new ArrayList<Continent>(spec.numContinents);
 		
-		final int totalLandNodes = (int) (rep.nodes.size() * spec.landRatio);
+		final int totalLandNodes = (int) (rep.countNodes() * spec.landRatio);
 		int landNodesRemaining = totalLandNodes;
 		
 		for (int i = 0; i < spec.numContinents - 1; ++i) {

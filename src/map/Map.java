@@ -7,6 +7,7 @@ import java.util.List;
 import geometry.Point2D;
 import geometry.Polygon2D;
 import geometry.Rect2D;
+import types.Pair;
 
 public class Map {
 
@@ -14,20 +15,68 @@ public class Map {
 	// Kept in separate class to allow generator objects to work with it more esily.
 	public static class Representation {
 		// Tiles that map is made from.
-		public List<MapTile> tiles;
+		private List<MapTile> tiles;
 		// Lookup of tile index by its seed location.
-		public java.util.Map<Point2D, Integer> tileLookup;
+		private java.util.Map<Point2D, Integer> tileLookup;
 		// Unique nodes defining the shape of all tiles. A node shared between tiles
 		// is only listed once.
-		public List<MapNode> nodes;
+		private List<MapNode> nodes;
 		// Lookup of node index by its location.
-		public java.util.Map<Point2D, Integer> nodeLookup;
+		private java.util.Map<Point2D, Integer> nodeLookup;
 		
 		public Representation() {
 			tiles = new ArrayList<MapTile>();
 			tileLookup = new HashMap<Point2D, Integer>();
 			nodes = new ArrayList<MapNode>();
 			nodeLookup = new HashMap<Point2D, Integer>();
+		}
+		
+		// Adds a given tile.
+		public int addTile(MapTile tile) {
+			tiles.add(tile);
+			int tileIdx = tiles.size() - 1;
+			tileLookup.put(tile.seed, tileIdx);
+			return tileIdx;
+		}
+		
+		public int countTiles() {
+			return tiles.size();
+		}
+		
+		public MapTile tile(int idx) {
+			return tiles.get(idx);
+		}
+		
+		// Returns the tile and its index whose seed is located at a given position.
+		public Pair<MapTile, Integer> findTileAt(Point2D pos) {
+			Integer idx = tileLookup.get(pos);
+			if (idx == null)
+				return null;
+			return new Pair<MapTile, Integer>(tiles.get(idx), idx);
+		}
+
+		// Adds a given node.
+		public int addNode(MapNode node) {
+			nodes.add(node);
+			int nodeIdx = nodes.size() - 1;
+			nodeLookup.put(node.pos, nodeIdx);
+			return nodeIdx;
+		}
+		
+		public int countNodes() {
+			return nodes.size();
+		}
+		
+		public MapNode node(int idx) {
+			return nodes.get(idx);
+		}
+		
+		// Returns the node and its index that is located at a given position.
+		public Pair<MapNode, Integer> findNodeAt(Point2D pos) {
+			Integer idx = nodeLookup.get(pos);
+			if (idx == null)
+				return null;
+			return new Pair<MapNode, Integer>(nodes.get(idx), idx);
 		}
 	}
 	

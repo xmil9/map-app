@@ -8,7 +8,7 @@ import geometry.Point2D;
 // Holds map properties for a location on the map.
 public class MapNode {
 
-	private final Point2D pos;
+	public final Point2D pos;
 	private double elevation;
 	// Back-reference to the map object.
 	private final Map map;

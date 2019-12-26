@@ -11,6 +11,7 @@ import geometry.Triangle2D;
 import geometry.VoronoiTesselation;
 import geometry.VoronoiTile;
 import math.MathUtil;
+import types.Pair;
 
 
 // Generates the layout of tiles for a map.
@@ -53,7 +54,6 @@ public class MapGeometryGenerator {
 	// Constructs the tiles that the map is segmented into from given tiles of
 	// a tesselation.
 	private void makeMapTiles(List<VoronoiTile> tessTiles) {
-		rep.tiles = new ArrayList<MapTile>(tessTiles.size());
 		for (var tessTile : tessTiles)
 			makeMapTile(tessTile);
 	}
@@ -62,10 +62,7 @@ public class MapGeometryGenerator {
 	private void makeMapTile(VoronoiTile tessTile) {
 		MapTile tile = new MapTile(tessTile.seed, tessTile.outline, map);
 		tile.setNodes(makeTileNodes(tessTile.outline));
-		
-		rep.tiles.add(tile);
-		Integer tileIdx = rep.tiles.size() - 1;
-		rep.tileLookup.put(tessTile.seed, tileIdx);
+		rep.addTile(tile);
 	}
 	
 	// Contructs the map nodes that define map properties at each vertex of a
@@ -77,13 +74,12 @@ public class MapGeometryGenerator {
 			Point2D pt = shape.vertex(i);
 			
 			// Check if a map node exists already at this point.
-			Integer nodeIdx = rep.nodeLookup.get(pt);
-			if (nodeIdx == null) {
-				// Add new node.
-				rep.nodes.add(new MapNode(pt, map));
-				nodeIdx = rep.nodes.size() - 1;
-				rep.nodeLookup.put(pt, nodeIdx);
-			}
+			int nodeIdx = -1;
+			Pair<MapNode, Integer> node = rep.findNodeAt(pt);
+			if (node == null)
+				nodeIdx = rep.addNode(new MapNode(pt, map));
+			else
+				nodeIdx = node.b;
 			
 			tileNodes.add(nodeIdx);
 		}
@@ -97,21 +93,20 @@ public class MapGeometryGenerator {
 		// Each vertex of a triangle corresponds to a tile seed. The triangle edges
 		// connect neighboring tiles. Mark the tiles of all triangle vertices as
 		// connected to each other.
-		Point2D[] seed = new Point2D[3];
-		Integer[] tileIdx = new Integer[3];
-		MapTile[] tile = new MapTile[3];
-		
 		for (var triangle : triangulation) {
-			for (int i = 0; i < 3; ++i) {
-				seed[i] = triangle.vertex(i);
-				tileIdx[i] = rep.tileLookup.get(seed[i]);
-				tile[i] = rep.tiles.get(tileIdx[i]);
-			}
-			for (int i = 0; i < 3; ++i) {
-				int next = MathUtil.cyclicNext(i, 3);
-				tile[i].addNeighbor(tileIdx[next]);
-				tile[i].addNeighbor(tileIdx[MathUtil.cyclicNext(next, 3)]);
-			}			
+			connectTilesAt(triangle.vertex(0), triangle.vertex(1));
+			connectTilesAt(triangle.vertex(1), triangle.vertex(2));
+			connectTilesAt(triangle.vertex(2), triangle.vertex(0));
+		}
+	}
+	
+	// Marks two map tiles at given locations as neighbors.
+	private void connectTilesAt(Point2D a, Point2D b) {
+		Pair<MapTile, Integer> tileA = rep.findTileAt(a);
+		Pair<MapTile, Integer> tileB = rep.findTileAt(b);
+		if (tileA != null && tileB != null) {
+			tileA.a.addNeighbor(tileB.b);
+			tileB.a.addNeighbor(tileA.b);
 		}
 	}
 	
@@ -134,14 +129,11 @@ public class MapGeometryGenerator {
 	
 	// Marks two map nodes at given locations as neighbors.
 	private void connectNodesAt(Point2D a, Point2D b) {
-		Integer nodeIdxA = rep.nodeLookup.get(a);
-		MapNode nodeA = (nodeIdxA != null) ? rep.nodes.get(nodeIdxA) : null;
-		Integer nodeIdxB = rep.nodeLookup.get(b);
-		MapNode nodeB = (nodeIdxB != null) ? rep.nodes.get(nodeIdxB) : null;
-		
+		Pair<MapNode, Integer> nodeA = rep.findNodeAt(a);
+		Pair<MapNode, Integer> nodeB = rep.findNodeAt(b);
 		if (nodeA != null && nodeB != null) {
-			nodeA.addNeighbor(nodeIdxB);
-			nodeB.addNeighbor(nodeIdxA);
+			nodeA.a.addNeighbor(nodeB.b);
+			nodeB.a.addNeighbor(nodeA.b);
 		}
 	}
 }
