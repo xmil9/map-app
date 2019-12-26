@@ -11,6 +11,7 @@ module TheMapApp {
 	
 	exports app;
 	exports geometry;
+	exports map;
 	exports math;
 	exports view2d;
 }
