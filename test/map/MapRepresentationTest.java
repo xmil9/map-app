@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
-import geometry.Rect2D;
 
 
 public class MapRepresentationTest {

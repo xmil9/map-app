@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import geometry.Point2D;
 import geometry.Rect2D;
-import math.FpUtil;
 
 public class MapGeometryGeneratorTest {
 
@@ -29,11 +28,6 @@ public class MapGeometryGeneratorTest {
 			if (node.neighbor(i) != expected[i])
 				return false;
 		return true;
-	}
-	
-	private static boolean verifyNodeCoordinates(MapNode node, double[] expected) {
-		return FpUtil.fpEqual(node.pos.x, expected[0]) &&
-				FpUtil.fpEqual(node.pos.y, expected[1]);
 	}
 	
 	@Test

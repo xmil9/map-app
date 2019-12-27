@@ -1,14 +1,12 @@
 package map;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
-import geometry.Rect2D;
 import types.Pair;
 
 public class Map {
