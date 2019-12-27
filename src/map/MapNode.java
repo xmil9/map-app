@@ -20,8 +20,19 @@ public class MapNode {
 		this.map = map;
 	}
 	
+	// Adds a node given by its index as a neighboring node.
 	public void addNeighbor(int nodeIdx) {
 		if (!neighbors.contains(nodeIdx))
 			neighbors.add(nodeIdx);
+	}
+
+	public int countNeighbors() {
+		return neighbors.size();
+	}
+
+	// Returns the node index (into the map's node collection) of a neighboring
+	// node given by its index (into the neighbor collection of this node).
+	public int neighbor(int idx) {
+		return neighbors.get(idx);
 	}
 }

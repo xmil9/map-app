@@ -28,8 +28,19 @@ public class MapTile {
 		this.nodes = nodes;
 	}
 	
+	// Adds a tile given by its index as a neighboring tile.
 	public void addNeighbor(int tileIdx) {
 		if (!neighbors.contains(tileIdx))
 			neighbors.add(tileIdx);
+	}
+
+	public int countNeighbors() {
+		return neighbors.size();
+	}
+
+	// Returns the tile index (into the map's tile collection) of a neighboring
+	// tile given by its index (into the neighbor collection of this tile).
+	public int neighbor(int idx) {
+		return neighbors.get(idx);
 	}
 }
