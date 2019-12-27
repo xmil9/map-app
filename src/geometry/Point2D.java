@@ -1,5 +1,6 @@
 package geometry;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import math.FpUtil;
@@ -31,6 +32,45 @@ public class Point2D extends Object {
 				FpUtil.fpEqual(y, otherPt.y);
 	}
 
+	// Returns a Comparator object that compares Point2D objects by their
+	// x-coordinates and if they are equal by their y-coordinate.
+	public static Comparator<Point2D> makeXYComparator() {
+		return new Comparator<Point2D>() {         
+		    @Override         
+		    public int compare(Point2D a, Point2D b) {
+		    	if (FpUtil.fpLess(a.x, b.x))
+		    		return -1;
+		    	if (FpUtil.fpEqual(a.x, b.x)) {
+			    	if (FpUtil.fpLess(a.y, b.y))
+			    		return -1;
+			    	if (FpUtil.fpEqual(a.y, b.y))
+			    		return 0;
+		    		
+		    	}
+		    	return 1;         
+		    }
+		};
+	}
+	
+	// Returns a Comparator object that compares Point2D objects by their
+	// x-coordinates.
+	public static Comparator<Point2D> makeXComparator() {
+		return new Comparator<Point2D>() {         
+		    @Override         
+		    public int compare(Point2D a, Point2D b) {
+		    	if (FpUtil.fpLess(a.x, b.x))
+		    		return -1;
+		    	if (FpUtil.fpEqual(a.x, b.x))
+		    		return 0;
+		      return 1;         
+		    }     
+		};
+	}
+	
+	// Caution: Because of the threshold-based equality for Point2D objects
+	// it is always possible to find two points that fall into separate hash
+	// buckets but compare equal.
+	// Better not to use hash-based collections for Point2D objects.
 	@Override
 	public int hashCode() {
 		return Objects.hash(FpUtil.fpHashCode(x), FpUtil.fpHashCode(y));

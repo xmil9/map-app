@@ -1,9 +1,7 @@
 package geometry;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -13,14 +11,14 @@ public class DelauneyTriangulationTest {
 
 	@Test
 	public void triangulate_ForNoPoints() {
-		DelauneyTriangulation dt = new DelauneyTriangulation(new HashSet<Point2D>());
+		DelauneyTriangulation dt = new DelauneyTriangulation(new ArrayList<Point2D>());
 		List<Triangle2D> triangles = dt.triangulate();
 		assertTrue(triangles.isEmpty());
 	}
 
 	@Test
 	public void triangulate_ForOnePoint() {
-		Set<Point2D> samples = new HashSet<Point2D>();
+		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(new Point2D(1, 2));
 		DelauneyTriangulation dt = new DelauneyTriangulation(samples);
 		List<Triangle2D> triangles = dt.triangulate();
@@ -30,7 +28,7 @@ public class DelauneyTriangulationTest {
 
 	@Test
 	public void triangulate_ForTwoPoints() {
-		Set<Point2D> samples = new HashSet<Point2D>();
+		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(new Point2D(1, 2));
 		samples.add(new Point2D(6, -3));
 		DelauneyTriangulation dt = new DelauneyTriangulation(samples);
@@ -44,7 +42,7 @@ public class DelauneyTriangulationTest {
 		Point2D a = new Point2D(1, 2);
 		Point2D b = new Point2D(6, -3);
 		Point2D c = new Point2D(-2, -1);
-		Set<Point2D> samples = new HashSet<Point2D>();
+		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(a);
 		samples.add(b);
 		samples.add(c);
@@ -62,7 +60,7 @@ public class DelauneyTriangulationTest {
 
 	@Test
 	public void triangulate_ForFourPointsAsRect() {
-		Set<Point2D> samples = new HashSet<Point2D>();
+		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(new Point2D(1, 10));
 		samples.add(new Point2D(5, 10));
 		samples.add(new Point2D(5, 1));
@@ -76,7 +74,7 @@ public class DelauneyTriangulationTest {
 
 	@Test
 	public void triangulate_ForTenPoints() {
-		Set<Point2D> samples = new HashSet<Point2D>();
+		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(new Point2D(2, 1));
 		samples.add(new Point2D(5, 2));
 		samples.add(new Point2D(2, 4));
@@ -94,7 +92,7 @@ public class DelauneyTriangulationTest {
 
 	@Test
 	public void delauneyTriangles() {
-		Set<Point2D> samples = new HashSet<Point2D>();
+		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(new Point2D(2, 1));
 		samples.add(new Point2D(5, 2));
 		samples.add(new Point2D(2, 4));

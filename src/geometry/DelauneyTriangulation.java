@@ -82,8 +82,9 @@ public class DelauneyTriangulation {
 	private List<DelauneyTriangle> settledTriangles =
 			new ArrayList<DelauneyTriangle>();
 	
-	public DelauneyTriangulation(Set<Point2D> samplePoints) {
-		samples = new ArrayList<Point2D>(samplePoints);
+	// Caller is responsible that sample points does not contain duplicates.
+	public DelauneyTriangulation(List<Point2D> samplePoints) {
+		samples = samplePoints;
 		boundingTriangle = calcBoundingTriangle(samples);
 		
 		// Add bounding triangle vertices to the end of the vertex list.
@@ -95,7 +96,7 @@ public class DelauneyTriangulation {
 
 		// Sort all collected sample points by their x-coordinate to enable
 		// detecting triangles that cannot affect the triangulation anymore.
-		Collections.sort(samples, makePointXCoordComparator());
+		Collections.sort(samples, Point2D.makeXComparator());
 	}
 	
 	// Starts the Delauney triangulation.
@@ -196,21 +197,6 @@ public class DelauneyTriangulation {
 	private void settleRemainingTriangles() {
 		settledTriangles.addAll(triangulation);
 		triangulation.clear();
-	}
-	
-	// Returns a Comparator object that compares Point2D objects by their
-	// x-coordinates.
-	private static Comparator<Point2D> makePointXCoordComparator() {
-		return new Comparator<Point2D>() {         
-		    @Override         
-		    public int compare(Point2D a, Point2D b) {
-		    	if (FpUtil.fpLess(a.x, b.x))
-		    		return -1;
-		    	if (FpUtil.fpEqual(a.x, b.x))
-		    		return 0;
-		      return 1;         
-		    }     
-		};
 	}
 	
 	// Calculates a triangle that encloses the given points. The points need to

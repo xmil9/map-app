@@ -39,20 +39,24 @@ public class MapGeometryGenerator {
 	private final Map map;
 	private Map.Representation rep;
 	private final Spec spec;
-	private final Random rand;
 
-	public MapGeometryGenerator(Map map, Spec spec, Random rand) {
+	public MapGeometryGenerator(Map map, Spec spec) {
 		this.map = map;
 		this.rep = new Map.Representation();
 		this.spec = spec;
-		this.rand = rand;
 	}
 
-	// Starts generating the geometry.
-	public Map.Representation generate() {
+	// Uses random sample points to generate the geometry.
+	public Map.Representation generate(Random rand) {
 		List<Point2D> seeds = generateTileSeeds(spec.bounds, spec.minSampleDistance,
 				spec.numSampleCandidates, rand);
 		makeMapGeometry(new VoronoiTesselation(seeds, spec.bounds));
+		return rep;
+	}
+	
+	// Uses given sample points to generate the geometry.
+	public Map.Representation generate(List<Point2D> samplePoints) {
+		makeMapGeometry(new VoronoiTesselation(samplePoints, spec.bounds));
 		return rep;
 	}
 	

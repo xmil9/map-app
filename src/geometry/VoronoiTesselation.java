@@ -1,10 +1,9 @@
 package geometry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 
@@ -411,8 +410,7 @@ public class VoronoiTesselation {
 	
 	// Performs a Delauney triangulation for the configured sample points.
 	private List<DelauneyTriangle> delauneyTriangulation() {
-		DelauneyTriangulation delauney = new DelauneyTriangulation(
-				new HashSet<Point2D>(samples));
+		DelauneyTriangulation delauney = new DelauneyTriangulation(samples);
 		triangulation = delauney.triangulate();
 		return delauney.delauneyTriangles();
 	}
@@ -421,8 +419,8 @@ public class VoronoiTesselation {
 	// point.
 	private Map<Point2D, DelauneyEdgeCollection> collectDelauneyEdges(
 			List<DelauneyTriangle> delauneyTriangles) {
-		Map<Point2D, DelauneyEdgeCollection> edgeMap =
-				new HashMap<Point2D, DelauneyEdgeCollection>();
+		var edgeMap = new TreeMap<Point2D, DelauneyEdgeCollection>(
+				Point2D.makeXYComparator());
 		
 		for (var dt : delauneyTriangles) {
 			for (int i = 0; i < 3; ++i) {

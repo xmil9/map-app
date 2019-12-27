@@ -30,15 +30,19 @@ public class FpUtil {
 	}
 	
 	// Returns a hash code for a given floating point value. Attempts to account
-	// for the equality threshold of fp values. 
+	// for the equality threshold of fp values.
+	// Note: Does not work because it is always possible to find two fp values
+	// that compare equal but fall into separate hash buckets.
+	// Better not to use hash-based collections for fp values or be aware of the
+	// limitations.
 	public static long fpHashCode(double fp) {
-		return Objects.hash((long) (fp * truncationFactor));
+		return Objects.hash(Math.round(fp * truncationFactor));
 	}
 
 	// Overload for given fp threshold.
 	public static long fpHashCode(double fp, double thres) {
-		double truncFactor = 1.0 / thres;
-		return Objects.hash((long) (fp * truncFactor));
+		double truncFactor = calcTruncationFactor(thres);
+		return Objects.hash(Math.round(fp * truncFactor));
 	}
 	
 	///////////////

@@ -1,10 +1,8 @@
 package app;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import javafx.application.*;
 import javafx.scene.*;
@@ -37,16 +35,16 @@ public class App extends Application {
 		rand = (randSeed != null) ? new Random(randSeed) : new Random();
 		
 //		return makePoissonDiscSampleScene();
-//		return makeVoronoiScene();
+		return makeVoronoiScene();
 //		return makeMapScene();
-		return makeTestMapScene();
+//		return makeTestMapScene();
 	}
 	
 	private Scene makeMapScene() {
 		final double strokeWidth = 0.03;
 		MapScene scene = new MapScene(1100, 1100);
 
-		Rect2D bounds = new Rect2D(10, 10, 15, 15);
+		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map.Spec spec = new Map.Spec(new MapGeometryGenerator.Spec(bounds, 1, 30),
 				new MapTopographyGenerator.Spec(rand));
 		Map map = new Map(spec, rand);
@@ -66,9 +64,23 @@ public class App extends Application {
 		var bounds = new Rect2D(10, 10, 15, 15);
 		var map = new Map(null, rand);
 		var spec = new MapGeometryGenerator.Spec(bounds, 1, 30);
-		var gen = new MapGeometryGenerator(map, spec, rand);
+		var gen = new MapGeometryGenerator(map, spec);
 		
-		Map.Representation rep = gen.generate();
+		List<Point2D> samples = new ArrayList<Point2D>();
+		samples.add(new Point2D(12.066096133148083, 14.952071865649085));
+		samples.add(new Point2D(10.359849814108108, 14.049893453244641));
+		samples.add(new Point2D(13.653193719274324, 14.339350751718165));
+		samples.add(new Point2D(11.84474718538761, 13.181846436135407));
+		samples.add(new Point2D(13.456819983470801, 12.846725798122872));
+		samples.add(new Point2D(14.594267081916872, 12.774468009475912));
+		samples.add(new Point2D(11.47279168687508, 11.606484000770104));
+		samples.add(new Point2D(10.198911427928012, 12.149143937412557));
+		samples.add(new Point2D(13.483368093737289, 11.083084116266384));
+		samples.add(new Point2D(14.849570135024054, 10.946546502471405));
+		samples.add(new Point2D(11.557253434315392, 10.25812270703529));
+		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
+
+		Map.Representation rep = gen.generate(samples);
 		
 		List<Polygon2D> shapes = new ArrayList<Polygon2D>(rep.countTiles());
 		for (int i = 0; i < rep.countTiles(); ++i)
@@ -84,7 +96,7 @@ public class App extends Application {
 	private Scene makeVoronoiScene() {
 		final boolean showSamples = false;
 		final boolean showVoronoi = true;
-		final boolean showDelauney = false;
+		final boolean showDelauney = true;
 		final boolean showBounds = true;
 		
 		final double strokeWidth = 0.05;
@@ -92,7 +104,20 @@ public class App extends Application {
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 //		List<Point2D> samples = genSamplePoints(10, bounds, rand);
-		List<Point2D> samples = genPoissonSamplePoints(bounds, rand);
+//		List<Point2D> samples = genPoissonSamplePoints(bounds, rand);
+		List<Point2D> samples = new ArrayList<Point2D>();
+		samples.add(new Point2D(12.066096133148083, 14.952071865649085));
+		samples.add(new Point2D(10.359849814108108, 14.049893453244641));
+		samples.add(new Point2D(13.653193719274324, 14.339350751718165));
+		samples.add(new Point2D(11.84474718538761, 13.181846436135407));
+		samples.add(new Point2D(13.456819983470801, 12.846725798122872));
+		samples.add(new Point2D(14.594267081916872, 12.774468009475912));
+		samples.add(new Point2D(11.47279168687508, 11.606484000770104));
+		samples.add(new Point2D(10.198911427928012, 12.149143937412557));
+		samples.add(new Point2D(13.483368093737289, 11.083084116266384));
+		samples.add(new Point2D(14.849570135024054, 10.946546502471405));
+		samples.add(new Point2D(11.557253434315392, 10.25812270703529));
+		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		VoronoiTesselation voronoi = new VoronoiTesselation(samples, bounds);
 		List<VoronoiTile> regions = voronoi.tesselate();
@@ -171,10 +196,13 @@ public class App extends Application {
 	private static List<Point2D> genUniformSamplePoints(int num, Rect2D bounds,
 			Random rand) {
 		// Collect samples in set to prevent duplicates. 
-		Set<Point2D> pts = new HashSet<Point2D>(num);
-		while (pts.size() < num)
-			pts.add(genSamplePoint(bounds, rand));
-		return new ArrayList<Point2D>(pts);
+		List<Point2D> pts = new ArrayList<Point2D>(num);
+		while (pts.size() < num) {
+			Point2D pt = genSamplePoint(bounds, rand);
+			if (!pts.contains(pt))
+				pts.add(pt);
+		}
+		return pts;
 	}
 	
 	private static Point2D genSamplePoint(Rect2D bounds, Random rand) {

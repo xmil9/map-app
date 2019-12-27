@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeMap;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
@@ -39,9 +40,9 @@ public class Map {
 		
 		public Representation() {
 			tiles = new ArrayList<MapTile>();
-			tileLookup = new HashMap<Point2D, Integer>();
+			tileLookup = new TreeMap<Point2D, Integer>(Point2D.makeXYComparator());
 			nodes = new ArrayList<MapNode>();
-			nodeLookup = new HashMap<Point2D, Integer>();
+			nodeLookup = new TreeMap<Point2D, Integer>(Point2D.makeXYComparator());
 		}
 		
 		// Adds a given tile.
@@ -126,8 +127,8 @@ public class Map {
 
 	// Generates the tile layout of the map.
 	private void generateGeometry() {
-		MapGeometryGenerator gen = new MapGeometryGenerator(this, spec.geom, rand);
-		rep = gen.generate();
+		MapGeometryGenerator gen = new MapGeometryGenerator(this, spec.geom);
+		rep = gen.generate(rand);
 	}
 	
 	// Generates the node elevations.
