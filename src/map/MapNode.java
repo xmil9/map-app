@@ -9,7 +9,7 @@ import geometry.Point2D;
 public class MapNode {
 
 	public final Point2D pos;
-	private double elevation;
+	private double elevation = -1;
 	// Back-reference to the map object.
 	private final Map map;
 	// Array of indices into the map's node array.
@@ -34,5 +34,13 @@ public class MapNode {
 	// node given by its index (into the neighbor collection of this node).
 	public int neighbor(int idx) {
 		return neighbors.get(idx);
+	}
+	
+	public double elevation() {
+		return elevation;
+	}
+	
+	public void setElevation(double elevation) {
+		this.elevation = elevation;
 	}
 }
