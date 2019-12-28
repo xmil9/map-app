@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+// Generates continents by growing them randomly outward from a seed node.
+// Leads to blob looking shapes for large maps.
 public class BlobContinentGenerator implements ContinentGenerator {
 
 	private Map.Representation rep;
@@ -14,50 +16,59 @@ public class BlobContinentGenerator implements ContinentGenerator {
 		this.rand = rand;
 	}
 	
+	@Override
 	public void generate(Continent continent) {
-		MapNode nextNode = findWaterNode();
+		MapNode nextNode = findSeedNode();
 		if (nextNode == null)
 			return;
-		nextNode.setElevation(1);
+		assignNode(continent, nextNode);
 		
-		List<MapNode> landNodes = new ArrayList<MapNode>();
-		landNodes.add(nextNode);
+		// Pool of nodes that are used to grow the continent from.
 		List<MapNode> growthPool = new ArrayList<MapNode>();
 		growthPool.add(nextNode);
 		
-		while (landNodes.size() < continent.allocatedSize) {
-			nextNode = findNeighboringWaterNode(growthPool);
+		while (continent.size() < continent.allocatedSize) {
+			nextNode = findUnassignedNode(growthPool);
 			if (nextNode == null)
 				return;
-			nextNode.setElevation(1);
-
-			landNodes.add(nextNode);
+			assignNode(continent, nextNode);
 			growthPool.add(nextNode);
 		}
 	}
 	
-	private MapNode findWaterNode() {
+	// Finds an unassigned node on the map.
+	private MapNode findSeedNode() {
 		int attemptsLeft = 100;
 		while (--attemptsLeft > 0) {
 			int nodeIdx = rand.nextInt(rep.countNodes());
-			if (rep.node(nodeIdx).elevation() < 0)
+			if (isUnassignedNode(rep.node(nodeIdx)))
 				return rep.node(nodeIdx);
 		}
 		return null;
 	}
 	
-	private MapNode findNeighboringWaterNode(List<MapNode> nodePool) {
+	// Finds an unassigned neighbor of a node from a given pool of nodes.
+	private MapNode findUnassignedNode(List<MapNode> nodePool) {
 		while (!nodePool.isEmpty()) {
 			int nodeIdx = rand.nextInt(nodePool.size());
 			MapNode node = nodePool.get(nodeIdx);
 			for (int i = 0; i < node.countNeighbors(); ++i) {
 				MapNode neighbor = node.neighbor(i);
-				if (neighbor.elevation() < 0)
+				if (isUnassignedNode(neighbor))
 					return neighbor;
 			}
-			// No neighboring water nodes. Remove node from pool.
+			// No unassigned neighbors left. Remove node from pool.
 			nodePool.remove(nodeIdx);
 		}
 		return null;
+	}
+	
+	private static boolean isUnassignedNode(MapNode node) {
+		return node.elevation() < 0;
+	}
+	
+	private static void assignNode(Continent continent, MapNode node) {
+		node.setElevation(1);
+		continent.addNode(node);
 	}
 }

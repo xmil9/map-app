@@ -14,7 +14,11 @@ public class Continent {
 		this.nodes = new ArrayList<MapNode>(size);
 	}
 	
-	public void setNodes(List<MapNode> nodes) {
-		this.nodes = nodes;
+	public int size() {
+		return nodes.size();
+	}
+	
+	public void addNode(MapNode node) {
+		nodes.add(node);
 	}
 }
