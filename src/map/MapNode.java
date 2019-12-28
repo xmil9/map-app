@@ -10,14 +10,11 @@ public class MapNode extends Object {
 
 	public final Point2D pos;
 	private double elevation = -1;
-	// Back-reference to the map object.
-	private final Map map;
-	// Array of indices into the map's node array.
-	private List<Integer> neighbors = new ArrayList<Integer>();
+	// Array neighboring nodes.
+	private List<MapNode> neighbors = new ArrayList<MapNode>();
 	
-	public MapNode(Point2D pos, Map map) {
+	public MapNode(Point2D pos) {
 		this.pos = pos;
-		this.map = map;
 	}
 	
 	@Override
@@ -29,13 +26,13 @@ public class MapNode extends Object {
 		if (getClass() != other.getClass())
 			return false;
 		MapNode otherNode = (MapNode) other;
-		return map == otherNode.map && pos.equals(otherNode.pos);
+		return pos.equals(otherNode.pos);
 	}
 	
-	// Adds a node given by its index as a neighboring node.
-	public void addNeighbor(int nodeIdx) {
-		if (!neighbors.contains(nodeIdx))
-			neighbors.add(nodeIdx);
+	// Adds a given node as a neighboring node.
+	public void addNeighbor(MapNode node) {
+		if (!neighbors.contains(node))
+			neighbors.add(node);
 	}
 
 	public int countNeighbors() {
@@ -44,7 +41,7 @@ public class MapNode extends Object {
 
 	// Returns a neighboring node given by its index.
 	public MapNode neighbor(int idx) {
-		return map.node(neighbors.get(idx));
+		return neighbors.get(idx);
 	}
 	
 	public double elevation() {

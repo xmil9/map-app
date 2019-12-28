@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
-import types.Pair;
 
 public class Map {
 
@@ -28,27 +27,25 @@ public class Map {
 	public static class Representation {
 		// Tiles that map is made from.
 		private List<MapTile> tiles;
-		// Lookup of tile index by its seed location.
-		private java.util.Map<Point2D, Integer> tileLookup;
+		// Lookup of tiles by their seed location.
+		private java.util.Map<Point2D, MapTile> tileLookup;
 		// Unique nodes defining the shape of all tiles. A node shared between tiles
 		// is only listed once.
 		private List<MapNode> nodes;
-		// Lookup of node index by its location.
-		private java.util.Map<Point2D, Integer> nodeLookup;
+		// Lookup of nodes by their locations.
+		private java.util.Map<Point2D, MapNode> nodeLookup;
 		
 		public Representation() {
 			tiles = new ArrayList<MapTile>();
-			tileLookup = new TreeMap<Point2D, Integer>(Point2D.makeXYComparator());
+			tileLookup = new TreeMap<Point2D, MapTile>(Point2D.makeXYComparator());
 			nodes = new ArrayList<MapNode>();
-			nodeLookup = new TreeMap<Point2D, Integer>(Point2D.makeXYComparator());
+			nodeLookup = new TreeMap<Point2D, MapNode>(Point2D.makeXYComparator());
 		}
 		
 		// Adds a given tile.
-		public int addTile(MapTile tile) {
+		public void addTile(MapTile tile) {
 			tiles.add(tile);
-			int tileIdx = tiles.size() - 1;
-			tileLookup.put(tile.seed, tileIdx);
-			return tileIdx;
+			tileLookup.put(tile.seed, tile);
 		}
 		
 		public int countTiles() {
@@ -59,20 +56,15 @@ public class Map {
 			return tiles.get(idx);
 		}
 		
-		// Returns the tile and its index whose seed is located at a given position.
-		public Pair<MapTile, Integer> findTileAt(Point2D pos) {
-			Integer idx = tileLookup.get(pos);
-			if (idx == null)
-				return null;
-			return new Pair<MapTile, Integer>(tiles.get(idx), idx);
+		// Returns the tile whose seed is located at a given position.
+		public MapTile findTileAt(Point2D pos) {
+			return  tileLookup.get(pos);
 		}
 
 		// Adds a given node.
-		public int addNode(MapNode node) {
+		public void addNode(MapNode node) {
 			nodes.add(node);
-			int nodeIdx = nodes.size() - 1;
-			nodeLookup.put(node.pos, nodeIdx);
-			return nodeIdx;
+			nodeLookup.put(node.pos, node);
 		}
 		
 		public int countNodes() {
@@ -83,12 +75,9 @@ public class Map {
 			return nodes.get(idx);
 		}
 		
-		// Returns the node and its index that is located at a given position.
-		public Pair<MapNode, Integer> findNodeAt(Point2D pos) {
-			Integer idx = nodeLookup.get(pos);
-			if (idx == null)
-				return null;
-			return new Pair<MapNode, Integer>(nodes.get(idx), idx);
+		// Returns the node that is located at a given position.
+		public MapNode findNodeAt(Point2D pos) {
+			return nodeLookup.get(pos);
 		}
 	}
 	
@@ -129,11 +118,6 @@ public class Map {
 		for (var tile : rep.tiles)
 			shapes.add(tile.shape);
 		return shapes;
-	}
-
-	// Inject a representation. Used to set up tests.
-	public void setRepresentation(Representation rep) {
-		this.rep = rep;
 	}
 	
 	// Generates the tile layout of the map.

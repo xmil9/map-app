@@ -54,9 +54,6 @@ public class MapGeometryGeneratorTest {
 		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		Map.Representation rep = gen.generate(samples);
-		// Inject representation into map to allow calls from tile and node objects into
-		// the map to work.
-		map.setRepresentation(rep);
 		
 		// If the following two asserts fail, then most likely the random
 		// number generation in the code has changed, e.g. a call to Random
@@ -104,9 +101,6 @@ public class MapGeometryGeneratorTest {
 		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		Map.Representation rep = gen.generate(samples);
-		// Inject representation into map to allow calls from tile and node objects into
-		// the map to work.
-		map.setRepresentation(rep);
 		
 		// If the following two asserts fail, then most likely the random
 		// number generation in the code has changed, e.g. a call to Random
@@ -164,9 +158,6 @@ public class MapGeometryGeneratorTest {
 		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		Map.Representation rep = gen.generate(samples);
-		// Inject representation into map to allow calls from tile and node objects into
-		// the map to work.
-		map.setRepresentation(rep);
 		
 		// If the following two asserts fail, then most likely the random
 		// number generation in the code has changed, e.g. a call to Random

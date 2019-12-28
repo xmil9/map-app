@@ -11,17 +11,14 @@ public class MapTile extends Object {
 
 	public final Point2D seed;
 	public final Polygon2D shape;
-	// Back-reference to the map object.
-	private final Map map;
-	// Array of indices into the map's node array. Ordered ccw.
-	private List<Integer> nodes;
-	// Array of indices into the map's tile array.
-	private List<Integer> neighbors = new ArrayList<Integer>();
+	// Nodes for each point in the tile's shape. Ordered ccw.
+	private List<MapNode> nodes;
+	// Neighboring tiles.
+	private List<MapTile> neighbors = new ArrayList<MapTile>();
 	
-	public MapTile(Point2D seed, Polygon2D shape, Map map) {
+	public MapTile(Point2D seed, Polygon2D shape) {
 		this.seed = seed;
 		this.shape = shape;
-		this.map = map;
 	}
 	
 	@Override
@@ -33,17 +30,17 @@ public class MapTile extends Object {
 		if (getClass() != other.getClass())
 			return false;
 		MapTile otherTile = (MapTile) other;
-		return map == otherTile.map && seed.equals(otherTile.seed);
+		return seed.equals(otherTile.seed);
 	}
 	
-	public void setNodes(List<Integer> nodes) {
+	public void setNodes(List<MapNode> nodes) {
 		this.nodes = nodes;
 	}
 	
-	// Adds a tile given by its index as a neighboring tile.
-	public void addNeighbor(int tileIdx) {
-		if (!neighbors.contains(tileIdx))
-			neighbors.add(tileIdx);
+	// Adds a given tile as a neighboring tile.
+	public void addNeighbor(MapTile neighbor) {
+		if (!neighbors.contains(neighbor))
+			neighbors.add(neighbor);
 	}
 
 	public int countNeighbors() {
@@ -52,7 +49,7 @@ public class MapTile extends Object {
 
 	// Returns a neighboring tile.
 	public MapTile neighbor(int idx) {
-		return map.tile(neighbors.get(idx));
+		return neighbors.get(idx);
 	}
 
 	public int countNodes() {
@@ -61,6 +58,6 @@ public class MapTile extends Object {
 
 	// Returns a node in the tile's outline.
 	public MapNode node(int idx) {
-		return map.node(nodes.get(idx));
+		return nodes.get(idx);
 	}
 }

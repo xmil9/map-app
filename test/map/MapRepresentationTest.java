@@ -17,8 +17,6 @@ public class MapRepresentationTest {
 
 	@Test
 	public void addTile_SingleTile() {
-		var map = new Map(null, new Random());
-		
 		var pos = new Point2D(2, 0);
 		List<Point2D> shapePts = new ArrayList<Point2D>();
 		shapePts.add(new Point2D(1, 2));
@@ -26,7 +24,7 @@ public class MapRepresentationTest {
 		shapePts.add(new Point2D(3, 2));
 		shapePts.add(new Point2D(4, -2));
 		var shape = new Polygon2D(shapePts);
-		var tile = new MapTile(pos, shape, map);
+		var tile = new MapTile(pos, shape);
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addTile(tile);
@@ -36,8 +34,6 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void addTile_MultipleTiles() {
-		var map = new Map(null, new Random());
-		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
 		shapePtsA.add(new Point2D(1, 2));
@@ -45,7 +41,7 @@ public class MapRepresentationTest {
 		shapePtsA.add(new Point2D(3, 2));
 		shapePtsA.add(new Point2D(4, -2));
 		var shapeA = new Polygon2D(shapePtsA);
-		var tileA = new MapTile(posA, shapeA, map);
+		var tileA = new MapTile(posA, shapeA);
 		
 		var posB = new Point2D(4, 2);
 		List<Point2D> shapePtsB = new ArrayList<Point2D>();
@@ -54,7 +50,7 @@ public class MapRepresentationTest {
 		shapePtsB.add(new Point2D(5, 4));
 		shapePtsB.add(new Point2D(3, 5));
 		var shapeB = new Polygon2D(shapePtsB);
-		var tileB = new MapTile(posB, shapeB, map);
+		var tileB = new MapTile(posB, shapeB);
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addTile(tileA);
@@ -65,8 +61,6 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void tile() {
-		var map = new Map(null, new Random());
-		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
 		shapePtsA.add(new Point2D(1, 2));
@@ -74,7 +68,7 @@ public class MapRepresentationTest {
 		shapePtsA.add(new Point2D(3, 2));
 		shapePtsA.add(new Point2D(4, -2));
 		var shapeA = new Polygon2D(shapePtsA);
-		var tileA = new MapTile(posA, shapeA, map);
+		var tileA = new MapTile(posA, shapeA);
 		
 		var posB = new Point2D(4, 2);
 		List<Point2D> shapePtsB = new ArrayList<Point2D>();
@@ -83,7 +77,7 @@ public class MapRepresentationTest {
 		shapePtsB.add(new Point2D(5, 4));
 		shapePtsB.add(new Point2D(3, 5));
 		var shapeB = new Polygon2D(shapePtsB);
-		var tileB = new MapTile(posB, shapeB, map);
+		var tileB = new MapTile(posB, shapeB);
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addTile(tileA);
@@ -95,8 +89,6 @@ public class MapRepresentationTest {
 	
 	@Test
 	public void findTileAt_ForAvailableLocation() {
-		var map = new Map(null, new Random());
-		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
 		shapePtsA.add(new Point2D(1, 2));
@@ -104,7 +96,7 @@ public class MapRepresentationTest {
 		shapePtsA.add(new Point2D(3, 2));
 		shapePtsA.add(new Point2D(4, -2));
 		var shapeA = new Polygon2D(shapePtsA);
-		var tileA = new MapTile(posA, shapeA, map);
+		var tileA = new MapTile(posA, shapeA);
 		
 		var posB = new Point2D(4, 2);
 		List<Point2D> shapePtsB = new ArrayList<Point2D>();
@@ -113,25 +105,21 @@ public class MapRepresentationTest {
 		shapePtsB.add(new Point2D(5, 4));
 		shapePtsB.add(new Point2D(3, 5));
 		var shapeB = new Polygon2D(shapePtsB);
-		var tileB = new MapTile(posB, shapeB, map);
+		var tileB = new MapTile(posB, shapeB);
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addTile(tileA);
 		rep.addTile(tileB);
 		
 		var result = rep.findTileAt(posA);
-		assertEquals(tileA, result.a);
-		assertEquals(Integer.valueOf(0), result.b);
+		assertEquals(tileA, result);
 		
 		result = rep.findTileAt(posB);
-		assertEquals(tileB, result.a);
-		assertEquals(Integer.valueOf(1), result.b);
+		assertEquals(tileB, result);
 	}
 	
 	@Test
 	public void findTileAt_ForUnavailableLocation() {
-		var map = new Map(null, new Random());
-		
 		var posA = new Point2D(2, 0);
 		List<Point2D> shapePtsA = new ArrayList<Point2D>();
 		shapePtsA.add(new Point2D(1, 2));
@@ -139,7 +127,7 @@ public class MapRepresentationTest {
 		shapePtsA.add(new Point2D(3, 2));
 		shapePtsA.add(new Point2D(4, -2));
 		var shapeA = new Polygon2D(shapePtsA);
-		var tileA = new MapTile(posA, shapeA, map);
+		var tileA = new MapTile(posA, shapeA);
 		
 		var posB = new Point2D(4, 2);
 		List<Point2D> shapePtsB = new ArrayList<Point2D>();
@@ -148,7 +136,7 @@ public class MapRepresentationTest {
 		shapePtsB.add(new Point2D(5, 4));
 		shapePtsB.add(new Point2D(3, 5));
 		var shapeB = new Polygon2D(shapePtsB);
-		var tileB = new MapTile(posB, shapeB, map);
+		var tileB = new MapTile(posB, shapeB);
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addTile(tileA);
@@ -160,10 +148,8 @@ public class MapRepresentationTest {
 
 	@Test
 	public void addNode_SingleNode() {
-		var map = new Map(null, new Random());
-		
 		var pos = new Point2D(2, 0);
-		var node = new MapNode(pos, map);
+		var node = new MapNode(pos);
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addNode(node);
@@ -173,22 +159,18 @@ public class MapRepresentationTest {
 
 	@Test
 	public void addNode_MultipleNodes() {
-		var map = new Map(null, new Random());
-		
 		Map.Representation rep = new Map.Representation();
-		rep.addNode(new MapNode(new Point2D(2, 0), map));
-		rep.addNode(new MapNode(new Point2D(3, 2), map));
-		rep.addNode(new MapNode(new Point2D(-1, 3), map));
+		rep.addNode(new MapNode(new Point2D(2, 0)));
+		rep.addNode(new MapNode(new Point2D(3, 2)));
+		rep.addNode(new MapNode(new Point2D(-1, 3)));
 		
 		assertEquals(3, rep.countNodes());
 	}
 
 	@Test
 	public void node() {
-		var map = new Map(null, new Random());
-		
-		var nodeA = new MapNode(new Point2D(2, 0), map);
-		var nodeB = new MapNode(new Point2D(3, 2), map);
+		var nodeA = new MapNode(new Point2D(2, 0));
+		var nodeB = new MapNode(new Point2D(3, 2));
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addNode(nodeA);
@@ -200,11 +182,9 @@ public class MapRepresentationTest {
 
 	@Test
 	public void findNodeAt_ForAvailableNode() {
-		var map = new Map(null, new Random());
-		
-		var nodeA = new MapNode(new Point2D(2, 0), map);
-		var nodeB = new MapNode(new Point2D(3, 2), map);
-		var nodeC = new MapNode(new Point2D(-1, 3), map);
+		var nodeA = new MapNode(new Point2D(2, 0));
+		var nodeB = new MapNode(new Point2D(3, 2));
+		var nodeC = new MapNode(new Point2D(-1, 3));
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addNode(nodeA);
@@ -212,25 +192,20 @@ public class MapRepresentationTest {
 		rep.addNode(nodeC);
 		
 		var result = rep.findNodeAt(new Point2D(2, 0));
-		assertEquals(nodeA, result.a);
-		assertEquals(Integer.valueOf(0), result.b);
+		assertEquals(nodeA, result);
 		
 		result = rep.findNodeAt(new Point2D(3, 2));
-		assertEquals(nodeB, result.a);
-		assertEquals(Integer.valueOf(1), result.b);
+		assertEquals(nodeB, result);
 		
 		result = rep.findNodeAt(new Point2D(-1, 3));
-		assertEquals(nodeC, result.a);
-		assertEquals(Integer.valueOf(2), result.b);
+		assertEquals(nodeC, result);
 	}
 
 	@Test
 	public void findNodeAt_ForUnavailableNode() {
-		var map = new Map(null, new Random());
-		
-		var nodeA = new MapNode(new Point2D(2, 0), map);
-		var nodeB = new MapNode(new Point2D(3, 2), map);
-		var nodeC = new MapNode(new Point2D(-1, 3), map);
+		var nodeA = new MapNode(new Point2D(2, 0));
+		var nodeB = new MapNode(new Point2D(3, 2));
+		var nodeC = new MapNode(new Point2D(-1, 3));
 		
 		Map.Representation rep = new Map.Representation();
 		rep.addNode(nodeA);
