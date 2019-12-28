@@ -8,7 +8,11 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
+import map.Map;
+import map.MapNode;
+import map.MapTile;
 
 public class MapScene {
 
@@ -118,5 +122,37 @@ public class MapScene {
 			viewCircle.setFill(null);
 		    content.getChildren().add(viewCircle);
 		}
+	}
+	
+	public void addMap(map.Map map) {
+		int numTiles = map.countTiles();
+		for (int i = 0; i < numTiles; ++i)
+			addTile(map.tile(i), map);
+	}
+	
+	private void addTile(MapTile tile, map.Map map) {
+		Polygon poly = new Polygon();
+		
+		int numNodes = tile.countNodes();
+		for (int i = 0; i < numNodes; ++i) {
+			MapNode node = map.node(tile.node(i));
+			poly.getPoints().add(node.pos.x);
+			poly.getPoints().add(node.pos.y);
+		}
+
+		poly.setStroke(null);
+		poly.setFill(makeTileFill(tile, map));
+		
+		content.getChildren().add(poly);
+	}
+	
+	private static Paint makeTileFill(MapTile tile, map.Map map) {
+		int numNodes = tile.countNodes();
+		for (int i = 0; i < numNodes; ++i) {
+			MapNode node = map.node(tile.node(i));
+			if (node.elevation() > 0)
+				return Color.web("00762D", 1.0);
+		}
+		return Color.web("00389B", 1.0);
 	}
 }

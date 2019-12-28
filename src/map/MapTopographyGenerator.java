@@ -14,20 +14,10 @@ public class MapTopographyGenerator {
 		public final int numContinents;
 		
 		public Spec(Random rand) {
+//			landRatio = rand.nextDouble();
 			landRatio = MathUtil.randGaussian(rand, 0,  1);
-			numContinents = (int) MathUtil.randGaussian(rand, 0,  10);
-		}
-	}
-	
-	private static class Continent {
-		
-		// Number of map nodes in continent.
-		public final int size;
-		private List<MapNode> nodes;
-		
-		public Continent(int size) {
-			this.size = size;
-			this.nodes = new ArrayList<MapNode>(size);
+			numContinents = 1 + rand.nextInt(20);
+//			numContinents = (int) MathUtil.randGaussian(rand, 0,  10);
 		}
 	}
 	
@@ -51,7 +41,6 @@ public class MapTopographyGenerator {
 	
 	public void generateContinents() {
 		initContinents();
-		
 		for (var continent : continents)
 			generateContinent(continent);
 	}
@@ -60,21 +49,23 @@ public class MapTopographyGenerator {
 	private void initContinents() {
 		continents = new ArrayList<Continent>(spec.numContinents);
 		
-//		final int totalLandNodes = (int) (rep.countNodes() * spec.landRatio);
-//		int landNodesRemaining = totalLandNodes;
-//		
-//		for (int i = 0; i < spec.numContinents - 1; ++i) {
-//			int continentsRemaining = spec.numContinents - i; 
-//			int continentSize = rand.nextInt(landNodesRemaining - continentsRemaining);
-//			landNodesRemaining -= continentSize;
-//			continents.add(new Continent(continentSize));
-//		}
-//		
-//		// Last continent.
-//		continents.add(new Continent(landNodesRemaining));
+		final int totalLandNodes = (int) (rep.countNodes() * spec.landRatio);
+		int landNodesRemaining = totalLandNodes;
+		
+		for (int i = 0; i < spec.numContinents - 1; ++i) {
+			int continentsRemaining = spec.numContinents - i;
+			int continentSize = (landNodesRemaining > continentsRemaining) ?
+					rand.nextInt(landNodesRemaining - continentsRemaining) : 0;
+			landNodesRemaining -= continentSize;
+			continents.add(new Continent(continentSize));
+		}
+		
+		// Last continent.
+		continents.add(new Continent(landNodesRemaining));
 	}
 	
 	private void generateContinent(Continent continent) {
-		// todo
+		ContinentGenerator gen = new RandomContinentGenerator(rep, rand);
+		gen.generate(continent);
 	}
 }

@@ -27,7 +27,7 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		primaryStage.setTitle("The Map App");
-		primaryStage.setScene(makeScene(123456L));
+		primaryStage.setScene(makeScene(null));//123456L));
 		primaryStage.show();
 	}
 	
@@ -35,12 +35,28 @@ public class App extends Application {
 		rand = (randSeed != null) ? new Random(randSeed) : new Random();
 		
 //		return makePoissonDiscSampleScene();
-		return makeVoronoiScene();
-//		return makeMapScene();
+//		return makeVoronoiScene();
+//		return makeMapSceneWithShapes();
 //		return makeTestMapScene();
+		return makeMapScene();
 	}
 	
 	private Scene makeMapScene() {
+		MapScene scene = new MapScene(1100, 1100);
+
+		Rect2D bounds = new Rect2D(0, 0, 100, 100);
+		Map.Spec spec = new Map.Spec(new MapGeometryGenerator.Spec(bounds, 0.5, 30),
+				new MapTopographyGenerator.Spec(rand));
+		Map map = new Map(spec, rand);
+		map.generate();
+
+		scene.addMap(map);
+
+		scene.scale(10);
+		return scene.scene();
+	}
+	
+	private Scene makeMapSceneWithShapes() {
 		final double strokeWidth = 0.03;
 		MapScene scene = new MapScene(1100, 1100);
 

@@ -115,6 +115,14 @@ public class Map {
 		return rep.tiles.size();
 	}
 
+	public MapTile tile(int idx) {
+		return rep.tile(idx);
+	}
+
+	public MapNode node(int idx) {
+		return rep.node(idx);
+	}
+	
 	// Returns the shapes of all tiles.
 	public List<Polygon2D> tileShapes() {
 		List<Polygon2D> shapes = new ArrayList<Polygon2D>(rep.tiles.size());
