@@ -127,29 +127,29 @@ public class MapScene {
 	public void addMap(map.Map map) {
 		int numTiles = map.countTiles();
 		for (int i = 0; i < numTiles; ++i)
-			addTile(map.tile(i), map);
+			addTile(map.tile(i));
 	}
 	
-	private void addTile(MapTile tile, map.Map map) {
+	private void addTile(MapTile tile) {
 		Polygon poly = new Polygon();
 		
 		int numNodes = tile.countNodes();
 		for (int i = 0; i < numNodes; ++i) {
-			MapNode node = map.node(tile.node(i));
+			MapNode node = tile.node(i);
 			poly.getPoints().add(node.pos.x);
 			poly.getPoints().add(node.pos.y);
 		}
 
 		poly.setStroke(null);
-		poly.setFill(makeTileFill(tile, map));
+		poly.setFill(makeTileFill(tile));
 		
 		content.getChildren().add(poly);
 	}
 	
-	private static Paint makeTileFill(MapTile tile, map.Map map) {
+	private static Paint makeTileFill(MapTile tile) {
 		int numNodes = tile.countNodes();
 		for (int i = 0; i < numNodes; ++i) {
-			MapNode node = map.node(tile.node(i));
+			MapNode node = tile.node(i);
 			if (node.elevation() > 0)
 				return Color.web("00762D", 1.0);
 		}

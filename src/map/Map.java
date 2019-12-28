@@ -131,6 +131,11 @@ public class Map {
 		return shapes;
 	}
 
+	// Inject a representation. Used to set up tests.
+	public void setRepresentation(Representation rep) {
+		this.rep = rep;
+	}
+	
 	// Generates the tile layout of the map.
 	private void generateGeometry() {
 		MapGeometryGenerator gen = new MapGeometryGenerator(this, spec.geom);

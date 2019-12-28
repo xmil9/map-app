@@ -51,7 +51,7 @@ public class RandomContinentGenerator implements ContinentGenerator {
 			int nodeIdx = rand.nextInt(nodePool.size());
 			MapNode node = nodePool.get(nodeIdx);
 			for (int i = 0; i < node.countNeighbors(); ++i) {
-				MapNode neighbor = rep.node(node.neighbor(i));
+				MapNode neighbor = node.neighbor(i);
 				if (neighbor.elevation() < 0)
 					return neighbor;
 			}

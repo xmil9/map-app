@@ -12,20 +12,22 @@ import geometry.Rect2D;
 
 public class MapGeometryGeneratorTest {
 
-	private static boolean verifyTileNeighbors(MapTile tile, int[] expected) {
+	private static boolean verifyTileNeighbors(MapTile tile, Map.Representation rep,
+			int[] expected) {
 		if (tile.countNeighbors() != expected.length)
 			return false;
 		for (int i = 0; i < tile.countNeighbors(); ++i)
-			if (tile.neighbor(i) != expected[i])
+			if (!tile.neighbor(i).equals(rep.tile(expected[i])))
 				return false;
 		return true;
 	}
 	
-	private static boolean verifyNodeNeighbors(MapNode node, int[] expected) {
+	private static boolean verifyNodeNeighbors(MapNode node, Map.Representation rep,
+			int[] expected) {
 		if (node.countNeighbors() != expected.length)
 			return false;
 		for (int i = 0; i < node.countNeighbors(); ++i)
-			if (node.neighbor(i) != expected[i])
+			if (!node.neighbor(i).equals(rep.node(expected[i])))
 				return false;
 		return true;
 	}
@@ -52,6 +54,9 @@ public class MapGeometryGeneratorTest {
 		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		Map.Representation rep = gen.generate(samples);
+		// Inject representation into map to allow calls from tile and node objects into
+		// the map to work.
+		map.setRepresentation(rep);
 		
 		// If the following two asserts fail, then most likely the random
 		// number generation in the code has changed, e.g. a call to Random
@@ -59,22 +64,22 @@ public class MapGeometryGeneratorTest {
 		assertEquals(12, rep.countTiles());
 		assertEquals(26, rep.countNodes());
 		
-		assertTrue(verifyTileNeighbors(rep.tile(0), new int[] {3, 1, 4}));
-		assertTrue(verifyTileNeighbors(rep.tile(1), new int[] {0, 3, 5, 2}));
-		assertTrue(verifyTileNeighbors(rep.tile(2), new int[] {1, 5, 6}));
-		assertTrue(verifyTileNeighbors(rep.tile(3), new int[] {0, 1, 4, 5, 7, 8}));
+		assertTrue(verifyTileNeighbors(rep.tile(0), rep, new int[] {3, 1, 4}));
+		assertTrue(verifyTileNeighbors(rep.tile(1), rep, new int[] {0, 3, 5, 2}));
+		assertTrue(verifyTileNeighbors(rep.tile(2), rep, new int[] {1, 5, 6}));
+		assertTrue(verifyTileNeighbors(rep.tile(3), rep, new int[] {0, 1, 4, 5, 7, 8}));
 		// The neighoring relationship with tile 11 happens outside the given bounds!
 		// This might cause problems when defining tile properties.
-		assertTrue(verifyTileNeighbors(rep.tile(4), new int[] {0, 3, 8, 11}));
-		assertTrue(verifyTileNeighbors(rep.tile(5), new int[] {1, 2, 3, 6, 7, 9}));
-		assertTrue(verifyTileNeighbors(rep.tile(6), new int[] {5, 2, 9}));
-		assertTrue(verifyTileNeighbors(rep.tile(7), new int[] {3, 5, 8, 9, 10}));
-		assertTrue(verifyTileNeighbors(rep.tile(8), new int[] {4, 3, 7, 10, 11}));
-		assertTrue(verifyTileNeighbors(rep.tile(9), new int[] {7, 5, 6, 10}));
-		assertTrue(verifyTileNeighbors(rep.tile(10), new int[] {8, 7, 9, 11}));
+		assertTrue(verifyTileNeighbors(rep.tile(4), rep, new int[] {0, 3, 8, 11}));
+		assertTrue(verifyTileNeighbors(rep.tile(5), rep, new int[] {1, 2, 3, 6, 7, 9}));
+		assertTrue(verifyTileNeighbors(rep.tile(6), rep, new int[] {5, 2, 9}));
+		assertTrue(verifyTileNeighbors(rep.tile(7), rep, new int[] {3, 5, 8, 9, 10}));
+		assertTrue(verifyTileNeighbors(rep.tile(8), rep, new int[] {4, 3, 7, 10, 11}));
+		assertTrue(verifyTileNeighbors(rep.tile(9), rep, new int[] {7, 5, 6, 10}));
+		assertTrue(verifyTileNeighbors(rep.tile(10), rep, new int[] {8, 7, 9, 11}));
 		// The neighoring relationship with tile 4 happens outside the given bounds!
 		// This might cause problems when defining tile properties.
-		assertTrue(verifyTileNeighbors(rep.tile(11), new int[] {4, 8, 10}));
+		assertTrue(verifyTileNeighbors(rep.tile(11), rep, new int[] {4, 8, 10}));
 	}
 	
 	@Test
@@ -99,6 +104,9 @@ public class MapGeometryGeneratorTest {
 		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		Map.Representation rep = gen.generate(samples);
+		// Inject representation into map to allow calls from tile and node objects into
+		// the map to work.
+		map.setRepresentation(rep);
 		
 		// If the following two asserts fail, then most likely the random
 		// number generation in the code has changed, e.g. a call to Random
@@ -156,6 +164,9 @@ public class MapGeometryGeneratorTest {
 		samples.add(new Point2D(10.175640410810594, 10.537547103975443));
 
 		Map.Representation rep = gen.generate(samples);
+		// Inject representation into map to allow calls from tile and node objects into
+		// the map to work.
+		map.setRepresentation(rep);
 		
 		// If the following two asserts fail, then most likely the random
 		// number generation in the code has changed, e.g. a call to Random
@@ -163,31 +174,31 @@ public class MapGeometryGeneratorTest {
 		assertEquals(12, rep.countTiles());
 		assertEquals(26, rep.countNodes());
 		
-		assertTrue(verifyNodeNeighbors(rep.node(0), new int[] {1, 4, 5}));
-		assertTrue(verifyNodeNeighbors(rep.node(1), new int[] {0, 2, 7}));
-		assertTrue(verifyNodeNeighbors(rep.node(2), new int[] {1, 3, 13}));
-		assertTrue(verifyNodeNeighbors(rep.node(3), new int[] {2, 4, 14}));
-		assertTrue(verifyNodeNeighbors(rep.node(4), new int[] {3, 0}));
-		assertTrue(verifyNodeNeighbors(rep.node(5), new int[] {6, 0, 10}));
-		assertTrue(verifyNodeNeighbors(rep.node(6), new int[] {5, 7, 9}));
-		assertTrue(verifyNodeNeighbors(rep.node(7), new int[] {6, 1, 11}));
-		assertTrue(verifyNodeNeighbors(rep.node(8), new int[] {9, 10, 17}));
-		assertTrue(verifyNodeNeighbors(rep.node(9), new int[] {8, 6, 15}));
-		assertTrue(verifyNodeNeighbors(rep.node(10), new int[] {5, 8}));
-		assertTrue(verifyNodeNeighbors(rep.node(11), new int[] {7, 12, 16}));
-		assertTrue(verifyNodeNeighbors(rep.node(12), new int[] {11, 13, 19}));
-		assertTrue(verifyNodeNeighbors(rep.node(13), new int[] {12, 2, 14}));
-		assertTrue(verifyNodeNeighbors(rep.node(14), new int[] {3, 13, 20}));
-		assertTrue(verifyNodeNeighbors(rep.node(15), new int[] {9, 16, 17}));
-		assertTrue(verifyNodeNeighbors(rep.node(16), new int[] {15, 11, 18}));
-		assertTrue(verifyNodeNeighbors(rep.node(17), new int[] {8, 15, 22}));
-		assertTrue(verifyNodeNeighbors(rep.node(18), new int[] {16, 19, 23}));
-		assertTrue(verifyNodeNeighbors(rep.node(19), new int[] {18, 12, 21}));
-		assertTrue(verifyNodeNeighbors(rep.node(20), new int[] {14, 21, 25}));
-		assertTrue(verifyNodeNeighbors(rep.node(21), new int[] {19, 20, 24}));
-		assertTrue(verifyNodeNeighbors(rep.node(22), new int[] {17, 23}));
-		assertTrue(verifyNodeNeighbors(rep.node(23), new int[] {22, 18, 24}));
-		assertTrue(verifyNodeNeighbors(rep.node(24), new int[] {23, 21, 25}));
-		assertTrue(verifyNodeNeighbors(rep.node(25), new int[] {24, 20}));
+		assertTrue(verifyNodeNeighbors(rep.node(0), rep, new int[] {1, 4, 5}));
+		assertTrue(verifyNodeNeighbors(rep.node(1), rep, new int[] {0, 2, 7}));
+		assertTrue(verifyNodeNeighbors(rep.node(2), rep, new int[] {1, 3, 13}));
+		assertTrue(verifyNodeNeighbors(rep.node(3), rep, new int[] {2, 4, 14}));
+		assertTrue(verifyNodeNeighbors(rep.node(4), rep, new int[] {3, 0}));
+		assertTrue(verifyNodeNeighbors(rep.node(5), rep, new int[] {6, 0, 10}));
+		assertTrue(verifyNodeNeighbors(rep.node(6), rep, new int[] {5, 7, 9}));
+		assertTrue(verifyNodeNeighbors(rep.node(7), rep, new int[] {6, 1, 11}));
+		assertTrue(verifyNodeNeighbors(rep.node(8), rep, new int[] {9, 10, 17}));
+		assertTrue(verifyNodeNeighbors(rep.node(9), rep, new int[] {8, 6, 15}));
+		assertTrue(verifyNodeNeighbors(rep.node(10), rep, new int[] {5, 8}));
+		assertTrue(verifyNodeNeighbors(rep.node(11), rep, new int[] {7, 12, 16}));
+		assertTrue(verifyNodeNeighbors(rep.node(12), rep, new int[] {11, 13, 19}));
+		assertTrue(verifyNodeNeighbors(rep.node(13), rep, new int[] {12, 2, 14}));
+		assertTrue(verifyNodeNeighbors(rep.node(14), rep, new int[] {3, 13, 20}));
+		assertTrue(verifyNodeNeighbors(rep.node(15), rep, new int[] {9, 16, 17}));
+		assertTrue(verifyNodeNeighbors(rep.node(16), rep, new int[] {15, 11, 18}));
+		assertTrue(verifyNodeNeighbors(rep.node(17), rep, new int[] {8, 15, 22}));
+		assertTrue(verifyNodeNeighbors(rep.node(18), rep, new int[] {16, 19, 23}));
+		assertTrue(verifyNodeNeighbors(rep.node(19), rep, new int[] {18, 12, 21}));
+		assertTrue(verifyNodeNeighbors(rep.node(20), rep, new int[] {14, 21, 25}));
+		assertTrue(verifyNodeNeighbors(rep.node(21), rep, new int[] {19, 20, 24}));
+		assertTrue(verifyNodeNeighbors(rep.node(22), rep, new int[] {17, 23}));
+		assertTrue(verifyNodeNeighbors(rep.node(23), rep, new int[] {22, 18, 24}));
+		assertTrue(verifyNodeNeighbors(rep.node(24), rep, new int[] {23, 21, 25}));
+		assertTrue(verifyNodeNeighbors(rep.node(25), rep, new int[] {24, 20}));
 	}
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import geometry.Point2D;
 
 // Holds map properties for a location on the map.
-public class MapNode {
+public class MapNode extends Object {
 
 	public final Point2D pos;
 	private double elevation = -1;
@@ -20,6 +20,18 @@ public class MapNode {
 		this.map = map;
 	}
 	
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other == null)
+			return false;
+		if (getClass() != other.getClass())
+			return false;
+		MapNode otherNode = (MapNode) other;
+		return map == otherNode.map && pos.equals(otherNode.pos);
+	}
+	
 	// Adds a node given by its index as a neighboring node.
 	public void addNeighbor(int nodeIdx) {
 		if (!neighbors.contains(nodeIdx))
@@ -30,10 +42,9 @@ public class MapNode {
 		return neighbors.size();
 	}
 
-	// Returns the node index (into the map's node collection) of a neighboring
-	// node given by its index (into the neighbor collection of this node).
-	public int neighbor(int idx) {
-		return neighbors.get(idx);
+	// Returns a neighboring node given by its index.
+	public MapNode neighbor(int idx) {
+		return map.node(neighbors.get(idx));
 	}
 	
 	public double elevation() {

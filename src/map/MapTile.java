@@ -7,7 +7,7 @@ import geometry.Point2D;
 import geometry.Polygon2D;
 
 // Defines a tile on the map.
-public class MapTile {
+public class MapTile extends Object {
 
 	public final Point2D seed;
 	public final Polygon2D shape;
@@ -24,6 +24,18 @@ public class MapTile {
 		this.map = map;
 	}
 	
+	@Override
+	public boolean equals(Object other) {
+		if (this == other)
+			return true;
+		if (other == null)
+			return false;
+		if (getClass() != other.getClass())
+			return false;
+		MapTile otherTile = (MapTile) other;
+		return map == otherTile.map && seed.equals(otherTile.seed);
+	}
+	
 	public void setNodes(List<Integer> nodes) {
 		this.nodes = nodes;
 	}
@@ -38,19 +50,17 @@ public class MapTile {
 		return neighbors.size();
 	}
 
-	// Returns the tile index (into the map's tile collection) of a neighboring
-	// tile given by its index (into the neighbor collection of this tile).
-	public int neighbor(int idx) {
-		return neighbors.get(idx);
+	// Returns a neighboring tile.
+	public MapTile neighbor(int idx) {
+		return map.tile(neighbors.get(idx));
 	}
 
 	public int countNodes() {
 		return nodes.size();
 	}
 
-	// Returns the node index (into the map's node collection) of a node
-	// given by its index (into the node collection of this tile).
-	public int node(int idx) {
-		return nodes.get(idx);
+	// Returns a node in the tile's outline.
+	public MapNode node(int idx) {
+		return map.node(nodes.get(idx));
 	}
 }
