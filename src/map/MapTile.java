@@ -43,4 +43,14 @@ public class MapTile {
 	public int neighbor(int idx) {
 		return neighbors.get(idx);
 	}
+
+	public int countNodes() {
+		return nodes.size();
+	}
+
+	// Returns the node index (into the map's node collection) of a node
+	// given by its index (into the node collection of this tile).
+	public int node(int idx) {
+		return nodes.get(idx);
+	}
 }
