@@ -65,7 +65,7 @@ public class MapTopographyGenerator {
 	}
 	
 	private void generateContinent(Continent continent) {
-		ContinentGenerator gen = new RandomContinentGenerator(rep, rand);
+		ContinentGenerator gen = new BlobContinentGenerator(rep, rand);
 		gen.generate(continent);
 	}
 }

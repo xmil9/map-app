@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class RandomContinentGenerator implements ContinentGenerator {
+public class BlobContinentGenerator implements ContinentGenerator {
 
 	private Map.Representation rep;
 	private Random rand;
 	
-	public RandomContinentGenerator(Map.Representation rep, Random rand) {
+	public BlobContinentGenerator(Map.Representation rep, Random rand) {
 		this.rep = rep;
 		this.rand = rand;
 	}
