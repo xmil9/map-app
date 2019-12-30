@@ -24,19 +24,48 @@ public class PerlinNoise {
 	
 	///////////////
 	
+	private final int width;
+	private final int height;
 	// Random gradients for each grid point.
 	private final Vector2D gradients[][];
 	
 	public PerlinNoise(int width, int height, Random rand) {
+		this.width = width;
+		this.height = height;
 		this.gradients = makeGradients(width + 1, height + 1, rand);
+	}
+	
+	// Calculates Perlin noise at a given point in 2D range ([0, width], [0, height])
+	// using multiple passes to accumulate the noise value at different levels of
+	// scale.
+	public double calcOctaveNoise(Point2D at, int numOctaves, double persistence) {
+		// Accumulates the influences of terrain areas at different scales to the
+		// noise for the given point.
+	    // As the frequency goes down larger and larger areas in the grid contribute
+	    // a value to the noise. At the same time the amplitude goes up emphasizing
+		// the contribution of larger scale areas compared to smaller scale areas.
+	    double total = 0;
+	    double frequency = 1;
+	    double amplitude = 1;
+	    double maxValue = 0;
+	    
+	    for(int i = 0; i < numOctaves; ++i) {
+	        total += calcNoise(at.scale(frequency)) * amplitude;
+	        maxValue += amplitude;
+	        
+	        amplitude *= persistence;
+	        frequency /= 2;
+	    }
+	    
+	    return (total / maxValue);
 	}
 	
 	// Calculates Perlin noise at a given point in 2D range ([0, width], [0, height]).
 	public double calcNoise(Point2D at) {
 		// Determine grid cell that point falls into.
-		int gridLeft = (int) at.x; 
+		int gridLeft = (int) (at.x % width); 
 		int gridRight = gridLeft + 1; 
-		int gridTop = (int) at.y; 
+		int gridTop = (int) (at.y % height); 
 		int gridBottom = gridTop + 1;
 		
 		// Collect data for each grid node that is involved in calculation.

@@ -15,10 +15,10 @@ public class PerlinTopography implements TopographyGenerator {
 	private final Random rand;
 	
 	public PerlinTopography(Rect2D bounds, Random rand) {
-		this.left = (int) scale(bounds.left());
-		this.top = (int) scale(bounds.top());
-		this.width = (int) scale(bounds.right() - left) + 1;
-		this.height = (int) scale(bounds.bottom() - top) + 1;
+		this.left = (int) (bounds.left());
+		this.top = (int) (bounds.top());
+		this.width = (int) (bounds.right() - left) + 1;
+		this.height = (int) (bounds.bottom() - top) + 1;
 		this.rand = rand;
 	}
 	
@@ -28,22 +28,14 @@ public class PerlinTopography implements TopographyGenerator {
 		
 		for (int i = 0; i < rep.countNodes(); ++i) {
 			MapNode node = rep.node(i);
-			double noise = perlinGen.calcNoise(scale(node.pos));
+			double noise = perlinGen.calcOctaveNoise(node.pos, 6, 2);
 			node.setElevation(10.0 * noise);
 		}
 		
 		for (int i = 0; i < rep.countTiles(); ++i) {
 			MapTile tile = rep.tile(i);
-			double noise = perlinGen.calcNoise(scale(tile.seed));
+			double noise = perlinGen.calcOctaveNoise(tile.seed, 6, 2);
 			tile.setElevation(noise);
 		}
-	}
-	
-	public static double scale(double val) {
-		return val / 50.0;
-	}
-	
-	public static Point2D scale(Point2D pt) {
-		return new Point2D(scale(pt.x), scale(pt.y));
 	}
 }

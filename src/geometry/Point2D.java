@@ -93,6 +93,10 @@ public class Point2D extends Object {
 		return offset(v.x, v.y);
 	}
 	
+	public Point2D scale(double factor) {
+		return new Point2D(x * factor, y * factor);
+	}
+	
 	// Returns distance between given points.
 	// Because it uses a sqrt the calculation is slow. To compare distances
 	// it is faster to compare their squared values.
