@@ -5,7 +5,6 @@ module TheMapApp {
 	requires transitive javafx.graphics;
 	requires javafx.media;
 	requires javafx.swing;
-	requires javafx.swt;
 	requires javafx.web;
 	requires junit;
 	

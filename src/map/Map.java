@@ -12,9 +12,9 @@ public class Map {
 
 	public static class Spec {
 		public final MapGeometryGenerator.Spec geom;
-		public final MapTopographyGenerator.Spec topo;
+		public final ContinentBasedTopography.Spec topo;
 		
-		public Spec(MapGeometryGenerator.Spec geom, MapTopographyGenerator.Spec topo) {
+		public Spec(MapGeometryGenerator.Spec geom, ContinentBasedTopography.Spec topo) {
 			this.geom = geom;
 			this.topo = topo;
 		}
@@ -25,12 +25,12 @@ public class Map {
 	// Data structures that hold the map data.
 	// Kept in separate class to allow generator objects to work with it more esily.
 	public static class Representation {
-		// Tiles that map is made from.
+		// Master collection of tiles that map is made from.
 		private List<MapTile> tiles;
 		// Lookup of tiles by their seed location.
 		private java.util.Map<Point2D, MapTile> tileLookup;
-		// Unique nodes defining the shape of all tiles. A node shared between tiles
-		// is only listed once.
+		// Master collection of unique nodes defining the shape of all tiles. A node shared
+		// between tiles is only listed once.
 		private List<MapNode> nodes;
 		// Lookup of nodes by their locations.
 		private java.util.Map<Point2D, MapNode> nodeLookup;
@@ -128,7 +128,8 @@ public class Map {
 	
 	// Generates the node elevations.
 	private void generateTopography() {
-		MapTopographyGenerator gen = new MapTopographyGenerator(rep, spec.topo, rand);
-		gen.generate();
+		PerlinTopography gen = new PerlinTopography(spec.geom.bounds, rand);
+//		ContinentBasedTopography gen = new ContinentBasedTopography(spec.topo, rand);
+		gen.generate(rep);
 	}
 }

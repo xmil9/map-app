@@ -10,7 +10,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
-import map.Map;
 import map.MapNode;
 import map.MapTile;
 
@@ -147,12 +146,24 @@ public class MapScene {
 	}
 	
 	private static Paint makeTileFill(MapTile tile) {
-		int numNodes = tile.countNodes();
-		for (int i = 0; i < numNodes; ++i) {
-			MapNode node = tile.node(i);
-			if (node.elevation() > 0)
-				return Color.web("00762D", 1.0);
+//		if (tile.elevation() < 0)
+//			return Color.web("00389B", -1.0 * tile.elevation());
+//		return Color.web("00762D", tile.elevation());
+//		double gray = (1.0 + tile.elevation()) / 2.0; 
+//		return Color.gray(gray);
+		if (tile.elevation() < 0.0) {
+			return Color.web("00389B", 1.0);
+//			return Color.web("00389B", -1.0 * tile.elevation());
 		}
-		return Color.web("00389B", 1.0);
+		
+//		int numNodes = tile.countNodes();
+//		for (int i = 0; i < numNodes; ++i) {
+//			MapNode node = tile.node(i);
+//			if (node.elevation() < 0)
+//				return Color.web("00389B", 1.0);
+//		}
+		
+		return Color.web("00762D", 1.0);
+//		return Color.web("00762D", tile.elevation());
 	}
 }

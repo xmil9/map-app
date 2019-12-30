@@ -6,14 +6,19 @@ import java.util.Random;
 
 // Generates continents by growing them randomly outward from a seed node.
 // Leads to blob looking shapes for large maps.
-public class BlobContinentGenerator implements ContinentGenerator {
+public class BlobContinentGenerator
+implements ContinentBasedTopography.ContinentGenerator {
 
+	private final Random rand;
 	private Map.Representation rep;
-	private Random rand;
 	
-	public BlobContinentGenerator(Map.Representation rep, Random rand) {
-		this.rep = rep;
+	public BlobContinentGenerator(Random rand) {
 		this.rand = rand;
+	}
+
+	@Override
+	public void setMap(Map.Representation rep) {
+		this.rep = rep;
 	}
 	
 	@Override

@@ -15,6 +15,7 @@ public class MapTile extends Object {
 	private List<MapNode> nodes;
 	// Neighboring tiles.
 	private List<MapTile> neighbors = new ArrayList<MapTile>();
+	private double elevation = -1;
 	
 	public MapTile(Point2D seed, Polygon2D shape) {
 		this.seed = seed;
@@ -59,5 +60,13 @@ public class MapTile extends Object {
 	// Returns a node in the tile's outline.
 	public MapNode node(int idx) {
 		return nodes.get(idx);
+	}
+	
+	public double elevation() {
+		return elevation;
+	}
+	
+	public void setElevation(double val) {
+		elevation = val;
 	}
 }
