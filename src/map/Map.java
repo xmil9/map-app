@@ -12,9 +12,9 @@ public class Map {
 
 	public static class Spec {
 		public final MapGeometryGenerator.Spec geom;
-		public final ContinentBasedTopography.Spec topo;
+		public final PerlinTopography.Spec topo;
 		
-		public Spec(MapGeometryGenerator.Spec geom, ContinentBasedTopography.Spec topo) {
+		public Spec(MapGeometryGenerator.Spec geom, PerlinTopography.Spec topo) {
 			this.geom = geom;
 			this.topo = topo;
 		}
@@ -128,7 +128,7 @@ public class Map {
 	
 	// Generates the node elevations.
 	private void generateTopography() {
-		PerlinTopography gen = new PerlinTopography(spec.geom.bounds, rand);
+		PerlinTopography gen = new PerlinTopography(spec.topo, rand);
 //		ContinentBasedTopography gen = new ContinentBasedTopography(spec.topo, rand);
 		gen.generate(rep);
 	}

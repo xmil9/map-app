@@ -12,8 +12,7 @@ import javafx.stage.*;
 import geometry.*;
 import map.Map;
 import map.MapGeometryGenerator;
-import map.BlobContinentGenerator;
-import map.ContinentBasedTopography;
+import map.PerlinTopography;
 import view2d.MapScene;
 
 
@@ -48,8 +47,7 @@ public class App extends Application {
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map.Spec spec = new Map.Spec(
 				new MapGeometryGenerator.Spec(bounds, 0.5, 30),
-				new ContinentBasedTopography.Spec(
-						rand, new BlobContinentGenerator(rand)));
+				new PerlinTopography.Spec(bounds, 6, 1.7));
 		Map map = new Map(spec, rand);
 		map.generate();
 
@@ -66,8 +64,7 @@ public class App extends Application {
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map.Spec spec = new Map.Spec(
 				new MapGeometryGenerator.Spec(bounds, 1, 30),
-				new ContinentBasedTopography.Spec(
-						rand, new BlobContinentGenerator(rand)));
+				new PerlinTopography.Spec(bounds, 6, 1.7));
 		Map map = new Map(spec, rand);
 		map.generate();
 		
