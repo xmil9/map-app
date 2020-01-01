@@ -1,5 +1,6 @@
 package math;
 
+import java.io.Console;
 import java.util.Random;
 
 import geometry.Point2D;
@@ -57,7 +58,7 @@ public class PerlinNoise {
 	        frequency /= 2;
 	    }
 	    
-	    return (total / maxValue);
+	    return MathUtil.clampToRange(4 * (total / maxValue), -1.0, 1.0);
 	}
 	
 	// Calculates Perlin noise at a given point in 2D range ([0, width], [0, height]).

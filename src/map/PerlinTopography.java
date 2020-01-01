@@ -2,7 +2,6 @@ package map;
 
 import java.util.Random;
 
-import geometry.Point2D;
 import geometry.Rect2D;
 import math.PerlinNoise;
 
