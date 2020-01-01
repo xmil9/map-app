@@ -61,6 +61,14 @@ public class Point2DTest {
 		assertEquals(4.0, q.x, 0.0);
 		assertEquals(6.0, q.y, 0.0);
 	}
+
+	@Test
+	public void scale() {
+		Point2D p = new Point2D(2, 3);
+		Point2D q = p.scale(2);
+		assertEquals(4.0, q.x, 0.0);
+		assertEquals(6.0, q.y, 0.0);
+	}
 	
 	@Test
 	public void distance() {
