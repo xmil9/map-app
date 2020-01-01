@@ -3,6 +3,7 @@ package map;
 import java.util.Random;
 
 import geometry.Rect2D;
+import math.MathUtil;
 import math.PerlinNoise;
 
 public class PerlinTopography implements TopographyGenerator {
@@ -45,14 +46,18 @@ public class PerlinTopography implements TopographyGenerator {
 			MapNode node = rep.node(i);
 			double noise = perlinGen.calcOctaveNoise(node.pos, spec.numOctaves,
 					spec.persistence);
-			node.setElevation(10.0 * noise);
+			node.setElevation(scaleElevation(noise));
 		}
 		
 		for (int i = 0; i < rep.countTiles(); ++i) {
 			MapTile tile = rep.tile(i);
 			double noise = perlinGen.calcOctaveNoise(tile.seed, spec.numOctaves,
 					spec.persistence);
-			tile.setElevation(noise);
+			tile.setElevation(scaleElevation(noise));
 		}
+	}
+	
+	private static double scaleElevation(double elev) {
+		return MathUtil.clampToRange(4 * elev, -1.0, 1.0);
 	}
 }

@@ -58,7 +58,7 @@ public class PerlinNoise {
 	        frequency /= 2;
 	    }
 	    
-	    return MathUtil.clampToRange(4 * (total / maxValue), -1.0, 1.0);
+	    return total / maxValue;
 	}
 	
 	// Calculates Perlin noise at a given point in 2D range ([0, width], [0, height]).
