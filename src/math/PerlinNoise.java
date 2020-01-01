@@ -1,6 +1,5 @@
 package math;
 
-import java.io.Console;
 import java.util.Random;
 
 import geometry.Point2D;
@@ -36,9 +35,9 @@ public class PerlinNoise {
 		this.gradients = makeGradients(width + 1, height + 1, rand);
 	}
 	
-	// Calculates Perlin noise at a given point in 2D range ([0, width], [0, height])
-	// using multiple passes to accumulate the noise value at different levels of
-	// scale.
+	// Calculates Perlin noise in range [-1, 1) at a given point in 2D range
+	// ([0, width], [0, height]) using multiple passes to accumulate the noise
+	// value at different levels of scale.
 	public double calcOctaveNoise(Point2D at, int numOctaves, double persistence) {
 		// Accumulates the influences of terrain areas at different scales to the
 		// noise for the given point.
@@ -61,7 +60,9 @@ public class PerlinNoise {
 	    return total / maxValue;
 	}
 	
-	// Calculates Perlin noise at a given point in 2D range ([0, width], [0, height]).
+	// Calculates Perlin noise value in range [-1, 1) at a given point in 2D range
+	// ([0, width], [0, height]). Caller is responsible for keeping input point in
+	// legal range.
 	public double calcNoise(Point2D at) {
 		// Determine grid cell that point falls into.
 		int gridLeft = (int) (at.x % width); 
