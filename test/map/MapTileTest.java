@@ -47,13 +47,19 @@ public class MapTileTest {
 
 	@Test
 	public void equals_WhenEqual() {
-		Polygon2D shape = new Polygon2D();
-		shape.addVertex(new Point2D(3, 4));
-		shape.addVertex(new Point2D(1, 1));
-		shape.addVertex(new Point2D(2, 6));
-		MapTile t = new MapTile(new Point2D(1, 2), shape);
+		Polygon2D shapeA = new Polygon2D();
+		shapeA.addVertex(new Point2D(3, 4));
+		shapeA.addVertex(new Point2D(1, 1));
+		shapeA.addVertex(new Point2D(2, 6));
+		MapTile ta = new MapTile(new Point2D(1, 2), shapeA);
 
-		assertTrue(t.equals(t));
+		Polygon2D shapeB = new Polygon2D();
+		shapeB.addVertex(new Point2D(3, 4));
+		shapeB.addVertex(new Point2D(1, 1));
+		shapeB.addVertex(new Point2D(2, 6));
+		MapTile tb = new MapTile(new Point2D(1, 2), shapeB);
+
+		assertTrue(ta.equals(tb));
 	}
 
 	@Test
