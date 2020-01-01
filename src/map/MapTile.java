@@ -34,8 +34,20 @@ public class MapTile extends Object {
 		return seed.equals(otherTile.seed);
 	}
 	
+	// Sets the map nodes for each point of the tile's shape.
+	// Caller is responsible to make sure the node's locations correspond
+	// to points on the tile's shape.
 	public void setNodes(List<MapNode> nodes) {
 		this.nodes = nodes;
+	}
+
+	public int countNodes() {
+		return nodes.size();
+	}
+
+	// Returns a node in the tile's outline.
+	public MapNode node(int idx) {
+		return nodes.get(idx);
 	}
 	
 	// Adds a given tile as a neighboring tile.
@@ -51,15 +63,6 @@ public class MapTile extends Object {
 	// Returns a neighboring tile.
 	public MapTile neighbor(int idx) {
 		return neighbors.get(idx);
-	}
-
-	public int countNodes() {
-		return nodes.size();
-	}
-
-	// Returns a node in the tile's outline.
-	public MapNode node(int idx) {
-		return nodes.get(idx);
 	}
 	
 	public double elevation() {
