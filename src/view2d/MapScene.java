@@ -1,5 +1,6 @@
 package view2d;
 
+import java.util.ArrayList;
 import java.util.List;
 import geometry.*;
 import javafx.geometry.Insets;
@@ -14,7 +15,7 @@ import map.MapNode;
 import map.MapTile;
 
 public class MapScene {
-
+	
 	private Scene map;
 	private Group content;
 	
@@ -146,24 +147,34 @@ public class MapScene {
 	}
 	
 	private static Paint makeTileFill(MapTile tile) {
-//		if (tile.elevation() < 0)
-//			return Color.web("00389B", -1.0 * tile.elevation());
-//		return Color.web("00762D", tile.elevation());
-//		double gray = (1.0 + tile.elevation()) / 2.0; 
-//		return Color.gray(gray);
-		if (tile.elevation() < 0.0) {
-			return Color.web("00389B", 1.0);
-//			return Color.web("00389B", -1.0 * tile.elevation());
+//		if (tile.elevation() < 0.1)
+//			return Color.web("2060C7");
+//		return Color.web("00A52D");
+		
+		double seaLevel = 0.2;
+		double maxLevel = 1.0;
+		double minLevel = -1.0;
+		List<Paint> landFills = new ArrayList<Paint>();
+		landFills.add(Color.web("00D72D"));
+		landFills.add(Color.web("00A52D"));
+		landFills.add(Color.web("00762D"));
+		// landFills.add(Color.web("919191")); // gray
+		landFills.add(Color.web("00542D")); // dark green
+		List<Paint> waterFills = new ArrayList<Paint>();
+		waterFills.add(Color.web("20CDFF"));
+		waterFills.add(Color.web("20A5FF")); 
+		waterFills.add(Color.web("2070FF"));
+		waterFills.add(Color.web("203EFF"));
+
+		if (tile.elevation() < seaLevel) {
+			return waterFills.get(waterFills.size() - 1);
+//			double intervalSize = (seaLevel - minLevel) / (double) waterFills.size();
+//			int fillIdx = (int) ((tile.elevation() - minLevel) / (double) intervalSize);
+//			return waterFills.get(waterFills.size() - 1 - fillIdx);
 		}
 		
-//		int numNodes = tile.countNodes();
-//		for (int i = 0; i < numNodes; ++i) {
-//			MapNode node = tile.node(i);
-//			if (node.elevation() < 0)
-//				return Color.web("00389B", 1.0);
-//		}
-		
-		return Color.web("00762D", 1.0);
-//		return Color.web("00762D", tile.elevation());
+		double intervalSize = (maxLevel - seaLevel) / (double) landFills.size();
+		int fillIdx = (int) ((maxLevel - tile.elevation()) / (double) intervalSize);
+		return landFills.get(landFills.size() - 1 - fillIdx);
 	}
 }
