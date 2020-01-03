@@ -47,7 +47,7 @@ public class App extends Application {
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map.Spec spec = new Map.Spec(
 				new MapGeometryGenerator.Spec(bounds, 0.5, 30),
-				new PerlinTopography.Spec(bounds, 6, 1.7));
+				new PerlinTopography.Spec(bounds, 6, 1.8));
 		Map map = new Map(spec, rand);
 		map.generate();
 

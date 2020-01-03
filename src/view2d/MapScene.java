@@ -147,19 +147,16 @@ public class MapScene {
 	}
 	
 	private static Paint makeTileFill(MapTile tile) {
-//		if (tile.elevation() < 0.1)
-//			return Color.web("2060C7");
-//		return Color.web("00A52D");
+		boolean showWaterDepth = true;
 		
-		double seaLevel = 0.2;
+		double seaLevel = 0.1;
 		double maxLevel = 1.0;
 		double minLevel = -1.0;
 		List<Paint> landFills = new ArrayList<Paint>();
 		landFills.add(Color.web("00D72D"));
 		landFills.add(Color.web("00A52D"));
 		landFills.add(Color.web("00762D"));
-		// landFills.add(Color.web("919191")); // gray
-		landFills.add(Color.web("00542D")); // dark green
+		landFills.add(Color.web("00542D"));
 		List<Paint> waterFills = new ArrayList<Paint>();
 		waterFills.add(Color.web("20CDFF"));
 		waterFills.add(Color.web("20A5FF")); 
@@ -167,10 +164,13 @@ public class MapScene {
 		waterFills.add(Color.web("203EFF"));
 
 		if (tile.elevation() < seaLevel) {
-			return waterFills.get(waterFills.size() - 1);
-//			double intervalSize = (seaLevel - minLevel) / (double) waterFills.size();
-//			int fillIdx = (int) ((tile.elevation() - minLevel) / (double) intervalSize);
-//			return waterFills.get(waterFills.size() - 1 - fillIdx);
+			if (showWaterDepth) {
+				double intervalSize = (seaLevel - minLevel) / (double) waterFills.size();
+				int fillIdx = (int) ((tile.elevation() - minLevel) / (double) intervalSize);
+				return waterFills.get(waterFills.size() - 1 - fillIdx);
+			} else {
+				return waterFills.get(waterFills.size() - 1);
+			}
 		}
 		
 		double intervalSize = (maxLevel - seaLevel) / (double) landFills.size();
