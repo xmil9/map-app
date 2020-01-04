@@ -53,7 +53,7 @@ public class App extends Application {
 
 		scene.addMap(map);
 
-		scene.scale(10);
+		scene.scale(30);
 		return scene.scene();
 	}
 	

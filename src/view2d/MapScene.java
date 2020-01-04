@@ -9,7 +9,10 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Paint;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.*;
 import map.MapNode;
 import map.MapTile;
@@ -147,34 +150,87 @@ public class MapScene {
 	}
 	
 	private static Paint makeTileFill(MapTile tile) {
+		boolean showTileBasedElevation = false;
 		boolean showWaterDepth = true;
 		
-		double seaLevel = 0.1;
-		double maxLevel = 1.0;
-		double minLevel = -1.0;
-		List<Paint> landFills = new ArrayList<Paint>();
+		if (showTileBasedElevation) {
+			return getFill(tile.elevation(), showWaterDepth);
+		} else {
+			double maxElev = -2;
+			Point2D maxPt = null;
+			double minElev = 2;
+			Point2D minPt = null;
+			int numNodes = tile.countNodes();
+			for (int i = 0; i < numNodes; ++i) {
+				MapNode node = tile.node(i);
+				double elev = node.elevation();
+				if (elev > maxElev) {
+					maxElev = elev;
+					maxPt = node.pos;
+				}
+				if (elev < minElev) {
+					minElev = elev;
+					minPt = node.pos;
+				}
+			}
+			if (maxElev > 1)
+				maxElev = 1;
+			if (minElev < -1)
+				minElev = -1;
+			
+			Color maxFill = getFill(maxElev, showWaterDepth);
+			Color minFill = getFill(minElev, showWaterDepth);
+			Stop[] stops = new Stop[] { new Stop(0, maxFill), new Stop(1, minFill) };
+			return new LinearGradient(maxPt.x, maxPt.y, minPt.x, minPt.y, false,
+					CycleMethod.NO_CYCLE, stops);
+		}
+	}
+	
+	private static Color getFill(double elev, boolean showWaterDepth) {
+		// Lighter to darker
+		List<Color> landFills = new ArrayList<Color>();
 		landFills.add(Color.web("00D72D"));
+		landFills.add(Color.web("00C22D"));
 		landFills.add(Color.web("00A52D"));
 		landFills.add(Color.web("00762D"));
 		landFills.add(Color.web("00542D"));
-		List<Paint> waterFills = new ArrayList<Paint>();
-		waterFills.add(Color.web("20CDFF"));
-		waterFills.add(Color.web("20A5FF")); 
-		waterFills.add(Color.web("2070FF"));
+		landFills.add(Color.web("51542D"));
+		landFills.add(Color.web("AA8300"));
+//		landFills.add(Color.web("AA5400"));
+		landFills.add(Color.web("835406"));
+		landFills.add(Color.web("4B4B4B"));
+		landFills.add(Color.web("787878"));
+		landFills.add(Color.web("AAAAAA"));
+//		landFills.add(Color.web("CCCCCC"));
+//		landFills.add(Color.web("EEEEEE"));
+		// Darker to lighter
+		List<Color> waterFills = new ArrayList<Color>();
 		waterFills.add(Color.web("203EFF"));
+		waterFills.add(Color.web("2070FF"));
+		waterFills.add(Color.web("20A5FF"));
+		waterFills.add(Color.web("20CDFF"));
 
-		if (tile.elevation() < seaLevel) {
-			if (showWaterDepth) {
-				double intervalSize = (seaLevel - minLevel) / (double) waterFills.size();
-				int fillIdx = (int) ((tile.elevation() - minLevel) / (double) intervalSize);
-				return waterFills.get(waterFills.size() - 1 - fillIdx);
-			} else {
-				return waterFills.get(waterFills.size() - 1);
-			}
-		}
+		double seaLevel = 0.1;
+		double maxLevel = 1.0;
+		double minLevel = -1.0;
 		
-		double intervalSize = (maxLevel - seaLevel) / (double) landFills.size();
-		int fillIdx = (int) ((maxLevel - tile.elevation()) / (double) intervalSize);
-		return landFills.get(landFills.size() - 1 - fillIdx);
+		if (elev < seaLevel) {
+			if (showWaterDepth)
+				return interpolateFill(elev, minLevel, seaLevel, waterFills);
+			return waterFills.get(waterFills.size() - 1);
+		} else {
+			if (elev == 1)
+				return Color.web("CCCCCC");
+			return interpolateFill(elev, seaLevel, maxLevel, landFills);
+		}
+	}
+	
+	private static Color interpolateFill(double val, double min, double max,
+			List<Color> fills) {
+		double intervalSize = (max - min) / (double) fills.size();
+		int idx = (int) ((val - min) / (double) intervalSize);
+		if (idx >= fills.size())
+			idx = fills.size() - 1;
+		return fills.get(idx);
 	}
 }
