@@ -157,40 +157,23 @@ public class MapScene {
 		if (showTileBasedElevation) {
 			return getFill(tile.elevation(), seaLevel, showWaterDepth);
 		} else {
-			double maxElev = -2;
-			Point2D maxPt = null;
-			double minElev = 2;
-			Point2D minPt = null;
-			int numNodes = tile.countNodes();
-			for (int i = 0; i < numNodes; ++i) {
-				MapNode node = tile.node(i);
-				double elev = node.elevation();
-				if (elev > maxElev) {
-					maxElev = elev;
-					maxPt = node.pos;
-				}
-				if (elev < minElev) {
-					minElev = elev;
-					minPt = node.pos;
-				}
-			}
-			if (maxElev > 1)
-				maxElev = 1;
-			if (minElev < -1)
-				minElev = -1;
-			// Create firm shore line. Don't color tiles with interpolations of
-			// land and sea colors.
-			if (minElev < seaLevel && maxElev >= seaLevel)
-				minElev = seaLevel;
+			MinMaxElevation minMaxElev = new MinMaxElevation();
+			minMaxElev.find(tile);	
 			
-			Color maxFill = getFill(maxElev, seaLevel, showWaterDepth);
-			Color minFill = getFill(minElev, seaLevel, showWaterDepth);
+			// Create firm shore line. Don't interpolate between land and sea colors.
+			if (minMaxElev.min < seaLevel && minMaxElev.max >= seaLevel)
+				minMaxElev.min = seaLevel;
+			
+			Color maxFill = getFill(minMaxElev.max, seaLevel, showWaterDepth);
+			Color minFill = getFill(minMaxElev.min, seaLevel, showWaterDepth);
 			Stop[] stops = new Stop[] { new Stop(0, maxFill), new Stop(1, minFill) };
-			return new LinearGradient(maxPt.x, maxPt.y, minPt.x, minPt.y, false,
+			return new LinearGradient(minMaxElev.maxPos.x, minMaxElev.maxPos.y,
+					minMaxElev.minPos.x, minMaxElev.minPos.y, false,
 					CycleMethod.NO_CYCLE, stops);
 		}
 	}
 	
+	// Returns a color that should be used for a given elevation value.  
 	private static Color getFill(double elev, double seaLevel, boolean showWaterDepth) {
 		// Lighter to darker
 		List<Color> landFills = new ArrayList<Color>();
@@ -201,13 +184,11 @@ public class MapScene {
 		landFills.add(Color.web("00542D"));
 		landFills.add(Color.web("51542D"));
 		landFills.add(Color.web("A16708"));
-//		landFills.add(Color.web("AA5400"));
 		landFills.add(Color.web("835406"));
 		landFills.add(Color.web("4B4B4B"));
 		landFills.add(Color.web("787878"));
 		landFills.add(Color.web("AAAAAA"));
-//		landFills.add(Color.web("CCCCCC"));
-//		landFills.add(Color.web("EEEEEE"));
+		Color mountainTops = Color.web("CCCCCC");
 		// Darker to lighter
 		List<Color> waterFills = new ArrayList<Color>();
 		waterFills.add(Color.web("203EFF"));
@@ -223,12 +204,15 @@ public class MapScene {
 				return interpolateFill(elev, minLevel, seaLevel, waterFills);
 			return waterFills.get(waterFills.size() - 1);
 		} else {
+			// Max elevation is colored in unique mountain top color.
 			if (elev == 1)
-				return Color.web("CCCCCC");
+				return mountainTops;
 			return interpolateFill(elev, seaLevel, maxLevel, landFills);
 		}
 	}
 	
+	// Returns a color from a given ordered color list propotional to a given value
+	// in a given range.
 	private static Color interpolateFill(double val, double min, double max,
 			List<Color> fills) {
 		double intervalSize = (max - min) / (double) fills.size();
@@ -236,5 +220,41 @@ public class MapScene {
 		if (idx >= fills.size())
 			idx = fills.size() - 1;
 		return fills.get(idx);
+	}
+	
+	///////////////
+	
+	// Finds the min and max elevations of a given tile's shape.
+	private static class MinMaxElevation {
+		public double max = -2;
+		public Point2D maxPos = null;
+		public double min = 2;
+		public Point2D minPos = null;
+		
+		public void find(MapTile tile) {
+			max = -2;
+			maxPos = null;
+			min = 2;
+			minPos = null;
+			
+			int numNodes = tile.countNodes();
+			for (int i = 0; i < numNodes; ++i) {
+				MapNode node = tile.node(i);
+				double elev = node.elevation();
+				if (elev > max) {
+					max = elev;
+					maxPos = node.pos;
+				}
+				if (elev < min) {
+					min = elev;
+					minPos = node.pos;
+				}
+			}
+			
+			if (max > 1)
+				max = 1;
+			if (min < -1)
+				min = -1;
+		}
 	}
 }
