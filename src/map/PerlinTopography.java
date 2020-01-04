@@ -57,7 +57,19 @@ public class PerlinTopography implements TopographyGenerator {
 		}
 	}
 	
+	// Scales elevation values because Perlin noise values calculated with multiple
+	// octaves tend to be pretty flat.
 	private static double scaleElevation(double elev) {
-		return MathUtil.clampToRange(4 * elev, -1.0, 1.0);
+		return MathUtil.clampToRange(stretch(elev), -1.0, 1.0);
+	}
+
+	// Stretches a given value depending on it's range.
+	private static double stretch(double t) {
+		double abs = Math.abs(t);
+		if (abs < .3)
+			return 4 * t;
+		else if (abs < .5)
+			return 3 * t;
+		return t;
 	}
 }

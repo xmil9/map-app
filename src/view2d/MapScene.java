@@ -152,9 +152,10 @@ public class MapScene {
 	private static Paint makeTileFill(MapTile tile) {
 		boolean showTileBasedElevation = false;
 		boolean showWaterDepth = true;
+		double seaLevel = 0.1;
 		
 		if (showTileBasedElevation) {
-			return getFill(tile.elevation(), showWaterDepth);
+			return getFill(tile.elevation(), seaLevel, showWaterDepth);
 		} else {
 			double maxElev = -2;
 			Point2D maxPt = null;
@@ -177,16 +178,20 @@ public class MapScene {
 				maxElev = 1;
 			if (minElev < -1)
 				minElev = -1;
+			// Create firm shore line. Don't color tiles with interpolations of
+			// land and sea colors.
+			if (minElev < seaLevel && maxElev >= seaLevel)
+				minElev = seaLevel;
 			
-			Color maxFill = getFill(maxElev, showWaterDepth);
-			Color minFill = getFill(minElev, showWaterDepth);
+			Color maxFill = getFill(maxElev, seaLevel, showWaterDepth);
+			Color minFill = getFill(minElev, seaLevel, showWaterDepth);
 			Stop[] stops = new Stop[] { new Stop(0, maxFill), new Stop(1, minFill) };
 			return new LinearGradient(maxPt.x, maxPt.y, minPt.x, minPt.y, false,
 					CycleMethod.NO_CYCLE, stops);
 		}
 	}
 	
-	private static Color getFill(double elev, boolean showWaterDepth) {
+	private static Color getFill(double elev, double seaLevel, boolean showWaterDepth) {
 		// Lighter to darker
 		List<Color> landFills = new ArrayList<Color>();
 		landFills.add(Color.web("00D72D"));
@@ -195,7 +200,7 @@ public class MapScene {
 		landFills.add(Color.web("00762D"));
 		landFills.add(Color.web("00542D"));
 		landFills.add(Color.web("51542D"));
-		landFills.add(Color.web("AA8300"));
+		landFills.add(Color.web("A16708"));
 //		landFills.add(Color.web("AA5400"));
 		landFills.add(Color.web("835406"));
 		landFills.add(Color.web("4B4B4B"));
@@ -210,7 +215,6 @@ public class MapScene {
 		waterFills.add(Color.web("20A5FF"));
 		waterFills.add(Color.web("20CDFF"));
 
-		double seaLevel = 0.1;
 		double maxLevel = 1.0;
 		double minLevel = -1.0;
 		

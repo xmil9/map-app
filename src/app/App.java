@@ -47,13 +47,13 @@ public class App extends Application {
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map.Spec spec = new Map.Spec(
 				new MapGeometryGenerator.Spec(bounds, 0.5, 30),
-				new PerlinTopography.Spec(bounds, 6, 1.8));
+				new PerlinTopography.Spec(bounds, 6, 1.7));
 		Map map = new Map(spec, rand);
 		map.generate();
 
 		scene.addMap(map);
 
-		scene.scale(30);
+		scene.scale(10);
 		return scene.scene();
 	}
 	
@@ -64,7 +64,7 @@ public class App extends Application {
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 		Map.Spec spec = new Map.Spec(
 				new MapGeometryGenerator.Spec(bounds, 1, 30),
-				new PerlinTopography.Spec(bounds, 6, 1.7));
+				new PerlinTopography.Spec(bounds, 6, 3));
 		Map map = new Map(spec, rand);
 		map.generate();
 		
