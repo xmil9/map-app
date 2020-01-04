@@ -159,14 +159,21 @@ public class MapScene {
 		} else {
 			MinMaxElevation minMaxElev = new MinMaxElevation();
 			minMaxElev.find(tile);	
+			double seedElev = tile.elevation();
 			
 			// Create firm shore line. Don't interpolate between land and sea colors.
 			if (minMaxElev.min < seaLevel && minMaxElev.max >= seaLevel)
 				minMaxElev.min = seaLevel;
+			if (seedElev < seaLevel && minMaxElev.max >= seaLevel)
+				seedElev = seaLevel;
 			
 			Color maxFill = getFill(minMaxElev.max, seaLevel, showWaterDepth);
 			Color minFill = getFill(minMaxElev.min, seaLevel, showWaterDepth);
-			Stop[] stops = new Stop[] { new Stop(0, maxFill), new Stop(1, minFill) };
+			Color seedFill = getFill(seedElev, seaLevel, showWaterDepth);
+			Stop[] stops = new Stop[] {
+					new Stop(0, maxFill),
+					new Stop(.5, seedFill),
+					new Stop(1, minFill) };
 			return new LinearGradient(minMaxElev.maxPos.x, minMaxElev.maxPos.y,
 					minMaxElev.minPos.x, minMaxElev.minPos.y, false,
 					CycleMethod.NO_CYCLE, stops);
