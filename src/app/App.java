@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Random;
 
 import javafx.application.*;
+import javafx.event.EventHandler;
 import javafx.scene.*;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
 
@@ -44,43 +46,15 @@ public class App extends Application {
 		// Smaller persistence => Smaller and choppier features.
 		public double persistence = 1.7;
 	}
-	
-	///////////////
-	
-	Spec spec;
-	// App-wide random number generator. Must be used everywhere to guarantee
-	// deterministic map generation.
-	private Random rand;
-	
-	public static void main(String passes[]) {
-		launch(passes);
-	}
 
-	@Override
-	public void start(Stage primaryStage) {
-		spec = new Spec();
-		rand = (spec.randSeed != null) ? new Random(spec.randSeed) : new Random();
-		
-		primaryStage.setTitle("The Map App");
-		primaryStage.setScene(makeScene());
-		primaryStage.show();
-	}
-	
-	private Scene makeScene() {
-		
-//		return makePoissonDiscSampleScene();
-//		return makeVoronoiScene();
-//		return makeMapSceneWithShapes();
-//		return makeTestMapScene();
-		return makeMapScene();
-	}
-	
+	// Creates a view spec from an app-wide spec.
 	private static MapScene.Spec makeViewSpec(Spec appSpec) {
 		return new MapScene.Spec(appSpec.viewWidth, appSpec.viewHeight,
 				appSpec.seaLevel, appSpec.scaleFactor, appSpec.elevRendering,
 				appSpec.showWaterDepth, appSpec.hasFirmShoreline);
 	}
 	
+	// Creates a model spec from an app-wide spec.
 	private static Map.Spec makeModelSpec(Spec appSpec) {
 		Rect2D bounds = new Rect2D(0, 0, appSpec.mapWidth, appSpec.mapHeight);
 		return new Map.Spec(
@@ -90,31 +64,75 @@ public class App extends Application {
 						appSpec.persistence));
 	}
 	
-	private Scene makeMapScene() {
+	///////////////
+	
+	Spec spec;
+	// App-wide random number generator. Must be used everywhere to guarantee
+	// deterministic map generation.
+	private Random rand;
+	private double sceneScale;
+	private MapScene mapScene;
+	
+	public static void main(String passes[]) {
+		launch(passes);
+	}
+
+	@Override
+	public void start(Stage primaryStage) {
+		spec = new Spec();
+		rand = (spec.randSeed != null) ? new Random(spec.randSeed) : new Random();
+		sceneScale = spec.scaleFactor;
+		mapScene = makeScene();
+		
+		primaryStage.setTitle("The Map App");
+		primaryStage.setScene(mapScene.scene());
+		primaryStage.show();
+	}
+	
+	private MapScene makeScene() {
+//		return makePoissonDiscSampleScene();
+//		return makeVoronoiScene();
+//		return makeMapSceneWithShapes();
+//		return makeTestMapScene();
+		MapScene mapScene = makeMapScene();
+		// Mouse wheel zooming.
+		mapScene.scene().setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                double zoomFactor = (event.getDeltaY() > 0) ? 1.1 : 0.9;
+                sceneScale *= zoomFactor;
+                mapScene.scale(sceneScale * zoomFactor);
+                event.consume();
+            }
+        });
+		return mapScene;
+	}
+	
+	private MapScene makeMapScene() {
 		Map map = new Map(makeModelSpec(spec), rand);
 		map.generate();
 
 		MapScene scene = new MapScene(makeViewSpec(spec));
 		scene.addMap(map);
 		scene.scale(spec.scaleFactor);
-		return scene.scene();
+		return scene;
 	}
 	
-	private Scene makeMapSceneWithShapes() {
+	private MapScene makeMapSceneWithShapes() {
 		Map map = new Map(makeModelSpec(spec), rand);
 		map.generate();
 		
 		final double strokeWidth = 0.03;
-		MapScene scene = new MapScene(makeViewSpec(spec));
-		scene.addPolygons(map.tileShapes(), Color.web("359BAF"),
+		MapScene mapScene = new MapScene(makeViewSpec(spec));
+		mapScene.addPolygons(map.tileShapes(), Color.web("359BAF"),
 				Color.web("black", 1.0), strokeWidth);
-		scene.scale(spec.scaleFactor);
-		return scene.scene();
+		mapScene.scale(spec.scaleFactor);
+		return mapScene;
 	}
 	
-	private Scene makeTestMapScene() {
+	private MapScene makeTestMapScene() {
 		final double strokeWidth = 0.03;
-		MapScene scene = new MapScene(makeViewSpec(spec));
+		MapScene mapScene = new MapScene(makeViewSpec(spec));
 
 		var bounds = new Rect2D(10, 10, 15, 15);
 		var map = new Map(null, rand);
@@ -141,20 +159,20 @@ public class App extends Application {
 		for (int i = 0; i < rep.countTiles(); ++i)
 			shapes.add(rep.tile(i).shape);
 		
-		scene.addPolygons(shapes, Color.web("359BAF"),
+		mapScene.addPolygons(shapes, Color.web("359BAF"),
 				Color.web("black", 1.0), strokeWidth);
-		scene.scale(spec.scaleFactor);
-		return scene.scene();
+		mapScene.scale(spec.scaleFactor);
+		return mapScene;
 	}
 
-	private Scene makeVoronoiScene() {
+	private MapScene makeVoronoiScene() {
 		final boolean showSamples = false;
 		final boolean showVoronoi = true;
 		final boolean showDelauney = true;
 		final boolean showBounds = true;
 		
 		final double strokeWidth = 0.05;
-		MapScene scene = new MapScene(makeViewSpec(spec));
+		MapScene mapScene = new MapScene(makeViewSpec(spec));
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 //		List<Point2D> samples = genSamplePoints(10, bounds, rand);
@@ -180,39 +198,39 @@ public class App extends Application {
 			List<Point2D> ptList = new ArrayList<Point2D>();
 			for (Point2D pt : samples)
 				ptList.add(pt);
-			scene.addPoints(ptList, Color.web("red", 1.0), strokeWidth * 5);
+			mapScene.addPoints(ptList, Color.web("red", 1.0), strokeWidth * 5);
 		}		
 		
 		if (showBounds) {
 			List<Rect2D> rects = new ArrayList<Rect2D>();
 			rects.add(bounds);
-			scene.addRects(rects, Color.web("blue", 1.0), strokeWidth);
+			mapScene.addRects(rects, Color.web("blue", 1.0), strokeWidth);
 		}		
 		
 		if (showVoronoi) {
 			List<Polygon2D> polys = new ArrayList<Polygon2D>();
 			for (VoronoiTile vr : regions)
 				polys.add(vr.outline);
-			scene.addPolygons(polys, null, Color.web("red", 1.0), strokeWidth);
+			mapScene.addPolygons(polys, null, Color.web("red", 1.0), strokeWidth);
 		}
 
 		if (showDelauney) {
 			if (voronoi.getTriangulation() != null)
-				scene.addTriangles(voronoi.getTriangulation(), Color.web("black", 1.0),
+				mapScene.addTriangles(voronoi.getTriangulation(), Color.web("black", 1.0),
 						strokeWidth);
 		}		
 		
-		scene.scale(spec.scaleFactor);
-		return scene.scene();
+		mapScene.scale(spec.scaleFactor);
+		return mapScene;
 	}
 	
-	private Scene makePoissonDiscSampleScene() {
+	private MapScene makePoissonDiscSampleScene() {
 		final boolean showSamples = true;
 		final boolean showDomain = true;
 		final boolean showMinDistance = true;
 		
 		final double strokeWidth = 0.05;
-		MapScene scene = new MapScene(makeViewSpec(spec));
+		MapScene mapScene = new MapScene(makeViewSpec(spec));
 
 		Rect2D domain = new Rect2D(0, 0, 100, 100);
 		double minDist = 3;
@@ -222,24 +240,24 @@ public class App extends Application {
 		List<Point2D> samples = sampler.generate();
 		
 		if (showSamples) {
-			scene.addPoints(samples, Color.web("red", 1.0), strokeWidth * 5);
+			mapScene.addPoints(samples, Color.web("red", 1.0), strokeWidth * 5);
 		}		
 
 		if (showMinDistance) {
 			List<Circle2D> circleList = new ArrayList<Circle2D>();
 			for (Point2D pt : samples)
 				circleList.add(new Circle2D(pt, minDist));
-			scene.addCircles(circleList, Color.web("black", 1.0), strokeWidth);
+			mapScene.addCircles(circleList, Color.web("black", 1.0), strokeWidth);
 		}		
 		
 		if (showDomain) {
 			List<Rect2D> rects = new ArrayList<Rect2D>();
 			rects.add(domain);
-			scene.addRects(rects, Color.web("blue", 1.0), strokeWidth);
+			mapScene.addRects(rects, Color.web("blue", 1.0), strokeWidth);
 		}		
 		
-		scene.scale(spec.scaleFactor);
-		return scene.scene();
+		mapScene.scale(spec.scaleFactor);
+		return mapScene;
 	}
 	
 	private static List<Point2D> genPoissonSamplePoints(Rect2D bounds, Random rand) {
