@@ -20,9 +20,9 @@ public class MapGeometryGenerator {
 	public static class Spec {
 		public final Rect2D bounds;
 		// Minimal distance of randomly generated sample points.
-		// Smaller distance => smaller and more map tiles.
+		// Smaller distance => smaller and more tiles.
 		public final double minSampleDistance;
-		// Number of candidates for generated sample points.
+		// Number of tested candidates for generated sample points.
 		// Larger number => more evenly spaced sample points but slower.
 		public final int numSampleCandidates;
 		

@@ -18,6 +18,38 @@ import view2d.MapScene;
 
 public class App extends Application {
 	
+	public class Spec {
+		public Long randSeed = 1234567890L;
+		// View specs.
+		public int viewWidth = 2100;
+		public int viewHeight = 1100;
+		public double seaLevel = 0.2;
+		public double scaleFactor = 10.0;
+		public MapScene.ElevationRendering elevRendering =
+				MapScene.ElevationRendering.NODE_BASED;
+		public boolean showWaterDepth = true;
+		public boolean hasFirmShoreline = false;
+		// Model specs.
+		public int mapWidth = 200;
+		public int mapHeight = 100;
+		// Smaller distance => smaller and more tiles.
+		public double minSampleDistance = .5;
+		// More candidates => more evenly spaced sample points but slower generation.
+		public int numSampleCandidates = 30;
+		// More octaves => Wider and wider areas are affected by values of
+		// individual noise values of higher octave passes. Leads to zoomed in
+		// appearance on features of the map.
+		public int numOctaves = 6;
+		// Larger persistence => Larger and smoother features.
+		// Smaller persistence => Smaller and choppier features.
+		public double persistence = 1.7;
+	}
+	
+	///////////////
+	
+	Spec spec;
+	// App-wide random number generator. Must be used everywhere to guarantee
+	// deterministic map generation.
 	private Random rand;
 	
 	public static void main(String passes[]) {
@@ -26,13 +58,15 @@ public class App extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		spec = new Spec();
+		rand = (spec.randSeed != null) ? new Random(spec.randSeed) : new Random();
+		
 		primaryStage.setTitle("The Map App");
-		primaryStage.setScene(makeScene(null));//123456L));
+		primaryStage.setScene(makeScene());
 		primaryStage.show();
 	}
 	
-	private Scene makeScene(Long randSeed) {
-		rand = (randSeed != null) ? new Random(randSeed) : new Random();
+	private Scene makeScene() {
 		
 //		return makePoissonDiscSampleScene();
 //		return makeVoronoiScene();
@@ -41,48 +75,51 @@ public class App extends Application {
 		return makeMapScene();
 	}
 	
+	private static MapScene.Spec makeViewSpec(Spec appSpec) {
+		return new MapScene.Spec(appSpec.viewWidth, appSpec.viewHeight,
+				appSpec.seaLevel, appSpec.scaleFactor, appSpec.elevRendering,
+				appSpec.showWaterDepth, appSpec.hasFirmShoreline);
+	}
+	
+	private static Map.Spec makeModelSpec(Spec appSpec) {
+		Rect2D bounds = new Rect2D(0, 0, appSpec.mapWidth, appSpec.mapHeight);
+		return new Map.Spec(
+				new MapGeometryGenerator.Spec(bounds, appSpec.minSampleDistance,
+						appSpec.numSampleCandidates),
+				new PerlinTopography.Spec(bounds, appSpec.numOctaves,
+						appSpec.persistence));
+	}
+	
 	private Scene makeMapScene() {
-		MapScene scene = new MapScene(1100, 1100);
-
-		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Map.Spec spec = new Map.Spec(
-				new MapGeometryGenerator.Spec(bounds, 0.5, 30),
-				new PerlinTopography.Spec(bounds, 6, 1.7));
-		Map map = new Map(spec, rand);
+		Map map = new Map(makeModelSpec(spec), rand);
 		map.generate();
 
+		MapScene scene = new MapScene(makeViewSpec(spec));
 		scene.addMap(map);
-
-		scene.scale(10);
+		scene.scale(spec.scaleFactor);
 		return scene.scene();
 	}
 	
 	private Scene makeMapSceneWithShapes() {
-		final double strokeWidth = 0.03;
-		MapScene scene = new MapScene(1100, 1100);
-
-		Rect2D bounds = new Rect2D(0, 0, 100, 100);
-		Map.Spec spec = new Map.Spec(
-				new MapGeometryGenerator.Spec(bounds, 1, 30),
-				new PerlinTopography.Spec(bounds, 6, 3));
-		Map map = new Map(spec, rand);
+		Map map = new Map(makeModelSpec(spec), rand);
 		map.generate();
 		
+		final double strokeWidth = 0.03;
+		MapScene scene = new MapScene(makeViewSpec(spec));
 		scene.addPolygons(map.tileShapes(), Color.web("359BAF"),
 				Color.web("black", 1.0), strokeWidth);
-
-		scene.scale(10);
+		scene.scale(spec.scaleFactor);
 		return scene.scene();
 	}
 	
 	private Scene makeTestMapScene() {
 		final double strokeWidth = 0.03;
-		MapScene scene = new MapScene(1100, 1100);
+		MapScene scene = new MapScene(makeViewSpec(spec));
 
 		var bounds = new Rect2D(10, 10, 15, 15);
 		var map = new Map(null, rand);
-		var spec = new MapGeometryGenerator.Spec(bounds, 1, 30);
-		var gen = new MapGeometryGenerator(map, spec);
+		var geomSpec = new MapGeometryGenerator.Spec(bounds, 1, 30);
+		var gen = new MapGeometryGenerator(map, geomSpec);
 		
 		List<Point2D> samples = new ArrayList<Point2D>();
 		samples.add(new Point2D(12.066096133148083, 14.952071865649085));
@@ -106,8 +143,7 @@ public class App extends Application {
 		
 		scene.addPolygons(shapes, Color.web("359BAF"),
 				Color.web("black", 1.0), strokeWidth);
-
-		scene.scale(10);
+		scene.scale(spec.scaleFactor);
 		return scene.scene();
 	}
 
@@ -118,7 +154,7 @@ public class App extends Application {
 		final boolean showBounds = true;
 		
 		final double strokeWidth = 0.05;
-		MapScene scene = new MapScene(1100, 1100);
+		MapScene scene = new MapScene(makeViewSpec(spec));
 
 		Rect2D bounds = new Rect2D(0, 0, 100, 100);
 //		List<Point2D> samples = genSamplePoints(10, bounds, rand);
@@ -166,7 +202,7 @@ public class App extends Application {
 						strokeWidth);
 		}		
 		
-		scene.scale(10);
+		scene.scale(spec.scaleFactor);
 		return scene.scene();
 	}
 	
@@ -176,7 +212,7 @@ public class App extends Application {
 		final boolean showMinDistance = true;
 		
 		final double strokeWidth = 0.05;
-		MapScene scene = new MapScene(1100, 1100);
+		MapScene scene = new MapScene(makeViewSpec(spec));
 
 		Rect2D domain = new Rect2D(0, 0, 100, 100);
 		double minDist = 3;
@@ -202,7 +238,7 @@ public class App extends Application {
 			scene.addRects(rects, Color.web("blue", 1.0), strokeWidth);
 		}		
 		
-		scene.scale(10);
+		scene.scale(spec.scaleFactor);
 		return scene.scene();
 	}
 	

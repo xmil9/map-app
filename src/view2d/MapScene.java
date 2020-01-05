@@ -19,12 +19,43 @@ import map.MapTile;
 
 public class MapScene {
 	
+	public enum ElevationRendering {
+		TILE_BASED,
+		NODE_BASED
+	}
+	
+	public static class Spec {
+		public final int width;
+		public final int height;
+		public final double seaLevel;
+		public final double scaleFactor;
+		public final ElevationRendering elevRendering;
+		public final boolean showWaterDepth;
+		public final boolean hasFirmShoreline;
+		
+		public Spec(int width, int height, double seaLevel, double scaleFactor,
+				ElevationRendering elevRendering, boolean showWaterDepth,
+				boolean haveFirmShoreline) {
+			this.width = width;
+			this.height = height;
+			this.seaLevel = seaLevel;
+			this.scaleFactor = scaleFactor;
+			this.elevRendering = elevRendering;
+			this.showWaterDepth = showWaterDepth;
+			this.hasFirmShoreline = haveFirmShoreline;
+		}
+	}
+	
+	///////////////
+	
+	private final Spec spec;
 	private Scene map;
 	private Group content;
 	
-	public MapScene(int width, int height) {
+	public MapScene(Spec spec) {
+		this.spec = spec;
 		this.content = new Group();
-		this.map = setupScene(width, height, content);
+		this.map = setupScene(spec.width, spec.height, content);
 	}
 	
 	private static Scene setupScene(int width, int height, Group content) {
@@ -149,59 +180,74 @@ public class MapScene {
 		content.getChildren().add(poly);
 	}
 	
-	private static Paint makeTileFill(MapTile tile) {
-		boolean showTileBasedElevation = false;
-		boolean showWaterDepth = true;
-		double seaLevel = 0.1;
-		
-		if (showTileBasedElevation) {
-			return getFill(tile.elevation(), seaLevel, showWaterDepth);
-		} else {
-			MinMaxElevation minMaxElev = new MinMaxElevation();
-			minMaxElev.find(tile);	
-			double seedElev = tile.elevation();
-			
-			// Create firm shore line. Don't interpolate between land and sea colors.
-			if (minMaxElev.min < seaLevel && minMaxElev.max >= seaLevel)
-				minMaxElev.min = seaLevel;
-			if (seedElev < seaLevel && minMaxElev.max >= seaLevel)
-				seedElev = seaLevel;
-			
-			Color maxFill = getFill(minMaxElev.max, seaLevel, showWaterDepth);
-			Color minFill = getFill(minMaxElev.min, seaLevel, showWaterDepth);
-			Color seedFill = getFill(seedElev, seaLevel, showWaterDepth);
-			Stop[] stops = new Stop[] {
-					new Stop(0, maxFill),
-					new Stop(.5, seedFill),
-					new Stop(1, minFill) };
-			return new LinearGradient(minMaxElev.maxPos.x, minMaxElev.maxPos.y,
-					minMaxElev.minPos.x, minMaxElev.minPos.y, false,
-					CycleMethod.NO_CYCLE, stops);
+	private Paint makeTileFill(MapTile tile) {
+		switch (spec.elevRendering) {
+			case TILE_BASED: {
+				return makeTileBasedTileFill(tile);
+			}
+			case NODE_BASED: {
+				return makeNodeBasedTileFill(tile);
+			}
 		}
+		return makeNodeBasedTileFill(tile);
+	}
+	
+	private Paint makeTileBasedTileFill(MapTile tile) {
+		return getFill(tile.elevation(), spec.seaLevel, spec.showWaterDepth);
+	}
+	
+	private Paint makeNodeBasedTileFill(MapTile tile) {
+		MinMaxElevation minMaxElev = new MinMaxElevation();
+		minMaxElev.find(tile);	
+		double seedElev = tile.elevation();
+		
+		// Create firm shore line. Don't interpolate between land and sea colors.
+		if (spec.hasFirmShoreline) {
+			if (minMaxElev.min < spec.seaLevel && minMaxElev.max >= spec.seaLevel)
+				minMaxElev.min = spec.seaLevel;
+			if (seedElev < spec.seaLevel && minMaxElev.max >= spec.seaLevel)
+				seedElev = spec.seaLevel;
+		}			
+		
+		Color maxFill = getFill(minMaxElev.max, spec.seaLevel, spec.showWaterDepth);
+		Color minFill = getFill(minMaxElev.min, spec.seaLevel, spec.showWaterDepth);
+		Color seedFill = getFill(seedElev, spec.seaLevel, spec.showWaterDepth);
+		Stop[] stops = new Stop[] {
+				new Stop(0, maxFill),
+				new Stop(.5, seedFill),
+				new Stop(1, minFill) };
+		return new LinearGradient(minMaxElev.maxPos.x, minMaxElev.maxPos.y,
+				minMaxElev.minPos.x, minMaxElev.minPos.y, false,
+				CycleMethod.NO_CYCLE, stops);
 	}
 	
 	// Returns a color that should be used for a given elevation value.  
 	private static Color getFill(double elev, double seaLevel, boolean showWaterDepth) {
 		// Lighter to darker
 		List<Color> landFills = new ArrayList<Color>();
-		landFills.add(Color.web("00D72D"));
-		landFills.add(Color.web("00C22D"));
+		// Greens
 		landFills.add(Color.web("00A52D"));
-		landFills.add(Color.web("00762D"));
+		landFills.add(Color.web("00A52D"));
+		landFills.add(Color.web("008922"));
+		landFills.add(Color.web("008922"));
+		landFills.add(Color.web("006519"));
+		landFills.add(Color.web("006519"));
 		landFills.add(Color.web("00542D"));
-		landFills.add(Color.web("51542D"));
+		landFills.add(Color.web("00542D"));
+		// Browns
 		landFills.add(Color.web("A16708"));
 		landFills.add(Color.web("835406"));
+		// Grays
 		landFills.add(Color.web("4B4B4B"));
 		landFills.add(Color.web("787878"));
 		landFills.add(Color.web("AAAAAA"));
 		Color mountainTops = Color.web("CCCCCC");
 		// Darker to lighter
 		List<Color> waterFills = new ArrayList<Color>();
-		waterFills.add(Color.web("203EFF"));
-		waterFills.add(Color.web("2070FF"));
-		waterFills.add(Color.web("20A5FF"));
-		waterFills.add(Color.web("20CDFF"));
+		waterFills.add(Color.web("001965"));
+		waterFills.add(Color.web("062883"));
+		waterFills.add(Color.web("0837B3"));
+		waterFills.add(Color.web("0646DF"));
 
 		double maxLevel = 1.0;
 		double minLevel = -1.0;
@@ -209,7 +255,7 @@ public class MapScene {
 		if (elev < seaLevel) {
 			if (showWaterDepth)
 				return interpolateFill(elev, minLevel, seaLevel, waterFills);
-			return waterFills.get(waterFills.size() - 1);
+			return waterFills.get(0);
 		} else {
 			// Max elevation is colored in unique mountain top color.
 			if (elev == 1)

@@ -10,7 +10,15 @@ public class PerlinTopography implements TopographyGenerator {
 
 	public static class Spec {
 		public final Rect2D bounds;
+		// Number of octaves used to aggregate Perlin noise value.
+		// More octaves => Wider and wider areas are affected by values of
+		// individual noise values of higher octave passes. Leads to zoomed in
+		// appearance on features of the map (it's not an actual zooming/scaling
+		// operation, though).
 		public final int numOctaves;
+		// Factor by which the amplitude of each octave pass is scaled with.
+		// Larger persistence => Larger and smoother features.
+		// Smaller persistence => Smaller and choppier features.
 		public final double persistence;
 		
 		public Spec(Rect2D bounds, int numOctaves, double persistence) {
