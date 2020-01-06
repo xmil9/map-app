@@ -7,6 +7,7 @@ import java.util.Random;
 import javafx.application.*;
 import javafx.event.EventHandler;
 import javafx.scene.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.*;
@@ -72,6 +73,10 @@ public class App extends Application {
 	private Random rand;
 	private double sceneScale;
 	private MapScene mapScene;
+	private double contentAtMouseDownX;
+	private double contentAtMouseDownY;
+	private double mouseDownX;
+	private double mouseDownY;
 	
 	public static void main(String passes[]) {
 		launch(passes);
@@ -95,8 +100,9 @@ public class App extends Application {
 //		return makeMapSceneWithShapes();
 //		return makeTestMapScene();
 		MapScene mapScene = makeMapScene();
+		Scene scene = mapScene.scene(); 
 		// Mouse wheel zooming.
-		mapScene.scene().setOnScroll(new EventHandler<ScrollEvent>() {
+		scene.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
                 double zoomFactor = (event.getDeltaY() > 0) ? 1.1 : 0.9;
@@ -105,6 +111,30 @@ public class App extends Application {
                 event.consume();
             }
         });
+		// Mouse panning.
+		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+            public void handle(MouseEvent event)
+            {
+                mouseDownX = event.getX();
+                mouseDownY = event.getY();
+                contentAtMouseDownX = scene.getRoot().getTranslateX();
+                contentAtMouseDownY = scene.getRoot().getTranslateY();
+            }
+        });
+		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			@Override
+            public void handle(MouseEvent event)
+            {
+            	Parent content = scene.getRoot();
+            	content.setTranslateX(
+            			contentAtMouseDownX + event.getX() - mouseDownX);
+            	content.setTranslateY(
+            			contentAtMouseDownY + event.getY() - mouseDownY);
+                event.consume();
+            }
+        });
+		
 		return mapScene;
 	}
 	
