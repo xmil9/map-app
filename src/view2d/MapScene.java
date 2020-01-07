@@ -5,6 +5,7 @@ import java.util.List;
 import geometry.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
@@ -65,6 +66,8 @@ public class MapScene {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(25, 25, 25, 25));
+		grid.setCache(true);
+		grid.setCacheHint(CacheHint.SPEED);
 		
 		return new Scene(grid, width, height, Color.BEIGE);
 	}
