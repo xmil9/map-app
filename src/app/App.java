@@ -3,6 +3,8 @@ package app;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.application.*;
 import javafx.event.EventHandler;
@@ -33,7 +35,7 @@ public class App extends Application {
 		public boolean showWaterDepth = true;
 		public boolean hasFirmShoreline = false;
 		// Model specs.
-		public int mapWidth = 200;
+		public int mapWidth = 300;
 		public int mapHeight = 100;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = .5;
@@ -42,10 +44,10 @@ public class App extends Application {
 		// More octaves => Wider and wider areas are affected by values of
 		// individual noise values of higher octave passes. Leads to zoomed in
 		// appearance on features of the map.
-		public int numOctaves = 6;
+		public int numOctaves = 7;
 		// Larger persistence => Larger and smoother features.
 		// Smaller persistence => Smaller and choppier features.
-		public double persistence = 1.7;
+		public double persistence = 2;
 	}
 
 	// Creates a view spec from an app-wide spec.
@@ -77,6 +79,7 @@ public class App extends Application {
 	private double contentAtMouseDownY;
 	private double mouseDownX;
 	private double mouseDownY;
+	private Timer zoomTimer = new Timer();
 	
 	public static void main(String passes[]) {
 		launch(passes);
@@ -105,9 +108,8 @@ public class App extends Application {
 		scene.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
-                double zoomFactor = (event.getDeltaY() > 0) ? 1.1 : 0.9;
-                sceneScale *= zoomFactor;
-                mapScene.scale(sceneScale * zoomFactor);
+                sceneScale *= calcZoomFactor(sceneScale, event.getDeltaY() > 0);
+                scheduleZoomTask();
                 event.consume();
             }
         });
@@ -136,6 +138,36 @@ public class App extends Application {
         });
 		
 		return mapScene;
+	}
+	
+	private static double calcZoomFactor(double curScale, boolean zoomIn) {
+		// Zoom faster when zoomed in deeper.
+		double delta = (curScale > 20.0) ? .2 : .1;
+		if (!zoomIn)
+			delta *= -1;
+		return 1.0 + delta;
+	}
+	
+	// Schedules the processing of a zoom event for a brief interval in the
+	// future. This aggregates the processing of multiple quick zoom events
+	// into one operation avoiding unnecessary updates.
+	private void scheduleZoomTask() {
+		// Clear previously scheduled task.
+        zoomTimer.cancel();
+        zoomTimer.purge();
+        
+        // Schedule new task.
+        final int ZOOM_DELAY = 50;
+        zoomTimer = new Timer();
+        zoomTimer.schedule(new TimerTask() {
+    		@Override
+    		public void run() {
+    			// Run the scaling of the scene on the UI thread.
+    			Platform.runLater(() -> {
+                    mapScene.scale(sceneScale);
+    			});
+    		}
+    	}, ZOOM_DELAY);
 	}
 	
 	private MapScene makeMapScene() {
