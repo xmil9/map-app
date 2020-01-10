@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -50,42 +51,49 @@ public class MapScene {
 	///////////////
 	
 	private final Spec spec;
-	private Scene map;
-	private Group content;
+	private Group map;
+	private GridPane layout;
+	private Scene scene;
 	
 	public MapScene(Spec spec) {
 		this.spec = spec;
-		this.content = new Group();
-		this.map = setupScene(spec.width, spec.height, content);
+		this.map = new Group();
+		this.layout = setupLayout(this.map);
+		this.scene = setupScene(spec.width, spec.height, this.layout);
 	}
 	
-	private static Scene setupScene(int width, int height, Group content) {
-		GridPane grid = new GridPane();
-		grid.add(content, 0, 0);
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(25, 25, 25, 25));
-		grid.setCache(true);
-		grid.setCacheHint(CacheHint.SPEED);
-		
-		return new Scene(grid, width, height, Color.BEIGE);
+	private static GridPane setupLayout(Group map) {
+		GridPane layout = new GridPane();
+		layout.add(map, 0, 0);
+		layout.setAlignment(Pos.CENTER);
+		layout.setHgap(10);
+		layout.setVgap(10);
+		layout.setPadding(new Insets(25, 25, 25, 25));
+		return layout;
+	}
+	
+	private static Scene setupScene(int width, int height, GridPane layout) {
+		return new Scene(layout, width, height, Color.BEIGE);
 	}
 
 	public Scene scene() {
+		return scene;
+	}
+	
+	public Node mapNode() {
 		return map;
 	}
 	
 	public void scale(double factor) {
-	    content.setScaleX(factor);
-	    content.setScaleY(factor);
+	    map.setScaleX(factor);
+	    map.setScaleY(factor);
 	}
 	
 	public void addPoints(List<Point2D> points, Color clr, double strokeWidth) {
 		for (Point2D pt : points) {
 			Circle c = new Circle(pt.x, pt.y, strokeWidth);
 		    c.setFill(clr);
-		    content.getChildren().add(c);
+		    map.getChildren().add(c);
 		}
 	}
 	
@@ -95,7 +103,7 @@ public class MapScene {
 					l.endPoint().x, l.endPoint().y);  
 			viewLine.setStroke(clr);
 			viewLine.setStrokeWidth(strokeWidth);
-		    content.getChildren().add(viewLine);
+		    map.getChildren().add(viewLine);
 		}
 	}
 	
@@ -112,7 +120,7 @@ public class MapScene {
 		    poly.setStroke(clr);
 		    poly.setStrokeWidth(strokeWidth);
 		    poly.setFill(null);
-		    content.getChildren().add(poly);
+		    map.getChildren().add(poly);
 		}
 	}
 	
@@ -127,7 +135,7 @@ public class MapScene {
 		    viewPoly.setStroke(strokeClr);
 		    viewPoly.setStrokeWidth(strokeWidth);
 		    viewPoly.setFill(fillClr);
-		    content.getChildren().add(viewPoly);
+		    map.getChildren().add(viewPoly);
 		}
 	}
 	
@@ -146,7 +154,7 @@ public class MapScene {
 		    viewPoly.setStroke(clr);
 		    viewPoly.setStrokeWidth(strokeWidth);
 		    viewPoly.setFill(null);
-		    content.getChildren().add(viewPoly);
+		    map.getChildren().add(viewPoly);
 		}
 	}
 	
@@ -157,7 +165,7 @@ public class MapScene {
 			viewCircle.setStroke(clr);
 			viewCircle.setStrokeWidth(strokeWidth);
 			viewCircle.setFill(null);
-		    content.getChildren().add(viewCircle);
+		    map.getChildren().add(viewCircle);
 		}
 	}
 	
@@ -180,7 +188,7 @@ public class MapScene {
 		poly.setStroke(null);
 		poly.setFill(makeTileFill(tile));
 		
-		content.getChildren().add(poly);
+		map.getChildren().add(poly);
 	}
 	
 	private Paint makeTileFill(MapTile tile) {

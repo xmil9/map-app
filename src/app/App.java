@@ -75,8 +75,9 @@ public class App extends Application {
 	private Random rand;
 	private double sceneScale;
 	private MapScene mapScene;
-	private double contentAtMouseDownX;
-	private double contentAtMouseDownY;
+	private boolean isPanning;
+	private double mapPosAtMouseDownX;
+	private double mapPosAtMouseDownY;
 	private double mouseDownX;
 	private double mouseDownY;
 	private Timer zoomTimer = new Timer();
@@ -103,9 +104,12 @@ public class App extends Application {
 //		return makeMapSceneWithShapes();
 //		return makeTestMapScene();
 		MapScene mapScene = makeMapScene();
-		Scene scene = mapScene.scene(); 
+		Scene scene = mapScene.scene();
+		Node mapNode = mapScene.mapNode();
+		mapNode.setCache(true);
+		mapNode.setCacheHint(CacheHint.SPEED);
 		// Mouse wheel zooming.
-		scene.setOnScroll(new EventHandler<ScrollEvent>() {
+		mapNode.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
                 sceneScale *= calcZoomFactor(sceneScale, event.getDeltaY() > 0);
@@ -114,25 +118,24 @@ public class App extends Application {
             }
         });
 		// Mouse panning.
-		scene.setOnMousePressed(new EventHandler<MouseEvent>() {
+		mapNode.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
             public void handle(MouseEvent event)
             {
-                mouseDownX = event.getX();
-                mouseDownY = event.getY();
-                contentAtMouseDownX = scene.getRoot().getTranslateX();
-                contentAtMouseDownY = scene.getRoot().getTranslateY();
+                mouseDownX = event.getSceneX();
+                mouseDownY = event.getSceneY();
+                mapPosAtMouseDownX = mapNode.getTranslateX();
+                mapPosAtMouseDownY = mapNode.getTranslateY();
             }
         });
-		scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+		mapNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
 			@Override
             public void handle(MouseEvent event)
             {
-            	Parent content = scene.getRoot();
-            	content.setTranslateX(
-            			contentAtMouseDownX + event.getX() - mouseDownX);
-            	content.setTranslateY(
-            			contentAtMouseDownY + event.getY() - mouseDownY);
+            	mapNode.setTranslateX(
+            			mapPosAtMouseDownX + event.getSceneX() - mouseDownX);
+            	mapNode.setTranslateY(
+            			mapPosAtMouseDownY + event.getSceneY() - mouseDownY);
                 event.consume();
             }
         });
