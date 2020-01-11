@@ -17,6 +17,7 @@ import javafx.stage.*;
 import geometry.*;
 import map.Map;
 import map.MapGeometryGenerator;
+import map.MapNode;
 import map.PerlinTopography;
 import view2d.MapScene;
 
@@ -34,11 +35,12 @@ public class App extends Application {
 				MapScene.ElevationRendering.NODE_BASED;
 		public boolean showWaterDepth = true;
 		public boolean hasFirmShoreline = false;
+		public boolean cacheMap = false;
 		// Model specs.
-		public int mapWidth = 300;
-		public int mapHeight = 100;
+		public int mapWidth = 200;
+		public int mapHeight = 75;
 		// Smaller distance => smaller and more tiles.
-		public double minSampleDistance = .5;
+		public double minSampleDistance = .2;
 		// More candidates => more evenly spaced sample points but slower generation.
 		public int numSampleCandidates = 30;
 		// More octaves => Wider and wider areas are affected by values of
@@ -75,7 +77,6 @@ public class App extends Application {
 	private Random rand;
 	private double sceneScale;
 	private MapScene mapScene;
-	private boolean isPanning;
 	private double mapPosAtMouseDownX;
 	private double mapPosAtMouseDownY;
 	private double mouseDownX;
@@ -104,10 +105,13 @@ public class App extends Application {
 //		return makeMapSceneWithShapes();
 //		return makeTestMapScene();
 		MapScene mapScene = makeMapScene();
-		Scene scene = mapScene.scene();
 		Node mapNode = mapScene.mapNode();
-		mapNode.setCache(true);
-		mapNode.setCacheHint(CacheHint.SPEED);
+
+		if (spec.cacheMap) {
+			mapNode.setCache(true);
+			mapNode.setCacheHint(CacheHint.SPEED);
+		}
+		
 		// Mouse wheel zooming.
 		mapNode.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
