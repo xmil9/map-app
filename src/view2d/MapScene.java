@@ -2,13 +2,20 @@ package view2d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import geometry.*;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -29,19 +36,19 @@ public class MapScene {
 	public static class Spec {
 		public final int width;
 		public final int height;
+		public final double initialScale;
 		public final double seaLevel;
-		public final double scaleFactor;
 		public final ElevationRendering elevRendering;
 		public final boolean showWaterDepth;
 		public final boolean hasFirmShoreline;
 		
-		public Spec(int width, int height, double seaLevel, double scaleFactor,
+		public Spec(int width, int height, double scaleFactor, double seaLevel,
 				ElevationRendering elevRendering, boolean showWaterDepth,
 				boolean haveFirmShoreline) {
 			this.width = width;
 			this.height = height;
+			this.initialScale = scaleFactor;
 			this.seaLevel = seaLevel;
-			this.scaleFactor = scaleFactor;
 			this.elevRendering = elevRendering;
 			this.showWaterDepth = showWaterDepth;
 			this.hasFirmShoreline = haveFirmShoreline;
@@ -54,12 +61,23 @@ public class MapScene {
 	private Group map;
 	private GridPane layout;
 	private Scene scene;
+	// Scaling factor accumulated by edit operations (mouse wheel). Not necessarily
+	// the same as the current map scale because multiple edit events can accumulate
+	// before they get applied.
+	private double editedScale;
+	private double mapPosAtMouseDownX;
+	private double mapPosAtMouseDownY;
+	private double mouseDownX;
+	private double mouseDownY;
+	private Timer zoomTimer = new Timer();
 	
 	public MapScene(Spec spec) {
 		this.spec = spec;
+		this.editedScale = spec.initialScale;
 		this.map = new Group();
 		this.layout = setupLayout(this.map);
 		this.scene = setupScene(spec.width, spec.height, this.layout);
+		setupEditing();
 	}
 	
 	private static GridPane setupLayout(Group map) {
@@ -76,17 +94,72 @@ public class MapScene {
 		return new Scene(layout, width, height, Color.BEIGE);
 	}
 
+	private void setupEditing() {
+		// Mouse wheel zooming.
+		map.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+            	editedScale *= calcZoomFactor(editedScale, event.getDeltaY() > 0);
+                scheduleZoomTask();
+                event.consume();
+            }
+        });
+		// Mouse panning.
+		map.setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+            public void handle(MouseEvent event)
+            {
+                mouseDownX = event.getSceneX();
+                mouseDownY = event.getSceneY();
+                mapPosAtMouseDownX = map.getTranslateX();
+                mapPosAtMouseDownY = map.getTranslateY();
+            }
+        });
+		map.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			@Override
+            public void handle(MouseEvent event)
+            {
+				map.setTranslateX(
+            			mapPosAtMouseDownX + event.getSceneX() - mouseDownX);
+				map.setTranslateY(
+            			mapPosAtMouseDownY + event.getSceneY() - mouseDownY);
+                event.consume();
+            }
+        });
+	}
+	
+	private static double calcZoomFactor(double curScale, boolean zoomIn) {
+		// Zoom faster when zoomed in deeper.
+		double delta = (curScale > 20.0) ? .2 : .1;
+		if (!zoomIn)
+			delta *= -1;
+		return 1.0 + delta;
+	}
+	
+	// Schedules the processing of a zoom event for a brief interval in the
+	// future. This aggregates the processing of multiple quick zoom events
+	// into one operation avoiding unnecessary updates.
+	private void scheduleZoomTask() {
+		// Clear previously scheduled task.
+        zoomTimer.cancel();
+        zoomTimer.purge();
+        
+        // Schedule new task.
+        final int ZOOM_DELAY = 50;
+        zoomTimer = new Timer();
+        zoomTimer.schedule(new TimerTask() {
+    		@Override
+    		public void run() {
+    			// Run the scaling of the scene on the UI thread.
+    			Platform.runLater(() -> {
+                    scale(editedScale);
+    			});
+    		}
+    	}, ZOOM_DELAY);
+	}
+	
 	public Scene scene() {
 		return scene;
-	}
-	
-	public Node mapNode() {
-		return map;
-	}
-	
-	public void scale(double factor) {
-	    map.setScaleX(factor);
-	    map.setScaleY(factor);
 	}
 	
 	public void addPoints(List<Point2D> points, Color clr, double strokeWidth) {
@@ -173,6 +246,18 @@ public class MapScene {
 		int numTiles = map.countTiles();
 		for (int i = 0; i < numTiles; ++i)
 			addTile(map.tile(i));
+	}
+	
+	public void scale(double factor) {
+	    map.setScaleX(factor);
+	    map.setScaleY(factor);
+		editedScale = factor;
+	}
+	
+	public void enableCaching(boolean enable) {
+		map.setCache(true);
+		if (enable)
+			map.setCacheHint(CacheHint.SPEED);
 	}
 	
 	private void addTile(MapTile tile) {
