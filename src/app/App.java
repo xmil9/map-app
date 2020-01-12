@@ -1,11 +1,8 @@
 package app;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import javafx.application.*;
-import javafx.scene.paint.Color;
 import javafx.stage.*;
 
 import geometry.*;
@@ -13,6 +10,7 @@ import map.Map;
 import map.MapGeometryGenerator;
 import map.PerlinTopography;
 import view2d.MapScene;
+import view2d.Texture;
 
 
 public class App extends Application {
@@ -24,8 +22,8 @@ public class App extends Application {
 		public int viewHeight = 1100;
 		public double scaleFactor = 10.0;
 		public double seaLevel = 0.2;
-		public MapScene.ElevationRendering elevRendering =
-				MapScene.ElevationRendering.TILE_BASED;
+		public Texture.ElevationRendering elevRendering =
+				Texture.ElevationRendering.NODE_BASED;
 		public boolean showWaterDepth = true;
 		public boolean hasFirmShoreline = false;
 		public boolean cacheMap = true;
@@ -33,7 +31,7 @@ public class App extends Application {
 		public int mapWidth = 200;
 		public int mapHeight = 75;
 		// Smaller distance => smaller and more tiles.
-		public double minSampleDistance = .2;
+		public double minSampleDistance = .8;
 		// More candidates => more evenly spaced sample points but slower generation.
 		public int numSampleCandidates = 30;
 		// More octaves => Wider and wider areas are affected by values of
