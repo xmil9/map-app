@@ -62,15 +62,20 @@ public class CanvasMapView implements MapView {
 	}
 	
 	private void render() {
-		double scale = compositeScale();
-		
 		var gc = canvas.getGraphicsContext2D();
-		
+		renderBackground(gc);
+		renderMap(gc);
+	}
+	
+	private void renderBackground(GraphicsContext gc) {
 		gc.setFill(Color.BEIGE);
 		gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-		gc.setStroke(null);
+	}
+	
+	private void renderMap(GraphicsContext gc) {
+		gc.setStroke(Color.BLACK);
 		
+		double scale = compositeScale();
 		int numTiles = map.countTiles();
 		for (int i = 0; i < numTiles; ++i)
 			renderTile(gc, map.tile(i), scale);
