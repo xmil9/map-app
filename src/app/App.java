@@ -20,18 +20,18 @@ public class App extends Application {
 		// View specs.
 		public int viewWidth = 2100;
 		public int viewHeight = 1100;
-		public double scaleFactor = 10.0;
+		public double scaleFactor = 1.0;
 		public double seaLevel = 0.2;
 		public Texture.ElevationRendering elevRendering =
 				Texture.ElevationRendering.NODE_BASED;
 		public boolean showWaterDepth = true;
 		public boolean hasFirmShoreline = false;
-		public boolean cacheMap = true;
+		public boolean cacheMap = false;
 		// Model specs.
-		public int mapWidth = 200;
-		public int mapHeight = 75;
+		public int mapWidth = 300;
+		public int mapHeight = 100;
 		// Smaller distance => smaller and more tiles.
-		public double minSampleDistance = .8;
+		public double minSampleDistance = .5;
 		// More candidates => more evenly spaced sample points but slower generation.
 		public int numSampleCandidates = 30;
 		// More octaves => Wider and wider areas are affected by values of
@@ -88,7 +88,7 @@ public class App extends Application {
 		map.generate();
 
 		MapScene scene = new MapScene(makeViewSpec(spec));
-		scene.addMap(map);
+		scene.setMap(map);
 		scene.scale(spec.scaleFactor);
 		scene.enableCaching(spec.cacheMap);
 		return scene;

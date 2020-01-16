@@ -23,10 +23,16 @@ public class ShapeMapView implements MapView {
 	}
 	
 	@Override
-	public void addMap(map.Map mapModel) {
+	public void setMap(map.Map mapModel) {
 		int numTiles = mapModel.countTiles();
 		for (int i = 0; i < numTiles; ++i)
 			addTile(mapModel.tile(i));
+	}
+	
+	@Override
+	public void setScale(double factor) {
+	    mapNode.setScaleX(factor);
+	    mapNode.setScaleY(factor);
 	}
 	
 	private void addTile(MapTile tile) {

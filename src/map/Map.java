@@ -99,6 +99,14 @@ public class Map {
 		generateTopography();
 	}
 
+	public double width() {
+		return spec.geom.bounds.width();
+	}
+
+	public double height() {
+		return spec.geom.bounds.height();
+	}
+	
 	// Returns the number of tiles in the map.
 	public int countTiles() {
 		return rep.tiles.size();

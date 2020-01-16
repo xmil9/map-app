@@ -84,6 +84,7 @@ public class Texture {
 	
 	// Returns a color that should be used for a given elevation value.  
 	private static Color getFill(double elev, double seaLevel, boolean showWaterDepth) {
+		// TODO: Make fill collections fields of class.
 		// Lighter to darker
 		List<Color> landFills = new ArrayList<Color>();
 		// Greens

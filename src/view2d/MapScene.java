@@ -64,7 +64,8 @@ public class MapScene {
 	public MapScene(Spec spec) {
 		this.spec = spec;
 		this.editedScale = spec.initialScale;
-		this.mapView = new ShapeMapView(new Texture(makeTextureSpec(spec)));
+		this.mapView = new CanvasMapView(new Texture(makeTextureSpec(spec)), spec.width,
+				spec.height, spec.initialScale);
 		this.layout = setupLayout(mapView.node());
 		this.scene = setupScene(spec.width, spec.height, this.layout);
 		setupEditing();
@@ -235,14 +236,12 @@ public class MapScene {
 //		}
 //	}
 	
-	public void addMap(map.Map map) {
-		mapView.addMap(map);
+	public void setMap(map.Map map) {
+		mapView.setMap(map);
 	}
 	
 	public void scale(double factor) {
-		Node mapNode = mapView.node();
-	    mapNode.setScaleX(factor);
-	    mapNode.setScaleY(factor);
+		mapView.setScale(factor);
 		editedScale = factor;
 	}
 	
