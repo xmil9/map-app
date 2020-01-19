@@ -80,6 +80,11 @@ public class App extends Application {
 		
 		primaryStage.setTitle("The Map App");
 		primaryStage.setScene(mapScene.scene());
+		primaryStage.setOnCloseRequest(e -> {
+	        Platform.exit();
+	        System.exit(0);
+	    });
+		
 		primaryStage.show();
 	}
 	
