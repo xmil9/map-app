@@ -36,9 +36,46 @@ public class Texture {
 	///////////////
 	
 	private Spec spec;
+	private List<Color> landColors;
+	private List<Color> waterColors;
+	private Color mountainTops = Color.web("CCCCCC");;
 	
 	public Texture(Spec spec) {
 		this.spec = spec;
+		this.landColors = makeLandColors();
+		this.waterColors = makeWaterColors();
+	}
+	
+	private static List<Color> makeLandColors() {
+		// Lighter to darker
+		List<Color> colors = new ArrayList<Color>();
+		// Greens
+		colors.add(Color.web("00A52D"));
+		colors.add(Color.web("00A52D"));
+		colors.add(Color.web("008922"));
+		colors.add(Color.web("008922"));
+		colors.add(Color.web("006519"));
+		colors.add(Color.web("006519"));
+		colors.add(Color.web("00542D"));
+		colors.add(Color.web("00542D"));
+		// Browns
+		colors.add(Color.web("A16708"));
+		colors.add(Color.web("835406"));
+		// Grays
+		colors.add(Color.web("4B4B4B"));
+		colors.add(Color.web("787878"));
+		colors.add(Color.web("AAAAAA"));
+		return colors;
+	}
+	
+	private static List<Color> makeWaterColors() {
+		// Darker to lighter
+		List<Color> colors = new ArrayList<Color>();
+		colors.add(Color.web("001965"));
+		colors.add(Color.web("062883"));
+		colors.add(Color.web("0837B3"));
+		colors.add(Color.web("0646DF"));
+		return colors;
 	}
 	
 	public Paint tileFill(MapTile tile) {
@@ -83,46 +120,19 @@ public class Texture {
 	}
 	
 	// Returns a color that should be used for a given elevation value.  
-	private static Color getFill(double elev, double seaLevel, boolean showWaterDepth) {
-		// TODO: Make fill collections fields of class.
-		// Lighter to darker
-		List<Color> landFills = new ArrayList<Color>();
-		// Greens
-		landFills.add(Color.web("00A52D"));
-		landFills.add(Color.web("00A52D"));
-		landFills.add(Color.web("008922"));
-		landFills.add(Color.web("008922"));
-		landFills.add(Color.web("006519"));
-		landFills.add(Color.web("006519"));
-		landFills.add(Color.web("00542D"));
-		landFills.add(Color.web("00542D"));
-		// Browns
-		landFills.add(Color.web("A16708"));
-		landFills.add(Color.web("835406"));
-		// Grays
-		landFills.add(Color.web("4B4B4B"));
-		landFills.add(Color.web("787878"));
-		landFills.add(Color.web("AAAAAA"));
-		Color mountainTops = Color.web("CCCCCC");
-		// Darker to lighter
-		List<Color> waterFills = new ArrayList<Color>();
-		waterFills.add(Color.web("001965"));
-		waterFills.add(Color.web("062883"));
-		waterFills.add(Color.web("0837B3"));
-		waterFills.add(Color.web("0646DF"));
-
+	private Color getFill(double elev, double seaLevel, boolean showWaterDepth) {
 		double maxLevel = 1.0;
 		double minLevel = -1.0;
 		
 		if (elev < seaLevel) {
 			if (showWaterDepth)
-				return interpolateFill(elev, minLevel, seaLevel, waterFills);
-			return waterFills.get(0);
+				return interpolateFill(elev, minLevel, seaLevel, waterColors);
+			return waterColors.get(0);
 		} else {
 			// Max elevation is colored in unique mountain top color.
 			if (elev == 1)
 				return mountainTops;
-			return interpolateFill(elev, seaLevel, maxLevel, landFills);
+			return interpolateFill(elev, seaLevel, maxLevel, landColors);
 		}
 	}
 	
