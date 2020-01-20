@@ -3,6 +3,7 @@ package view2d;
 import java.util.ArrayList;
 import java.util.List;
 
+import geometry.Rect2D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -114,9 +115,12 @@ public class Texture {
 				new Stop(0, maxFill),
 				new Stop(.5, seedFill),
 				new Stop(1, minFill) };
-		return new LinearGradient(elevExtremes.maxPos.x, elevExtremes.maxPos.y,
-				elevExtremes.minPos.x, elevExtremes.minPos.y, false,
-				CycleMethod.NO_CYCLE, stops);
+		return new LinearGradient(
+				interpolateX(elevExtremes.maxPos.x, elevExtremes.bounds),
+				interpolateY(elevExtremes.maxPos.y, elevExtremes.bounds),
+				interpolateX(elevExtremes.minPos.x, elevExtremes.bounds),
+				interpolateY(elevExtremes.minPos.y, elevExtremes.bounds),
+				true, CycleMethod.NO_CYCLE, stops);
 	}
 	
 	// Returns a color that should be used for a given elevation value.  
@@ -145,5 +149,19 @@ public class Texture {
 		if (idx >= fills.size())
 			idx = fills.size() - 1;
 		return fills.get(idx);
+	}
+	
+	// Returns the interpolated value for a given x coordinate relative to the
+	// coordinate range of given bounds.
+	private double interpolateX(double x, Rect2D bounds) {
+		double w = bounds.width();
+		return (w != 0) ? (x - bounds.left()) / w : 0;
+	}
+	
+	// Returns the interpolated value for a given y coordinate relative to the
+	// coordinate range of given bounds.
+	private double interpolateY(double y, Rect2D bounds) {
+		double h = bounds.height();
+		return (h != 0) ? (y - bounds.top()) / h : 0;
 	}
 }
