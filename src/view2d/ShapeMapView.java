@@ -35,6 +35,12 @@ public class ShapeMapView implements MapView {
 	    mapNode.setScaleY(factor);
 	}
 	
+	@Override
+	public void move(double dx, double dy) {
+		mapNode.setTranslateX(mapNode.getTranslateX() + dx);
+		mapNode.setTranslateY(mapNode.getTranslateY() + dy);
+	}
+	
 	private void addTile(MapTile tile) {
 		Polygon poly = new Polygon();
 		

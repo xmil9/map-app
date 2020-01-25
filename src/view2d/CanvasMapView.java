@@ -1,5 +1,6 @@
 package view2d;
 
+import geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -46,19 +47,17 @@ public class CanvasMapView implements MapView {
 	
 	@Override
 	public void setScale(double scale) {
+		Point2D center = normalizedMapCenter();
 		zoom = scale;
-		centerMap();
+		setNormalizedMapCenter(center);
 		render();
 	}
-
-	private void centerMap() {
-		double scale = compositeScale();
-		
-		double deltaX = canvas.getWidth() - scale * map.width();
-		originX = deltaX / 2;
-		
-		double deltaY = canvas.getHeight() - scale * map.height();
-		originY = deltaY / 2;
+	
+	@Override
+	public void move(double dx, double dy) {
+		originX += dx;
+		originY += dy;
+		render();
 	}
 	
 	private void render() {
@@ -68,8 +67,10 @@ public class CanvasMapView implements MapView {
 	}
 	
 	private void renderBackground(GraphicsContext gc) {
-		gc.setFill(Color.BEIGE);
+		gc.setFill(Color.web("#FFFFDC"));
 		gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		gc.setStroke(Color.BLACK);
+		gc.strokeRect(0, 0, canvas.getWidth(), canvas.getHeight());
 	}
 	
 	private void renderMap(GraphicsContext gc) {
@@ -105,5 +106,33 @@ public class CanvasMapView implements MapView {
 	
 	private double compositeScale() {
 		return fittingScale() * zoom;
+	}
+	
+	// Returns the normalized point of the map that is centered on the
+	// screen. E.g. the map origin would be (0, 0), the map right-bottom
+	// would be (1.0, 1.0).
+	private Point2D normalizedMapCenter() {
+		double centerX = canvas.getWidth() / 2 - originX;
+		double centerY = canvas.getHeight() / 2 - originY;
+		
+		double scale = compositeScale();
+		double scaledWidth = scale * map.width();
+		double scaledHeight = scale * map.height();
+		
+		return new Point2D(centerX / scaledWidth, centerY / scaledHeight);
+	}
+
+	// Positions the map so that the given normalized point is in the
+	// center of the screen.
+	private void setNormalizedMapCenter(Point2D relativeCenter) {
+		double scale = compositeScale();
+		double scaledWidth = scale * map.width();
+		double scaledHeight = scale * map.height();
+		
+		double centerX = relativeCenter.x * scaledWidth;
+		double centerY = relativeCenter.y * scaledHeight;
+		
+		originX =  canvas.getWidth() / 2 - centerX;
+		originY =  canvas.getHeight() / 2 - centerY;
 	}
 }

@@ -7,4 +7,5 @@ public interface MapView {
 	public abstract Node node();
 	public abstract void setMap(map.Map mapModel);
 	public abstract void setScale(double factor);
+	public abstract void move(double dx, double dy);
 }

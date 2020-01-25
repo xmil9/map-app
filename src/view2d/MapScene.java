@@ -55,8 +55,6 @@ public class MapScene {
 	// the same as the current map scale because multiple edit events can accumulate
 	// before they get applied.
 	private double editedScale;
-	private double mapPosAtMouseDownX;
-	private double mapPosAtMouseDownY;
 	private double mouseDownX;
 	private double mouseDownY;
 	private Timer zoomTimer = new Timer();
@@ -102,21 +100,18 @@ public class MapScene {
             {
                 mouseDownX = event.getSceneX();
                 mouseDownY = event.getSceneY();
-
-                Node mapNode = mapView.node();
-                mapPosAtMouseDownX = mapNode.getTranslateX();
-                mapPosAtMouseDownY = mapNode.getTranslateY();
             }
         });
 		mapView.node().setOnMouseDragged(new EventHandler<MouseEvent>() {
 			@Override
             public void handle(MouseEvent event)
             {
-				Node mapNode = mapView.node();
-				mapNode.setTranslateX(
-            			mapPosAtMouseDownX + event.getSceneX() - mouseDownX);
-				mapNode.setTranslateY(
-            			mapPosAtMouseDownY + event.getSceneY() - mouseDownY);
+                double mousePosX = event.getSceneX();
+                double mousePosY = event.getSceneY();
+                move(mousePosX - mouseDownX, mousePosY - mouseDownY);
+                mouseDownX = mousePosX;
+                mouseDownY = mousePosY;
+                
                 event.consume();
             }
         });
@@ -163,6 +158,10 @@ public class MapScene {
 	public void scale(double factor) {
 		mapView.setScale(factor);
 		editedScale = factor;
+	}
+	
+	public void move(double dx, double dy) {
+		mapView.move(dx, dy);
 	}
 	
 	public void enableCaching(boolean enable) {
