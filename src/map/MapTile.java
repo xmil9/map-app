@@ -5,12 +5,14 @@ import java.util.List;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
+import geometry.Rect2D;
 
 // Defines a tile on the map.
 public class MapTile extends Object {
 
 	public final Point2D seed;
 	public final Polygon2D shape;
+	public final Rect2D bounds;
 	// Nodes for each point in the tile's shape. Ordered ccw.
 	private List<MapNode> nodes;
 	// Neighboring tiles.
@@ -20,6 +22,7 @@ public class MapTile extends Object {
 	public MapTile(Point2D seed, Polygon2D shape) {
 		this.seed = seed;
 		this.shape = shape;
+		this.bounds = shape.bounds();
 	}
 	
 	@Override
@@ -71,5 +74,9 @@ public class MapTile extends Object {
 	
 	public void setElevation(double val) {
 		elevation = val;
+	}
+	
+	public Rect2D bounds() {
+		return bounds;
 	}
 }

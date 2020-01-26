@@ -82,6 +82,10 @@ public class Polygon2D extends Object {
 		return new LineSegment2D(vertices.get(idx), vertices.get(idx + 1));
 	}
 	
+	public Rect2D bounds() {
+		return GeometryUtil.calcBoundingBox(vertices);
+	}
+	
 	public Polygon2D reversed() {
 		Polygon2D rev = new Polygon2D();
 		for (int i = vertices.size() - 1; i >= 0; --i)

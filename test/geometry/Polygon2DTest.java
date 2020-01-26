@@ -283,6 +283,31 @@ public class Polygon2DTest {
 		assertEquals(new LineSegment2D(points.get(2), points.get(3)), poly.edge(2));
 		assertEquals(new LineSegment2D(points.get(3), points.get(0)), poly.edge(3));
 	}
+	
+	@Test
+	public void bounds() {
+		List<Point2D> points = new ArrayList<Point2D>();
+		points.add(new Point2D(1, 2));
+		points.add(new Point2D(2, -2));
+		points.add(new Point2D(3, 2));
+		points.add(new Point2D(4, -2));
+		Polygon2D poly = new Polygon2D(points);
+		
+		assertEquals(new Rect2D(1, -2, 4, 2), poly.bounds());
+	}
+	
+	@Test
+	public void bounds_ForNoVertex() {
+		Polygon2D poly = new Polygon2D();
+		assertEquals(new Rect2D(), poly.bounds());
+	}
+	
+	@Test
+	public void bounds_ForOneVertex() {
+		Point2D pt = new Point2D(1, 2);
+		Polygon2D poly = new Polygon2D(pt);
+		assertEquals(new Rect2D(pt, pt), poly.bounds());
+	}
 
 	@Test
 	public void reversed() {
