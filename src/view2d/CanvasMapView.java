@@ -1,6 +1,7 @@
 package view2d;
 
 import geometry.Point2D;
+import geometry.Rect2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -13,9 +14,12 @@ public class CanvasMapView implements MapView {
 
 	private Texture tex;
 	private Group mapNode;
+	// Canvas that map is drawn into.
 	private Canvas canvas;
 	private map.Map map;
+	// User defined zoom factor of map.
 	private double zoom;
+	// Offset of top-left map corner from top-left corner of canvas.
 	private double originX;
 	private double originY;
 	
@@ -78,8 +82,26 @@ public class CanvasMapView implements MapView {
 		
 		double scale = compositeScale();
 		int numTiles = map.countTiles();
-		for (int i = 0; i < numTiles; ++i)
-			renderTile(gc, map.tile(i), scale);
+		for (int i = 0; i < numTiles; ++i) {
+			MapTile tile = map.tile(i);
+			if (isTileVisible(tile, scale)) {
+				renderTile(gc, tile, scale);
+			}
+		}
+	}
+	
+	// Returns whether a given tile is on the canvas.
+	private boolean isTileVisible(MapTile tile, double scale) {
+		Rect2D cvTileBounds = tile.bounds();
+		cvTileBounds.setLeft(canvasXFromMap(cvTileBounds.left(), scale));
+		cvTileBounds.setRight(canvasXFromMap(cvTileBounds.right(), scale));
+		cvTileBounds.setTop(canvasYFromMap(cvTileBounds.top(), scale));
+		cvTileBounds.setBottom(canvasYFromMap(cvTileBounds.bottom(), scale));
+		
+		return !(cvTileBounds.right() < 0 ||
+				cvTileBounds.left() > canvas.getWidth() ||
+				cvTileBounds.bottom() < 0 ||
+				cvTileBounds.top() > canvas.getHeight());
 	}
 	
 	private void renderTile(GraphicsContext gc, MapTile tile, double scale) {
@@ -89,8 +111,8 @@ public class CanvasMapView implements MapView {
 		
 		for (int i = 0; i < numNodes; ++i) {
 			MapNode node = tile.node(i);
-			xCoords[i] = originX + node.pos.x * scale;
-			yCoords[i] = originY + node.pos.y * scale;
+			xCoords[i] = canvasXFromMap(node.pos.x, scale);
+			yCoords[i] = canvasYFromMap(node.pos.y, scale);
 		}
 		
 		
@@ -98,19 +120,29 @@ public class CanvasMapView implements MapView {
 		gc.fillPolygon(xCoords, yCoords, numNodes);
 	}
 	
+	// Returns the scaling factor needed to fit the entire map onto the canvas.
 	private double fittingScale() {
 		double xScale = canvas.getWidth() / map.width();
 		double yScale = canvas.getHeight() / map.height();
 		return Math.min(xScale,  yScale);
 	}
 	
+	// Returns the total scaling factor for the map.
 	private double compositeScale() {
 		return fittingScale() * zoom;
 	}
 	
-	// Returns the normalized point of the map that is centered on the
-	// screen. E.g. the map origin would be (0, 0), the map right-bottom
-	// would be (1.0, 1.0).
+	private double canvasXFromMap(double x, double scale) {
+		return originX + x * scale;
+	}
+	
+	private double canvasYFromMap(double y, double scale) {
+		return originY + y * scale;
+	}
+	
+	// Returns the point of the map that is centered on the screen. The point
+	// is normalized to the dimensions of the map, e.g. the map's origin would
+	// be (0, 0), the map's right-bottom corner would be (1.0, 1.0).
 	private Point2D normalizedMapCenter() {
 		double centerX = canvas.getWidth() / 2 - originX;
 		double centerY = canvas.getHeight() / 2 - originY;
@@ -122,8 +154,8 @@ public class CanvasMapView implements MapView {
 		return new Point2D(centerX / scaledWidth, centerY / scaledHeight);
 	}
 
-	// Positions the map so that the given normalized point is in the
-	// center of the screen.
+	// Positions the map so that the given point is in the center of the screen.
+	// The given point has to be normalized to the dimensions of the map.
 	private void setNormalizedMapCenter(Point2D relativeCenter) {
 		double scale = compositeScale();
 		double scaledWidth = scale * map.width();
