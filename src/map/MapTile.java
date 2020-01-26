@@ -77,6 +77,6 @@ public class MapTile extends Object {
 	}
 	
 	public Rect2D bounds() {
-		return bounds;
+		return bounds.copy();
 	}
 }
