@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import geometry.Point2D;
 import geometry.Polygon2D;
+import geometry.Rect2D;
 
 public class MapTileTest {
 
@@ -200,5 +201,30 @@ public class MapTileTest {
 		t.setElevation(5);
 		
 		assertEquals(5, t.elevation(), 0.0);
+	}
+
+	@Test
+	public void bounds() {
+		Polygon2D shape = new Polygon2D();
+		shape.addVertex(new Point2D(3, 4));
+		shape.addVertex(new Point2D(1, 1));
+		shape.addVertex(new Point2D(2, 6));
+		MapTile t = new MapTile(new Point2D(1, 2), shape);
+
+		assertEquals(new Rect2D(1, 1, 3, 6), t.bounds());
+	}
+
+	@Test
+	public void bounds_ReturnsCopy() {
+		Polygon2D shape = new Polygon2D();
+		shape.addVertex(new Point2D(3, 4));
+		shape.addVertex(new Point2D(1, 1));
+		shape.addVertex(new Point2D(2, 6));
+		MapTile t = new MapTile(new Point2D(1, 2), shape);
+
+		Rect2D bounds = t.bounds();
+		bounds.setLeft(-10);
+		
+		assertEquals(new Rect2D(1, 1, 3, 6), t.bounds());
 	}
 }
