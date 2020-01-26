@@ -132,39 +132,39 @@ public class CanvasMapView implements MapView {
 		return fittingScale() * zoom;
 	}
 	
-	private double canvasXFromMap(double x, double scale) {
-		return originX + x * scale;
-	}
-	
-	private double canvasYFromMap(double y, double scale) {
-		return originY + y * scale;
-	}
-	
 	// Returns the point of the map that is centered on the screen. The point
 	// is normalized to the dimensions of the map, e.g. the map's origin would
 	// be (0, 0), the map's right-bottom corner would be (1.0, 1.0).
 	private Point2D normalizedMapCenter() {
-		double centerX = canvas.getWidth() / 2 - originX;
-		double centerY = canvas.getHeight() / 2 - originY;
-		
 		double scale = compositeScale();
-		double scaledWidth = scale * map.width();
-		double scaledHeight = scale * map.height();
-		
-		return new Point2D(centerX / scaledWidth, centerY / scaledHeight);
+		double centerX = mapXFromCanvas(canvas.getWidth() / 2, scale);
+		double centerY = mapYFromCanvas(canvas.getHeight() / 2, scale);
+		return new Point2D(centerX / map.width(), centerY / map.height());
 	}
 
 	// Positions the map so that the given point is in the center of the screen.
 	// The given point has to be normalized to the dimensions of the map.
-	private void setNormalizedMapCenter(Point2D relativeCenter) {
+	private void setNormalizedMapCenter(Point2D normedCenter) {
 		double scale = compositeScale();
-		double scaledWidth = scale * map.width();
-		double scaledHeight = scale * map.height();
-		
-		double centerX = relativeCenter.x * scaledWidth;
-		double centerY = relativeCenter.y * scaledHeight;
-		
-		originX =  canvas.getWidth() / 2 - centerX;
-		originY =  canvas.getHeight() / 2 - centerY;
+		double centerX = normedCenter.x * map.width();
+		double centerY = normedCenter.y * map.height();
+		originX =  canvas.getWidth() / 2 - (centerX * scale);
+		originY =  canvas.getHeight() / 2 - (centerY * scale);
+	}
+	
+	private double canvasXFromMap(double mapX, double scale) {
+		return originX + mapX * scale;
+	}
+	
+	private double canvasYFromMap(double mapY, double scale) {
+		return originY + mapY * scale;
+	}
+	
+	private double mapXFromCanvas(double canvasX, double scale) {
+		return (canvasX - originX) / scale;
+	}
+	
+	private double mapYFromCanvas(double canvasY, double scale) {
+		return (canvasY - originY) / scale;
 	}
 }
