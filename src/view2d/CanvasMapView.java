@@ -1,5 +1,8 @@
 package view2d;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import geometry.Point2D;
 import geometry.Rect2D;
 import javafx.scene.Group;
@@ -22,6 +25,11 @@ public class CanvasMapView implements MapView {
 	// Offset of top-left map corner from top-left corner of canvas.
 	private double originX;
 	private double originY;
+	// Coordinate arrays for each tile's shape canvas space. The actual coordinate
+	// values still need to change for each render operation but having the arrays
+	// as class fields avoids allocating them for each tile for each render operation.
+	List<double[]> tileXCoords;
+	List<double[]> tileYCoords;
 	
 	public CanvasMapView(Texture tex, int width, int height, double scale) {
 		this.tex = tex;
@@ -46,7 +54,21 @@ public class CanvasMapView implements MapView {
 		canvas.setWidth(scale * map.width());
 		canvas.setHeight(scale * map.height());
 		
+		initTileCoords();
 		render();
+	}
+	
+	private void initTileCoords() {
+		int numTiles = map.countTiles();
+
+		tileXCoords = new ArrayList<double[]>(numTiles);
+		tileYCoords = new ArrayList<double[]>(numTiles);
+
+		for (int i = 0; i < numTiles; ++i) {
+			int numNodes = map.tile(i).countNodes();
+			tileXCoords.add(new double[numNodes]);
+			tileYCoords.add(new double[numNodes]);
+		}
 	}
 	
 	@Override
@@ -80,14 +102,21 @@ public class CanvasMapView implements MapView {
 	private void renderMap(GraphicsContext gc) {
 		gc.setStroke(Color.BLACK);
 		
+		long startTime = System.currentTimeMillis();
+		int numRenderedTiles = 0;
+		
 		double scale = compositeScale();
 		int numTiles = map.countTiles();
 		for (int i = 0; i < numTiles; ++i) {
 			MapTile tile = map.tile(i);
 			if (isTileVisible(tile, scale)) {
-				renderTile(gc, tile, scale);
+				renderTile(gc, tile, tileXCoords.get(i), tileYCoords.get(i), scale);
+				numRenderedTiles++;
 			}
 		}
+		
+		System.out.println("Rendered tiles: " + numRenderedTiles);
+		System.out.println("Render time: " + (System.currentTimeMillis() - startTime));
 	}
 	
 	// Returns whether a given tile is on the canvas.
@@ -104,20 +133,21 @@ public class CanvasMapView implements MapView {
 				cvTileBounds.top() > canvas.getHeight());
 	}
 	
-	private void renderTile(GraphicsContext gc, MapTile tile, double scale) {
+	private void renderTile(GraphicsContext gc, MapTile tile, double[] xCoords,
+			double[] yCoords, double scale) {
+		updateTileCoordinates(tile, xCoords, yCoords, scale);
+		gc.setFill(tex.tileFill(tile));
+		gc.fillPolygon(xCoords, yCoords, tile.countNodes());
+	}
+	
+	private void updateTileCoordinates(MapTile tile, double[] xCoords, double[] yCoords,
+			double scale) {
 		int numNodes = tile.countNodes();
-		double xCoords[] = new double[numNodes];
-		double yCoords[] = new double[numNodes];
-		
 		for (int i = 0; i < numNodes; ++i) {
 			MapNode node = tile.node(i);
 			xCoords[i] = canvasXFromMap(node.pos.x, scale);
 			yCoords[i] = canvasYFromMap(node.pos.y, scale);
 		}
-		
-		
-		gc.setFill(tex.tileFill(tile));
-		gc.fillPolygon(xCoords, yCoords, numNodes);
 	}
 	
 	// Returns the scaling factor needed to fit the entire map onto the canvas.
