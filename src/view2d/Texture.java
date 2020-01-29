@@ -39,7 +39,7 @@ public class Texture {
 	private Spec spec;
 	private List<Color> landColors;
 	private List<Color> waterColors;
-	private Color mountainTops = Color.web("CCCCCC");;
+	private Color mountainTops = Color.web("CCCCCC");
 	
 	public Texture(Spec spec) {
 		this.spec = spec;

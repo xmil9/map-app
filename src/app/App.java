@@ -16,7 +16,7 @@ import view2d.Texture;
 public class App extends Application {
 	
 	public class Spec {
-		public Long randSeed = 1234567890L;
+		public Long randSeed = null;//1234567890L;
 		// View specs.
 		public int viewWidth = 2100;
 		public int viewHeight = 1100;
@@ -31,8 +31,8 @@ public class App extends Application {
 		// Turn off for canvas-based view of map. 
 		public boolean cacheMap = false;
 		// Model specs.
-		public int mapWidth = 300;
-		public int mapHeight = 100;
+		public int mapWidth = 500;
+		public int mapHeight = 200;
 		// Smaller distance => smaller and more tiles.
 		public double minSampleDistance = .5;
 		// More candidates => more evenly spaced sample points but slower generation.
