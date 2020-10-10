@@ -223,6 +223,46 @@ public class VoronoiTesselationTest {
 		}));
 	}
 
+
+	@Test
+	public void tesselate_ForFourPoints() {
+		List<Point2D> samples = new ArrayList<Point2D>();
+		samples.add(new Point2D(-1, -2));
+		samples.add(new Point2D(0, 3));
+		samples.add(new Point2D(4, 1));
+		samples.add(new Point2D(3, -1));
+		VoronoiTesselation vt = new VoronoiTesselation(samples);
+		List<VoronoiTile> tiles = vt.tesselate();
+		
+		assertTrue(tiles.size() == 4);
+		assertTrue(hasTileWithVertices(tiles, new Point2D[] {
+				new Point2D(-1, 0.6),
+				new Point2D(0.5526315789, 0.2894736842),
+				new Point2D(1.125, -2),
+				new Point2D(-1, -2),
+		}));
+		assertTrue(hasTileWithVertices(tiles, new Point2D[] {
+				new Point2D(-1, 0.6),
+				new Point2D(-1, 3),
+				new Point2D(2.5, 3),
+				new Point2D(1.5, 1),
+				new Point2D(0.5526315789, 0.2894736842),
+		}));
+		assertTrue(hasTileWithVertices(tiles, new Point2D[] {
+				new Point2D(4, -0.25),
+				new Point2D(4, -2),
+				new Point2D(1.125, -2),
+				new Point2D(0.5526315789, 0.2894736842),
+				new Point2D(1.5, 1),
+		}));
+		assertTrue(hasTileWithVertices(tiles, new Point2D[] {
+				new Point2D(2.5, 3),
+				new Point2D(4, 3),
+				new Point2D(4, -0.25),
+				new Point2D(1.5, 1.0),
+		}));
+	}
+	
 	@Test
 	public void tesselate_ForRect() {
 		List<Point2D> samples = new ArrayList<Point2D>();
